@@ -1,0 +1,32 @@
+{
+  "name": "webpack-mock-server",
+  "version": "0.0.1",
+  "description": "Mocks api requests for wepack dev server with hot-replacement",
+  "main": "lib/index.js",
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Yegorich555/webpack-mock-server.git"
+  },
+  "keywords": [
+    "webpack",
+    "mock",
+    "api",
+    "webpack-dev-server",
+    "webpack-api-mocker",
+    "json",
+    "ts",
+    "js",
+    "hot",
+    "replacement",
+    "hmr"
+  ],
+  "author": "yegorich555",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Yegorich555/webpack-mock-server/issues"
+  },
+  "homepage": "https://github.com/Yegorich555/webpack-mock-server#readme"
+}
