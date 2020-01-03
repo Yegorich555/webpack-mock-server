@@ -4,7 +4,10 @@
   "description": "Mocks api requests for wepack dev server with hot-replacement",
   "main": "lib/index.js",
   "scripts": {
-    "test": "test"
+    "test": "lint",
+    "lint": "npm run lint-code",
+    "lint-fix": "npm run lint-code -- --fix",
+    "lint-code": "./node_modules/.bin/eslint ./**/*.{js,jsx,ts,tsx,json}"
   },
   "repository": {
     "type": "git",
