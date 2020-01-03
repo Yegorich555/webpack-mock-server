@@ -1,1 +1,1 @@
-webpack-mock-server
+# Webpack Mock Server
