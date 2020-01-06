@@ -1,5 +1,12 @@
 {
   "compilerOptions": {
-    "baseUrl": "./src"
-  }
+    "baseUrl": "./src",
+    "outDir": "dist",
+    "target": "es6",
+    "declaration": true,
+    "esModuleInterop": true,
+    "strict": true,
+    "module": "commonJs"
+  },
+  "exclude": ["node_modules", "dist"]
 }

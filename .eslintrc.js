@@ -14,6 +14,16 @@ module.exports = {
   plugins: ["@typescript-eslint", "json", "prettier"],
   rules: {
     "prettier/prettier": ["error"],
+    "no-console": process.env.NODE_ENV === "production" ? "error" : "off",
+    "no-debugger": process.env.NODE_ENV === "production" ? "error" : "off",
+    "import/extensions": [
+      "error",
+      "ignorePackages",
+      {
+        js: "never",
+        ts: "never"
+      }
+    ],
     "max-len": [
       "warn",
       {
@@ -32,8 +42,8 @@ module.exports = {
   settings: {
     "import/resolver": {
       alias: {
-        map: "./src",
-        extensions: [".ts", ".js", ".jsx", ".tsx", ".json"]
+        map: [["@/", "./src"]],
+        extensions: [".ts", ".js", ".json"]
       }
     }
   }

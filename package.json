@@ -1,7 +1,7 @@
 {
   "name": "webpack-mock-server",
   "version": "0.0.1",
-  "description": "Mocks api requests for wepack dev server with hot-replacement",
+  "description": "Mocks api requests for webpack-dev-server with hot-replacement",
   "main": "lib/index.js",
   "scripts": {
     "test": "lint",
@@ -34,6 +34,8 @@
   },
   "homepage": "https://github.com/Yegorich555/webpack-mock-server#readme",
   "devDependencies": {
+    "@types/express": "^4.17.2",
+    "@types/node": "^13.1.2",
     "@typescript-eslint/eslint-plugin": "^2.14.0",
     "@typescript-eslint/parser": "^2.14.0",
     "eslint": "^6.8.0",
@@ -43,7 +45,12 @@
     "eslint-plugin-import": "^2.19.1",
     "eslint-plugin-json": "^2.0.1",
     "eslint-plugin-prettier": "^3.1.2",
+    "express": "^4.17.1",
     "prettier": "^1.19.1",
-    "typescript": "^3.7.4"
+    "typescript": "^3.7.4",
+    "webpack-dev-server": "^3.10.1"
+  },
+  "dependencies": {
+    "ts-node-dev": "^1.0.0-pre.44"
   }
 }
