@@ -1,12 +1,16 @@
 {
   "compilerOptions": {
     "baseUrl": "./src",
-    "outDir": "dist",
+    "outDir": "./lib",
     "target": "es6",
     "declaration": true,
     "esModuleInterop": true,
     "strict": true,
-    "module": "commonJs"
+    "module": "commonJs",
+    "allowJs": true
   },
-  "exclude": ["node_modules", "dist"]
+  "files": [
+    "./src/index.ts"
+  ]
+  "exclude": ["node_modules", "lib"]
 }

@@ -3,12 +3,15 @@
   "version": "0.0.1",
   "description": "Mocks api requests for webpack-dev-server with hot-replacement",
   "main": "lib/index.js",
+  "types": "./lib/index.d.ts",
   "scripts": {
     "test": "lint",
     "lint": "npm run lint-code && npm run lint-md",
     "lint-fix": "npm run lint-code -- --fix && npm run lint-md -- --fix",
     "lint-code": "./node_modules/.bin/eslint ./**/*.{js,jsx,ts,tsx,json}",
-    "lint-md": "./node_modules/.bin/markdownlint **/*.md --ignore node_modules"
+    "lint-md": "./node_modules/.bin/markdownlint **/*.md --ignore node_modules",
+    "test-runtime": "./node_modules/.bin/ts-node-dev ./src/runTest.ts",
+    "build": "tsc --build"
   },
   "repository": {
     "type": "git",
