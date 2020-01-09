@@ -1,18 +1,18 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
 import express from "express";
 import { AddressInfo } from "net";
-import mockPort from "./mockPort";
 import log from "./logger";
 import provideRoutes from "./provideRoutes";
 
-const app = express(); // todo clone express from webpack and remove it from dependency
+const app = express();
 app.set("json spaces", 2); // prettify json-response
 
-const mockedInfoPath = "/";
+const mockedInfoPath = "/test";
 app.get(mockedInfoPath, (_req, res) => {
   try {
     const routes = provideRoutes(app, mockedInfoPath);
     const html = `
+      <h1>Routes: </h1>
       <ul>${routes
         .map(r => {
           const isGet = r.method.includes("get");
@@ -25,7 +25,6 @@ app.get(mockedInfoPath, (_req, res) => {
         .join("")}
       </ul>
       `;
-
     res.send(html);
   } catch (ex) {
     res.send("Mock server is ready");
@@ -35,6 +34,8 @@ app.get(mockedInfoPath, (_req, res) => {
 
 // const mockApi = require("../webpack.mock").default;
 // mockApi(app);
+
+const mockPort = 8079;
 
 const listener = app.listen(mockPort, function listenCallback() {
   const address = listener.address() as AddressInfo;
