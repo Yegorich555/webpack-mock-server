@@ -39,6 +39,15 @@ module.exports = {
       }
     ]
   },
+  overrides: [
+    {
+      // enable the rule specifically for TypeScript files
+      files: ["*.js", "*.jsx"],
+      rules: {
+        "@typescript-eslint/explicit-function-return-type": "off"
+      }
+    }
+  ],
   settings: {
     "import/resolver": {
       alias: {
