@@ -1,4 +1,4 @@
-import webpackMockServer from "./src/index";
+import webpackMockServer from "../src/index";
 
 const { app } = webpackMockServer;
 
