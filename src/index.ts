@@ -1,18 +1,9 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
-import express, { Application as ExpressApp } from "express"; // todo remove as dependency
+import express, { Application as ExpressApp } from "express";
 import http from "http";
-import tsNodeDev from "ts-node-dev";
+import startServer from "./startServer";
 import log from "./logger";
-import mockPort from "./mockPort";
-
-// fix for error-extending in nodejs: https://github.com/nodejs/node/blob/4bec6d13f9e9068fba778d0c806a2ca1335c8180/lib/internal/errors.js#L545
-interface NetError extends Error {
-  errno: string;
-  code: string;
-  syscall: string;
-  address: string;
-  port: string | undefined;
-}
+import NetError from "./declarations/net-error";
 
 function addProxyToMockServer(app: ExpressApp, port: number): void {
   let wasError = false;
@@ -60,7 +51,7 @@ function addProxyToMockServer(app: ExpressApp, port: number): void {
                 }`
               );
             } else {
-              log.error(ex);
+              log.error("", ex);
             }
           }
           next();
@@ -73,33 +64,11 @@ function addProxyToMockServer(app: ExpressApp, port: number): void {
 }
 
 const webpackMockServer = {
-  run(): void {
-    const args = {
-      script: "./mockServer.ts",
-      scriptArgs: [],
-      nodeArgs: [],
-      opts: {
-        respawn: true, // node-dev: keep watching for changes after the script has exited
-        notify: false, // node-dev: switch off desktop notifications
-        debug: false, // ts-node-dev: switch off debug-info
-        // transpileOnly: true, // ts-node: ignore type checking for faster builds
-        ignoreDiagnostics: false,
-        compilerOptions: JSON.stringify({
-          // ts-node options instead of tsconfig.json
-          allowJs: true,
-          module: "commonjs",
-          esModuleInterop: true
-        })
-      }
-    };
-
-    tsNodeDev(args.script, args.scriptArgs, args.nodeArgs, args.opts);
-  },
   use(app: ExpressApp): void {
     try {
-      webpackMockServer.run(); // TODO get port from
+      const port = startServer();
 
-      addProxyToMockServer(app, mockPort);
+      addProxyToMockServer(app, port);
     } catch (ex) {
       log.error("Unable to start server.", ex);
     }

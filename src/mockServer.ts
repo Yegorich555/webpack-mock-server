@@ -1,8 +1,8 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
 import express from "express";
-import { AddressInfo } from "net";
 import log from "./logger";
 import provideRoutes from "./provideRoutes";
+import NetError from "./declarations/net-error";
 
 const app = express();
 app.set("json spaces", 2); // prettify json-response
@@ -35,9 +35,19 @@ app.get(mockedInfoPath, (_req, res) => {
 // const mockApi = require("../webpack.mock").default;
 // mockApi(app);
 
-const mockPort = 8079;
+function listen(port: number): void {
+  app
+    .listen(port, function listenCallback() {
+      // todo handle portNumber
+      log.info("Started at", `http://localhost:${port}/`);
+    })
+    .on("error", function listenErrorCallback(err: NetError) {
+      if (err.errno === "EADDRINUSE" || err.errno === "EACCES") {
+        listen(port + 1);
+      } else {
+        console.log(err);
+      }
+    });
+}
 
-const listener = app.listen(mockPort, function listenCallback() {
-  const address = listener.address() as AddressInfo;
-  log.info("Started at", `http://localhost:${address && address.port}/`);
-});
+listen(80); // todo reload with the previous portNumber
