@@ -11,8 +11,7 @@ module.exports = function startServer() {
       respawn: true, // node-dev: keep watching for changes after the script has exited
       notify: false, // node-dev: switch off desktop notifications
       debug: false, // ts-node-dev: switch off debug-info
-      // transpileOnly: true, // ts-node: ignore type checking for faster builds
-      ignoreDiagnostics: false,
+      transpileOnly: true, // ts-node: ignore type checking for faster builds
       compilerOptions: JSON.stringify({
         // ts-node options instead of tsconfig.json
         allowJs: true,

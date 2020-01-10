@@ -7,7 +7,7 @@ import provideRoutes from "./provideRoutes";
 const app = express();
 app.set("json spaces", 2); // prettify json-response
 
-const mockedInfoPath = "/test";
+const mockedInfoPath = "/";
 app.get(mockedInfoPath, (_req, res) => {
   try {
     const routes = provideRoutes(app, mockedInfoPath);
