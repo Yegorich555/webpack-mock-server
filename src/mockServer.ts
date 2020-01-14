@@ -1,3 +1,10 @@
+/* eslint-disable import/first */
+import path from "path";
+
+// add NODE_PATH if file moved into tmp dir
+process.env.NODE_PATH = path.join(process.cwd(), "node_modules");
+if (process.mainModule) process.mainModule.paths.push(process.env.NODE_PATH); // fix for "NODE_PATH sometimes doesn't work"
+
 // eslint-disable-next-line import/no-extraneous-dependencies
 import express from "express";
 import log from "./logger";
@@ -50,4 +57,4 @@ function listen(port: number): void {
     });
 }
 
-listen(80); // todo reload with the previous portNumber
+listen(90); // todo reload with the previous portNumber
