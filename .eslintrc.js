@@ -13,6 +13,9 @@ module.exports = {
   },
   plugins: ["@typescript-eslint", "json", "prettier"],
   rules: {
+    "no-plusplus": "off",
+    "no-bitwise": "off",
+    "prefer-rest-params": "off",
     "prettier/prettier": ["error"],
     "no-console": process.env.NODE_ENV === "production" ? "error" : "off",
     "no-debugger": process.env.NODE_ENV === "production" ? "error" : "off",
