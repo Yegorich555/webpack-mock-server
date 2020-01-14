@@ -11,7 +11,7 @@
     "lint-code": "./node_modules/.bin/eslint ./**/*.{js,jsx,ts,tsx,json}",
     "lint-md": "./node_modules/.bin/markdownlint **/*.md --ignore node_modules",
     "serve": "node ./test/start",
-    "build": "tsc --target ES6 --watch"
+    "build": "tsc --watch"
   },
   "repository": {
     "type": "git",

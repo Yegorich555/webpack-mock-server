@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 /* eslint-disable import/no-extraneous-dependencies */
 const { fork } = require("child_process");
+const { defOptions } = require("./mockServerOptions");
 const compiler = require("./compiler");
 const logger = require("./logger");
 
@@ -8,11 +9,18 @@ const logger = require("./logger");
 let child = null;
 
 /**
- * @param {(port: Number) => void | undefined} [callback]
+ * @param {import("./MockServerOptions").defOptions | undefined} [options]
+ * @param {{(port: number): void} | undefined} [listenCallback]
  */
-module.exports = function startServer(callback) {
+module.exports = function startServer(options, listenCallback) {
+  const opt = { ...defOptions, ...options };
+  if (opt.port) {
+    process.env.webpackMockPort = opt.port.toString();
+  }
+
   compiler(
     "mockServer.ts",
+    opt.compilerOptions,
     /**
      * @param {string} outPath
      */
@@ -27,11 +35,13 @@ module.exports = function startServer(callback) {
         });
 
         child.on("message", m => {
+          /** @type {number | undefined} */
+          let port;
           // @ts-ignore
-          const { port } = m;
-          // eslint-disable-next-line eqeqeq
-          if (port && process.env.webpackMockPort != port) {
-            callback && callback(port);
+          // eslint-disable-next-line prefer-const
+          port = m.port;
+          if (port && process.env.webpackMockPort !== port.toString()) {
+            listenCallback && listenCallback(port);
             process.env.webpackMockPort = port.toString();
           }
         });

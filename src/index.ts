@@ -2,8 +2,9 @@
 import express, { Application as ExpressApp } from "express";
 import http from "http";
 import startServer from "./startServer";
-import log from "./logger";
+import log from "./logger"; // todo autoimport doesn't work for index.ts file
 import NetError from "./declarations/net-error";
+import MockServerOptions, { defOptions } from "./mockServerOptions";
 
 let storedPort = 0;
 function addProxyToMockServer(app: ExpressApp): void {
@@ -65,10 +66,14 @@ function addProxyToMockServer(app: ExpressApp): void {
 }
 
 const webpackMockServer = {
-  use(app: ExpressApp): void {
+  use(app: ExpressApp, options: MockServerOptions | undefined): void {
     try {
+      const opt = { ...defOptions, ...options };
+      log.verbose = opt.verbose;
+
       addProxyToMockServer(app);
-      startServer(port => {
+      // todo search for tsconfig.json in parent module
+      startServer(opt, port => {
         storedPort = port;
       });
     } catch (ex) {

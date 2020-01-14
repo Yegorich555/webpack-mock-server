@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 // eslint-disable-next-line import/no-extraneous-dependencies
-const ts = require("typescript"); // todo TypeScript >= 2.7 expected
+const ts = require("typescript");
 const nodePath = require("path");
 const os = require("os");
 const logger = require("./logger");
@@ -61,9 +61,14 @@ function parseVersions(version) {
 // https://github.com/microsoft/TypeScript/wiki/Using-the-Compiler-API#writing-an-incremental-program-watcher
 /**
  * @param {string} watchFile
- * @param {{ (outPath: string): void; (arg0: string): void; }} onChanged
+ * @param {ts.CompilerOptions} extendCompilerOptions
+ * @param {(outPath: string) => void} onChanged
  */
-module.exports = function watchMain(watchFile, onChanged) {
+module.exports = function watchMain(
+  watchFile,
+  extendCompilerOptions,
+  onChanged
+) {
   const tsVer = Number.parseFloat(ts.versionMajorMinor);
   if (tsVer < 2.7) {
     throw new Error("WebpackMockServer. Typescript version >=2.7 is expected");
@@ -133,23 +138,23 @@ module.exports = function watchMain(watchFile, onChanged) {
   // define tmpDir
   const tmpDir = nodePath.join(
     os.tmpdir(),
-    `webpack-mock-${1 || new Date().getTime()}` // todo remove after debug
+    `webpack-mock-${new Date().getTime()}`
   );
 
   // todo clear tmp folder before exit
-
   const outFile = nodePath.join(tmpDir, watchFile).replace(".ts", ".js"); // todo improve this
   const host = ts.createWatchCompilerHost(
     // @ts-ignore
     [nodePath.join(__dirname, watchFile)],
     {
-      outDir: tmpDir,
-      target: esTarget,
       esModuleInterop: true,
-      module: "commonJs",
       allowJs: true,
-      skipLibCheck: true
-      // todo extend config from outside
+      skipLibCheck: true,
+      ...extendCompilerOptions,
+
+      outDir: tmpDir, // todo allow to change outDir
+      module: "commonJs",
+      target: esTarget
       // todo wait for transpileOnly option: https://github.com/microsoft/TypeScript/issues/29651
     },
     sysConfig,
