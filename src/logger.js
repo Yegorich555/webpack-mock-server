@@ -41,7 +41,7 @@ const logger = {
       ...optionalParams
     );
   },
-  verbose: true
+  verbose: true // todo set via options
 };
 
 module.exports = logger;

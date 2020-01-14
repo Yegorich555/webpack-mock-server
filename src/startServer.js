@@ -6,7 +6,11 @@ const logger = require("./logger");
 
 /** @type {import("child_process").ChildProcess | null} */
 let child = null;
-module.exports = function startServer() {
+
+/**
+ * @param {(port: Number) => void | undefined} [callback]
+ */
+module.exports = function startServer(callback) {
   compiler(
     "mockServer.ts",
     /**
@@ -21,17 +25,19 @@ module.exports = function startServer() {
           cwd: process.cwd(),
           env: process.env
         });
-      // todo get port from child
-      // child.on("message", m => {
-      //   console.log("PARENT got message:", m);
-      // });
 
-      // child.on("exit", start);
-          // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+        child.on("message", m => {
+          // @ts-ignore
+          const { port } = m;
+          // eslint-disable-next-line eqeqeq
+          if (port && process.env.webpackMockPort != port) {
+            callback && callback(port);
+            process.env.webpackMockPort = port.toString();
+          }
+        });
       } catch (ex) {
         logger.error(ex);
       }
     }
   );
-  return 0;
 };

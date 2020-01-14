@@ -35,6 +35,7 @@ app.get(mockedInfoPath, (_req, res) => {
     res.send(html);
   } catch (ex) {
     res.send("Mock server is ready");
+
     log.error("", ex as Error);
   }
 });
@@ -45,16 +46,16 @@ app.get(mockedInfoPath, (_req, res) => {
 function listen(port: number): void {
   app
     .listen(port, function listenCallback() {
-      // todo handle portNumber
+      process.send && process.send({ port });
       log.info("Started at", `http://localhost:${port}/`);
     })
     .on("error", function listenErrorCallback(err: NetError) {
       if (err.errno === "EADDRINUSE" || err.errno === "EACCES") {
         listen(port + 1);
       } else {
-        console.log(err);
+        log.error("", err);
       }
     });
 }
-
-listen(90); // todo reload with the previous portNumber
+const defPort = process.env.webpackMockPort || "8069"; // todo default port to options
+listen(Number(defPort));

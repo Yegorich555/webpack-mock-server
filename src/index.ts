@@ -5,7 +5,8 @@ import startServer from "./startServer";
 import log from "./logger";
 import NetError from "./declarations/net-error";
 
-function addProxyToMockServer(app: ExpressApp, port: number): void {
+let storedPort = 0;
+function addProxyToMockServer(app: ExpressApp): void {
   let wasError = false;
 
   // proxy for webpack
@@ -13,13 +14,13 @@ function addProxyToMockServer(app: ExpressApp, port: number): void {
     try {
       const options = {
         hostname: "localhost",
-        port,
+        port: storedPort,
         path: clientReq.url,
         method: clientReq.method,
         headers: clientReq.headers
       };
 
-      if (clientReq.url === "/") {
+      if (clientReq.url === "/" || !storedPort) {
         next();
         return;
       }
@@ -66,14 +67,15 @@ function addProxyToMockServer(app: ExpressApp, port: number): void {
 const webpackMockServer = {
   use(app: ExpressApp): void {
     try {
-      const port = startServer();
-
-      addProxyToMockServer(app, port);
+      addProxyToMockServer(app);
+      startServer(port => {
+        storedPort = port;
+      });
     } catch (ex) {
       log.error("Unable to start server.", ex);
     }
   },
-  app: express()
+  app: express() // todo remove this
 };
 
 export default webpackMockServer;
