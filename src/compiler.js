@@ -5,19 +5,27 @@ const nodePath = require("path");
 const os = require("os");
 const logger = require("./logger");
 
+/**
+ * ts.FormatDiagnosticsHost
+ */
 const formatHost = {
+  /**
+   * @param {string} path
+   */
   getCanonicalFileName: path => path,
   getCurrentDirectory: ts.sys.getCurrentDirectory,
   getNewLine: () => ts.sys.newLine
 };
 
+/**
+ * @param {ts.Diagnostic} diagnostic
+ */
 function reportDiagnostic(diagnostic) {
   logger.error(
-    `TS${diagnostic.code}:`,
-    ts.flattenDiagnosticMessageText(
+    `TS${diagnostic.code}:\n${ts.flattenDiagnosticMessageText(
       diagnostic.messageText,
       formatHost.getNewLine()
-    )
+    )}`
   );
 }
 
@@ -38,6 +46,9 @@ function reportDiagnostic(diagnostic) {
 //   return 4294967296 * (2097151 & h2) + (h1 >>> 0);
 // }
 
+/**
+ * @param {string} version
+ */
 function parseVersions(version) {
   const arr = version.split(/[v.]/g).filter(v => v !== "");
   return {
@@ -48,6 +59,10 @@ function parseVersions(version) {
 }
 
 // https://github.com/microsoft/TypeScript/wiki/Using-the-Compiler-API#writing-an-incremental-program-watcher
+/**
+ * @param {string} watchFile
+ * @param {{ (outPath: string): void; (arg0: string): void; }} onChanged
+ */
 module.exports = function watchMain(watchFile, onChanged) {
   const tsVer = Number.parseFloat(ts.versionMajorMinor);
   if (tsVer < 2.7) {
@@ -69,12 +84,18 @@ module.exports = function watchMain(watchFile, onChanged) {
     if (path.includes("node_modules")) {
       return emptyWatcher;
     }
+    /**
+     * @param {string} fileName
+     * @param {ts.FileWatcherEventKind} eventKind
+     */
     function callbackWrapper(fileName, eventKind) {
       console.warn("callback", fileName, eventKind);
+      // @ts-ignore
       callback(...arguments);
     }
     const args = [...arguments];
     args[1] = callbackWrapper;
+    // @ts-ignore
     return ts.sys.watchFile(...args);
   };
 
@@ -82,6 +103,7 @@ module.exports = function watchMain(watchFile, onChanged) {
     if (path.includes("node_modules")) {
       return emptyWatcher;
     }
+    // @ts-ignore
     return ts.sys.watchDirectory(...arguments);
   };
 
@@ -89,11 +111,13 @@ module.exports = function watchMain(watchFile, onChanged) {
     // todo ignore writing by hash
     logger.debug("write", path);
     isOnChanged = true;
+    // @ts-ignore
     return ts.sys.writeFile(...arguments);
   };
 
   sysConfig.readFile = function readFile(path) {
     logger.debug("read", path);
+    // @ts-ignore
     return ts.sys.readFile(...arguments);
   };
 
@@ -116,6 +140,7 @@ module.exports = function watchMain(watchFile, onChanged) {
 
   const outFile = nodePath.join(tmpDir, watchFile).replace(".ts", ".js"); // todo improve this
   const host = ts.createWatchCompilerHost(
+    // @ts-ignore
     [nodePath.join(__dirname, watchFile)],
     {
       outDir: tmpDir,
@@ -130,6 +155,7 @@ module.exports = function watchMain(watchFile, onChanged) {
     sysConfig,
     ts.createSemanticDiagnosticsBuilderProgram,
     reportDiagnostic,
+    // @ts-ignore
     diagnostic => {
       if (isOnChanged && onChanged && diagnostic.code === 6194) {
         onChanged(outFile);

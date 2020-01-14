@@ -19,6 +19,7 @@ module.exports = {
     "prettier/prettier": ["error"],
     "no-console": process.env.NODE_ENV === "production" ? "error" : "off",
     "no-debugger": process.env.NODE_ENV === "production" ? "error" : "off",
+    "no-unused-expressions": ["error", { allowShortCircuit: true }],
     "import/extensions": [
       "error",
       "ignorePackages",
@@ -47,7 +48,8 @@ module.exports = {
       // enable the rule specifically for TypeScript files
       files: ["*.js", "*.jsx"],
       rules: {
-        "@typescript-eslint/explicit-function-return-type": "off"
+        "@typescript-eslint/explicit-function-return-type": "off",
+        "@typescript-eslint/ban-ts-ignore": "off"
       }
     }
   ],
