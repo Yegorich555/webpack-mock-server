@@ -1,26 +1,27 @@
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const tsNodeDev = require("ts-node-dev");
+/* eslint-disable @typescript-eslint/no-var-requires */
+/* eslint-disable import/no-extraneous-dependencies */
+const { fork } = require("child_process");
+const compiler = require("./compiler");
 
-// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+let child = null;
 module.exports = function startServer() {
-  const args = {
-    script: `${__dirname}/mockServer.ts`, // todo improve here
-    scriptArgs: [],
-    nodeArgs: [],
-    opts: {
-      respawn: true, // node-dev: keep watching for changes after the script has exited
-      notify: false, // node-dev: switch off desktop notifications
-      debug: false, // ts-node-dev: switch off debug-info
-      transpileOnly: true, // ts-node: ignore type checking for faster builds
-      compilerOptions: JSON.stringify({
-        // ts-node options instead of tsconfig.json
-        allowJs: true,
-        module: "commonjs",
-        esModuleInterop: true
-      })
-    }
-  };
+  compiler("mockServer.ts", function onChanged(outPath) {
+    try {
+      // eslint-disable-next-line no-unused-expressions
+      child && child.kill();
+      child = fork(outPath, [], {
+        cwd: process.cwd(),
+        env: process.env
+      });
+      // todo get port from child
+      // child.on("message", m => {
+      //   console.log("PARENT got message:", m);
+      // });
 
-  tsNodeDev(args.script, args.scriptArgs, args.nodeArgs, args.opts);
-  return 8079;
+      // child.on("exit", start);
+    } catch (ex) {
+      console.warn(ex);
+    }
+  });
+  return 0;
 };
