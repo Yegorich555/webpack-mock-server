@@ -10,7 +10,7 @@
     "lint-fix": "npm run lint-code -- --fix && npm run lint-md -- --fix",
     "lint-code": "./node_modules/.bin/eslint ./**/*.{js,jsx,ts,tsx,json}",
     "lint-md": "./node_modules/.bin/markdownlint **/*.md --ignore node_modules",
-    "serve": "node ./test/start",
+    "serve": "node ./src/compile.js",
     "build": "tsc --watch"
   },
   "repository": {

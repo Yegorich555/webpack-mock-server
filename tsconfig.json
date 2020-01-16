@@ -1,16 +1,12 @@
 {
   "compilerOptions": {
-    "outDir": "./lib",
+    "outDir": "./build",
     "target": "es6",
-    "declaration": true,
     "esModuleInterop": true,
     "strict": true,
     "module": "commonJs",
-    "allowJs": true,
-    "checkJs": true
+    "allowJs": true
   },
-  "include": [
-    "src/**/*",
-  ],
+  "files": ["src/mockServer.ts"],
   "exclude": ["node_modules", "lib"]
 }
