@@ -2,7 +2,7 @@
 import { Application as ExpressApp } from "express";
 import http from "http";
 import log from "./log";
-import NetError from "./declarations/net-error";
+import NetError from "./netError";
 import MockServerOptions, { defOptions } from "./mockServerOptions";
 import startServer from "./startServer";
 

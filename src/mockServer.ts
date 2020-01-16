@@ -9,7 +9,7 @@ if (process.mainModule) process.mainModule.paths.push(process.env.NODE_PATH); //
 import express from "express";
 import log from "./log";
 import provideRoutes from "./provideRoutes";
-import NetError from "./declarations/net-error";
+import NetError from "./netError";
 
 const app = express();
 app.set("json spaces", 2); // prettify json-response
@@ -18,6 +18,7 @@ const mockedInfoPath = "/";
 app.get(mockedInfoPath, (_req, res) => {
   try {
     const routes = provideRoutes(app, mockedInfoPath);
+    // todo create user friendly view
     const html = `
       <h1>Routes: </h1>
       <ul>${routes
