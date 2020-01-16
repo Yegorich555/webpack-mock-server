@@ -57,5 +57,9 @@
   "peerDependencies": {
     "typescript": ">=2.7",
     "express": "*"
-  }
+  },
+  "files": [
+    "src/mockServer.ts",
+    "lib/*"
+  ]
 }
