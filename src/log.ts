@@ -33,7 +33,7 @@ const log = {
       ...optionalParams
     );
   },
-  verbose: true // todo set via options
+  verbose: !!process.env.webpackMockVerbose
 };
 
 export default log;
