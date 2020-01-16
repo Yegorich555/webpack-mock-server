@@ -1,5 +1,6 @@
 import ts from "typescript";
 import nodePath from "path";
+import fs from "fs";
 import os from "os";
 import log from "./log";
 
@@ -61,7 +62,7 @@ export default function watchMain(
   if (tsVer < 2.7) {
     throw new Error("WebpackMockServer. Typescript version >=2.7 is expected");
   }
-  let isOnChanged = true; // todo fix behavior
+  let isOnChanged = true;
 
   const emptyWatcher: ts.FileWatcher = {
     // eslint-disable-next-line @typescript-eslint/no-empty-function
@@ -118,9 +119,22 @@ export default function watchMain(
     `webpack-mock-${new Date().getTime()}`
   );
 
+  // clearing previous tmp-folder before exit
+  function clearTmpOutput(): void {
+    log.debug("clearing tmp folder ", tmpDir);
+    // recursive option is expiremental and supported in node >= v12.10.0: https://nodejs.org/api/fs.html#fs_fs_rmdir_path_options_callback
+    try {
+      fs.rmdirSync(tmpDir, {
+        recursive: true
+      });
+      // eslint-disable-next-line no-empty
+    } catch (ex) {}
+  }
+  process.on("SIGINT", clearTmpOutput); // handle termination by Ctrl+C
+  process.on("beforeExit", clearTmpOutput);
+
   const entryPoint = nodePath.join(__dirname, rootFile);
 
-  // todo clear tmp folder before exit
   const outFile = nodePath.join(
     tmpDir,
     `${nodePath.basename(entryPoint, nodePath.extname(entryPoint))}.js`
