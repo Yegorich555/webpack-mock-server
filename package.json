@@ -53,5 +53,8 @@
     "typescript": "^3.7.4",
     "webpack-dev-server": "^3.10.1"
   },
-  "dependencies": {}
+  "dependencies": {},
+  "peerDependencies": {
+    "typescript": ">=2.7"
+  }
 }
