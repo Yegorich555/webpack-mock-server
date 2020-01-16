@@ -40,7 +40,7 @@ app.get(mockedInfoPath, (_req, res) => {
   }
 });
 
-// const mockApi = require("../webpack.mock").default;
+// todo const mockApi = require("../webpack.mock").default;
 // mockApi(app);
 
 function listen(port: number): void {
@@ -57,5 +57,5 @@ function listen(port: number): void {
       }
     });
 }
-const defPort = process.env.webpackMockPort || "8069"; // todo default port to options
+const defPort = process.env.webpackMockPort || "8069";
 listen(Number(defPort));

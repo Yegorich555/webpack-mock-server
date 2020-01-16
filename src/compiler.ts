@@ -53,7 +53,7 @@ class VersionContainer {
 
 // https://github.com/microsoft/TypeScript/wiki/Using-the-Compiler-API#writing-an-incremental-program-watcher
 export default function watchMain(
-  rootFile: string, // todo set array
+  rootFile: string,
   extendCompilerOptions: ts.CompilerOptions,
   onChanged: (outPath: string) => void
 ): void {

@@ -1,5 +1,5 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
-import express, { Application as ExpressApp } from "express";
+import { Application as ExpressApp } from "express";
 import http from "http";
 import log from "./log";
 import NetError from "./declarations/net-error";
@@ -66,21 +66,22 @@ function addProxyToMockServer(app: ExpressApp): void {
 }
 
 const webpackMockServer = {
-  use(app: ExpressApp, options: MockServerOptions | undefined): void {
+  use(
+    app: ExpressApp,
+    options: MockServerOptions | undefined = undefined
+  ): void {
     try {
       const opt = { ...defOptions, ...options };
-      log.verbose = opt.verbose;
+      process.env.webpackMockVerbose = opt.verbose.toString();
 
       addProxyToMockServer(app);
-      // todo search for tsconfig.json in parent module
       startServer(opt, port => {
         storedPort = port;
       });
     } catch (ex) {
       log.error("Unable to start server.", ex);
     }
-  },
-  app: express() // todo remove this
+  }
 };
 
 export default webpackMockServer;

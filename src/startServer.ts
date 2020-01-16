@@ -22,7 +22,7 @@ function startServer(
   ) {
     try {
       if (child) {
-        child.kill(); // todo clear tmp folder
+        child.kill();
       }
       log.debug("running file", outPath);
       child = fork(outPath, [], {

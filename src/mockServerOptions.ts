@@ -12,6 +12,7 @@ class MockServerOptions {
     skipLibCheck: true,
     moduelResolution: ModuleResolutionKind.NodeJs
   };
+  // todo json-files support
 }
 export default MockServerOptions;
 
