@@ -9,8 +9,8 @@
     "allowJs": true,
     "checkJs": true
   },
-  "include": [
-    "src/**/*",
+  "files": [
+    "src/index.ts"
   ],
   "exclude": ["node_modules", "lib"]
 }

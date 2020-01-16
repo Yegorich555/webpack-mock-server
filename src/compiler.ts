@@ -69,7 +69,7 @@ export default function watchMain(
   };
 
   // creating hooks
-  const sysConfig = {
+  const sysConfig: ts.System = {
     ...ts.sys
   };
 
@@ -105,11 +105,11 @@ export default function watchMain(
 
   // define es target
   const nodeJsVersion = new VersionContainer(process.version);
-  let esTarget = "es3";
+  let esTarget = ts.ScriptTarget.ES3;
   if (nodeJsVersion.major >= 10) {
-    esTarget = "es2017";
+    esTarget = ts.ScriptTarget.ES2017;
   } else if (nodeJsVersion.major >= 6) {
-    esTarget = "es6";
+    esTarget = ts.ScriptTarget.ES5;
   }
 
   // define tmpDir
@@ -118,29 +118,32 @@ export default function watchMain(
     `webpack-mock-${new Date().getTime()}`
   );
 
+  const entryPoint = nodePath.join(__dirname, rootFile);
+
   // todo clear tmp folder before exit
-  const outFile = nodePath.join(tmpDir, rootFile).replace(".ts", ".js"); // todo improve this
+  const outFile = nodePath.join(
+    tmpDir,
+    `${nodePath.basename(entryPoint, nodePath.extname(entryPoint))}.js`
+  );
   const host = ts.createWatchCompilerHost(
-    // @ts-ignore
-    [nodePath.join(__dirname, rootFile)],
+    [entryPoint],
     {
       esModuleInterop: true,
       allowJs: true,
       skipLibCheck: true,
       ...extendCompilerOptions,
 
-      outDir: tmpDir, // todo allow to change outDir
-      module: "commonJs",
+      outDir: tmpDir,
+      module: ts.ModuleKind.CommonJS,
       target: esTarget
       // todo wait for transpileOnly option: https://github.com/microsoft/TypeScript/issues/29651
-    },
+    } as ts.CompilerOptions,
     sysConfig,
     ts.createSemanticDiagnosticsBuilderProgram,
     reportDiagnostic,
-    // @ts-ignore
     diagnostic => {
       if (isOnChanged && onChanged && diagnostic.code === 6194) {
-        // todo find a bettwe way
+        // todo find a better way
         onChanged(outFile);
         isOnChanged = false;
       } else {
@@ -148,5 +151,6 @@ export default function watchMain(
       }
     }
   );
+
   ts.createWatchProgram(host);
 }
