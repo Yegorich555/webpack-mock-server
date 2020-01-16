@@ -7,7 +7,7 @@ if (process.mainModule) process.mainModule.paths.push(process.env.NODE_PATH); //
 
 // eslint-disable-next-line import/no-extraneous-dependencies
 import express from "express";
-import log from "./logger";
+import log from "./log";
 import provideRoutes from "./provideRoutes";
 import NetError from "./declarations/net-error";
 

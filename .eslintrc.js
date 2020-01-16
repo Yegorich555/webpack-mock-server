@@ -13,6 +13,7 @@ module.exports = {
   },
   plugins: ["@typescript-eslint", "json", "prettier"],
   rules: {
+    "@typescript-eslint/ban-ts-ignore": "off",
     "no-plusplus": "off",
     "no-bitwise": "off",
     "prefer-rest-params": "off",
@@ -48,8 +49,7 @@ module.exports = {
       // enable the rule specifically for TypeScript files
       files: ["*.js", "*.jsx"],
       rules: {
-        "@typescript-eslint/explicit-function-return-type": "off",
-        "@typescript-eslint/ban-ts-ignore": "off"
+        "@typescript-eslint/explicit-function-return-type": "off"
       }
     }
   ],

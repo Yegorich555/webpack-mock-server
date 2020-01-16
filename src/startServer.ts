@@ -1,25 +1,20 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
-/* eslint-disable import/no-extraneous-dependencies */
-const { fork } = require("child_process");
-const { defOptions } = require("./mockServerOptions");
-const compiler = require("./compiler");
-const logger = require("./logger");
+import { fork, ChildProcess } from "child_process";
+import MockServerOptions, { defOptions } from "./mockServerOptions";
+import compiler from "./compiler";
+import log from "./log";
 
-/** @type {import("child_process").ChildProcess | null} */
-let child = null;
-
-/**
- * @param {import("./MockServerOptions").defOptions | undefined} [options]
- * @param {{(port: number): void} | undefined} [listenCallback]
- */
-module.exports = function startServer(options, listenCallback) {
+function startServer(
+  options: MockServerOptions | undefined,
+  listenCallback: (port: number) => void
+): void {
   const opt = { ...defOptions, ...options };
   if (opt.port) {
     process.env.webpackMockPort = opt.port.toString();
   }
 
+  let child: ChildProcess | null = null;
   compiler(
-    "mockServer.ts",
+    "mockServer.js",
     opt.compilerOptions,
     /**
      * @param {string} outPath
@@ -46,8 +41,10 @@ module.exports = function startServer(options, listenCallback) {
           }
         });
       } catch (ex) {
-        logger.error(ex);
+        log.error(ex);
       }
     }
   );
-};
+}
+
+export default startServer;

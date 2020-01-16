@@ -1,10 +1,10 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
 import express, { Application as ExpressApp } from "express";
 import http from "http";
-import startServer from "./startServer";
-import log from "./logger"; // todo autoimport doesn't work for index.ts file
+import log from "./log";
 import NetError from "./declarations/net-error";
 import MockServerOptions, { defOptions } from "./mockServerOptions";
+import startServer from "./startServer";
 
 let storedPort = 0;
 function addProxyToMockServer(app: ExpressApp): void {

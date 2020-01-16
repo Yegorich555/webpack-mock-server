@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
-const startServer = require("../src/startServer.js");
+// eslint-disable-next-line import/no-unresolved
+const startServer = require("../lib/startServer.js").default;
 
 startServer();

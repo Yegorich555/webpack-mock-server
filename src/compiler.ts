@@ -1,27 +1,16 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
-// eslint-disable-next-line import/no-extraneous-dependencies
-const ts = require("typescript");
-const nodePath = require("path");
-const os = require("os");
-const logger = require("./logger");
+import ts from "typescript";
+import nodePath from "path";
+import os from "os";
+import log from "./log";
 
-/**
- * ts.FormatDiagnosticsHost
- */
-const formatHost = {
-  /**
-   * @param {string} path
-   */
+const formatHost: ts.FormatDiagnosticsHost = {
   getCanonicalFileName: path => path,
   getCurrentDirectory: ts.sys.getCurrentDirectory,
   getNewLine: () => ts.sys.newLine
 };
 
-/**
- * @param {ts.Diagnostic} diagnostic
- */
-function reportDiagnostic(diagnostic) {
-  logger.error(
+function reportDiagnostic(diagnostic: ts.Diagnostic): void {
+  log.error(
     `TS${diagnostic.code}:\n${ts.flattenDiagnosticMessageText(
       diagnostic.messageText,
       formatHost.getNewLine()
@@ -46,38 +35,37 @@ function reportDiagnostic(diagnostic) {
 //   return 4294967296 * (2097151 & h2) + (h1 >>> 0);
 // }
 
-/**
- * @param {string} version
- */
-function parseVersions(version) {
-  const arr = version.split(/[v.]/g).filter(v => v !== "");
-  return {
-    major: Number.parseInt(arr[0], 10),
-    minor: Number.parseInt(arr[1], 10),
-    patch: arr[2]
-  };
+class VersionContainer {
+  major: number;
+
+  minor: number;
+
+  patch: string | undefined;
+
+  constructor(version: string) {
+    const arr = version.split(/[v.]/g).filter(v => v !== "");
+    this.major = Number.parseInt(arr[0], 10);
+    this.minor = Number.parseInt(arr[1], 10);
+    // eslint-disable-next-line prefer-destructuring
+    this.patch = arr[2];
+  }
 }
 
 // https://github.com/microsoft/TypeScript/wiki/Using-the-Compiler-API#writing-an-incremental-program-watcher
-/**
- * @param {string} watchFile
- * @param {ts.CompilerOptions} extendCompilerOptions
- * @param {(outPath: string) => void} onChanged
- */
-module.exports = function watchMain(
-  watchFile,
-  extendCompilerOptions,
-  onChanged
-) {
+export default function watchMain(
+  rootFile: string, // todo set array
+  extendCompilerOptions: ts.CompilerOptions,
+  onChanged: (outPath: string) => void
+): void {
   const tsVer = Number.parseFloat(ts.versionMajorMinor);
   if (tsVer < 2.7) {
     throw new Error("WebpackMockServer. Typescript version >=2.7 is expected");
   }
-  let isOnChanged = true;
+  let isOnChanged = true; // todo fix behavior
 
-  const emptyWatcher = {
+  const emptyWatcher: ts.FileWatcher = {
     // eslint-disable-next-line @typescript-eslint/no-empty-function
-    close: () => {}
+    close: (): void => {}
   };
 
   // creating hooks
@@ -85,26 +73,15 @@ module.exports = function watchMain(
     ...ts.sys
   };
 
-  sysConfig.watchFile = function watchFileWithIgnore(path, callback) {
+  sysConfig.watchFile = function watchFile(path: string): ts.FileWatcher {
     if (path.includes("node_modules")) {
       return emptyWatcher;
     }
-    /**
-     * @param {string} fileName
-     * @param {ts.FileWatcherEventKind} eventKind
-     */
-    function callbackWrapper(fileName, eventKind) {
-      console.warn("callback", fileName, eventKind);
-      // @ts-ignore
-      callback(...arguments);
-    }
-    const args = [...arguments];
-    args[1] = callbackWrapper;
     // @ts-ignore
-    return ts.sys.watchFile(...args);
+    return ts.sys.watchFile(...arguments);
   };
 
-  sysConfig.watchDirectory = function watchDirectoryWithIgnore(path) {
+  sysConfig.watchDirectory = function watchDir(path: string): ts.FileWatcher {
     if (path.includes("node_modules")) {
       return emptyWatcher;
     }
@@ -112,22 +89,22 @@ module.exports = function watchMain(
     return ts.sys.watchDirectory(...arguments);
   };
 
-  sysConfig.writeFile = function writeFileWrapper(path) {
+  sysConfig.writeFile = function writeFile(path: string): void {
     // todo ignore writing by hash
-    logger.debug("write", path);
+    log.debug("write", path);
     isOnChanged = true;
     // @ts-ignore
     return ts.sys.writeFile(...arguments);
   };
 
-  sysConfig.readFile = function readFile(path) {
-    logger.debug("read", path);
+  sysConfig.readFile = function readFile(path: string): string | undefined {
+    log.debug("read", path);
     // @ts-ignore
     return ts.sys.readFile(...arguments);
   };
 
   // define es target
-  const nodeJsVersion = parseVersions(process.version);
+  const nodeJsVersion = new VersionContainer(process.version);
   let esTarget = "es3";
   if (nodeJsVersion.major >= 10) {
     esTarget = "es2017";
@@ -142,10 +119,10 @@ module.exports = function watchMain(
   );
 
   // todo clear tmp folder before exit
-  const outFile = nodePath.join(tmpDir, watchFile).replace(".ts", ".js"); // todo improve this
+  const outFile = nodePath.join(tmpDir, rootFile).replace(".ts", ".js"); // todo improve this
   const host = ts.createWatchCompilerHost(
     // @ts-ignore
-    [nodePath.join(__dirname, watchFile)],
+    [nodePath.join(__dirname, rootFile)],
     {
       esModuleInterop: true,
       allowJs: true,
@@ -163,12 +140,13 @@ module.exports = function watchMain(
     // @ts-ignore
     diagnostic => {
       if (isOnChanged && onChanged && diagnostic.code === 6194) {
+        // todo find a bettwe way
         onChanged(outFile);
         isOnChanged = false;
       } else {
-        logger.debug(ts.formatDiagnostic(diagnostic, formatHost));
+        log.debug(ts.formatDiagnostic(diagnostic, formatHost));
       }
     }
   );
   ts.createWatchProgram(host);
-};
+}
