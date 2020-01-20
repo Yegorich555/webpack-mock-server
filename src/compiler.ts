@@ -98,7 +98,8 @@ export default function compiler(
   // define tmpDir
   const tmpDir = nodePath.join(
     os.tmpdir(),
-    `webpack-mock-${new Date().getTime()}` // todo generate nested folders
+    "webpack-mock-server",
+    new Date().getTime().toString()
   );
 
   const entryPoint = nodePath.join(process.cwd(), rootFile);
