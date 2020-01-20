@@ -36,7 +36,7 @@ class VersionContainer {
 }
 
 // https://github.com/microsoft/TypeScript/wiki/Using-the-Compiler-API#writing-an-incremental-program-watcher
-export default function watchMain(
+export default function compiler(
   rootFile: string,
   extendCompilerOptions: ts.CompilerOptions,
   onChanged: (outPath: string) => void
@@ -98,24 +98,10 @@ export default function watchMain(
   // define tmpDir
   const tmpDir = nodePath.join(
     os.tmpdir(),
-    `webpack-mock-${new Date().getTime()}`
+    `webpack-mock-${new Date().getTime()}` // todo generate nested folders
   );
 
-  // clearing previous tmp-folder before exit
-  function clearTmpOutput(): void {
-    log.debug("clearing tmp folder ", tmpDir);
-    // recursive option is expiremental and supported in node >= v12.10.0: https://nodejs.org/api/fs.html#fs_fs_rmdir_path_options_callback
-    try {
-      fs.rmdirSync(tmpDir, {
-        recursive: true
-      });
-      // eslint-disable-next-line no-empty
-    } catch (ex) {}
-  }
-  process.on("SIGINT", clearTmpOutput); // handle termination by Ctrl+C
-  process.on("beforeExit", clearTmpOutput);
-
-  const entryPoint = nodePath.join(__dirname, rootFile);
+  const entryPoint = nodePath.join(process.cwd(), rootFile);
 
   const outFile = nodePath.join(
     tmpDir,
@@ -147,5 +133,29 @@ export default function watchMain(
     }
   );
 
-  ts.createWatchProgram(host);
+  const program = ts.createWatchProgram(host);
+
+  /*
+   *  self-destroying
+   */
+
+  // clearing previous tmp-folder before exit
+  function clearTmpOutput(): void {
+    log.debug("clearing tmp folder ", tmpDir);
+    // recursive option is expiremental and supported in node >= v12.10.0: https://nodejs.org/api/fs.html#fs_fs_rmdir_path_options_callback
+    try {
+      fs.rmdirSync(tmpDir, {
+        recursive: true
+      });
+      // eslint-disable-next-line no-empty
+    } catch (ex) {}
+  }
+
+  function close(): void {
+    program && program.close();
+    clearTmpOutput();
+  }
+
+  process.on("SIGINT", close); // handle termination by Ctrl+C
+  process.on("beforeExit", close);
 }

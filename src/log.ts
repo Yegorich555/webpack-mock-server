@@ -33,9 +33,7 @@ const log = {
       ...optionalParams
     );
   },
-  get verbose(): boolean {
-    return process.env.webpackMockVerbose === "true";
-  }
+  verbose: true
 };
 
 export default log;

@@ -12,6 +12,8 @@ class MockServerOptions {
     skipLibCheck: true,
     moduelResolution: ModuleResolutionKind.NodeJs
   };
+
+  entry = "webpack.mock.ts";
   // todo json-files support
 }
 export default MockServerOptions;

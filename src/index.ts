@@ -4,7 +4,8 @@ import http from "http";
 import log from "./log";
 import NetError from "./netError";
 import MockServerOptions, { defOptions } from "./mockServerOptions";
-import startServer from "./startServer";
+import mockServer from "./mockServer";
+import compiler from "./compiler";
 
 let storedPort = 0;
 function addProxyToMockServer(app: ExpressApp): void {
@@ -72,11 +73,12 @@ const webpackMockServer = {
   ): void {
     try {
       const opt = { ...defOptions, ...options };
-      process.env.webpackMockVerbose = opt.verbose.toString();
-
+      log.verbose = opt.verbose;
       addProxyToMockServer(app);
-      startServer(opt, port => {
-        storedPort = port;
+      compiler(opt.entry, opt.compilerOptions, outPath => {
+        mockServer(outPath, opt.port, port => {
+          storedPort = port;
+        });
       });
     } catch (ex) {
       log.error("Unable to start server.", ex);

@@ -1,25 +1,43 @@
-/* eslint-disable import/first */
-import path from "path";
-
-// add NODE_PATH if file moved into tmp dir
-process.env.NODE_PATH = path.join(process.cwd(), "node_modules");
-if (process.mainModule) process.mainModule.paths.push(process.env.NODE_PATH); // fix for "NODE_PATH sometimes doesn't work"
-
 // eslint-disable-next-line import/no-extraneous-dependencies
-import express from "express";
+import express, { Application } from "express";
+import { Server } from "http";
 import log from "./log";
 import provideRoutes from "./provideRoutes";
 import NetError from "./netError";
 
-const app = express();
-app.set("json spaces", 2); // prettify json-response
+let app: Application;
+let server: Server;
 
-const mockedInfoPath = "/";
-app.get(mockedInfoPath, (_req, res) => {
-  try {
-    const routes = provideRoutes(app, mockedInfoPath);
-    // todo create user friendly view
-    const html = `
+function close(callback?: (err?: Error) => void): void {
+  server && server.close(callback);
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function requireUncached(str: string, ignoreCache = true): any {
+  if (ignoreCache) {
+    delete require.cache[require.resolve(str)];
+  }
+  // eslint-disable-next-line import/no-dynamic-require, global-require, @typescript-eslint/no-var-requires
+  const m = require(str);
+  // eslint-disable-next-line no-unused-expressions
+  return m.default ? m.default : m;
+}
+
+export default function mockServer(
+  attachedPath: string,
+  defPort: number,
+  listenCallback: (port: number, server: Server) => void
+): Application {
+  close(); // todo maybe we should use callback
+  app = express(); // todo use webpack instance
+  app.set("json spaces", 2); // prettify json-response
+
+  const mockedInfoPath = "/";
+  app.get(mockedInfoPath, (_req, res) => {
+    try {
+      const routes = provideRoutes(app, mockedInfoPath);
+      // todo create user friendly view
+      const html = `
       <h1>Routes: </h1>
       <ul>${routes
         .map(r => {
@@ -33,30 +51,38 @@ app.get(mockedInfoPath, (_req, res) => {
         .join("")}
       </ul>
       `;
-    res.send(html);
-  } catch (ex) {
-    res.send("Mock server is ready");
+      res.send(html);
+    } catch (ex) {
+      res.send("Mock server is ready");
+      log.error("Exception in provideRoutes()", ex as Error);
+    }
+  });
 
-    log.error("", ex as Error);
+  // todo improve this by getting written files from compiler
+  requireUncached(attachedPath, true)(app);
+
+  function listen(port: number): void {
+    server = app
+      .listen(port, function gotPort() {
+        listenCallback && listenCallback(port, server);
+        log.info("Started at", `http://localhost:${port}/`);
+        // log.info("Routes", "", provideRoutes(app, "/"));
+      })
+      .on("error", function listenErrorCallback(err: NetError) {
+        if (err.code === "EADDRINUSE" || err.code === "EACCES") {
+          listen(port + 1);
+        } else {
+          log.error("", err);
+        }
+      });
   }
-});
+  listen(defPort);
 
-// todo const mockApi = require("../webpack.mock").default;
-// mockApi(app);
-
-function listen(port: number): void {
-  app
-    .listen(port, function listenCallback() {
-      process.send && process.send({ port });
-      log.info("Started at", `http://localhost:${port}/`);
-    })
-    .on("error", function listenErrorCallback(err: NetError) {
-      if (err.errno === "EADDRINUSE" || err.errno === "EACCES") {
-        listen(port + 1);
-      } else {
-        log.error("", err);
-      }
-    });
+  return app;
 }
-const defPort = process.env.webpackMockPort || "8069";
-listen(Number(defPort));
+
+/*
+ *  self-destroying
+ */
+process.on("SIGINT", () => close()); // handle termination by Ctrl+C
+process.on("beforeExit", () => close());
