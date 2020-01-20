@@ -90,4 +90,4 @@ typings/
 build/
 dist/
 lib/
-webpack.mock.ts
+webpack.mock.js
