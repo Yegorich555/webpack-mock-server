@@ -152,9 +152,15 @@ export default function compiler(
     } catch (ex) {}
   }
 
+  // prevent double firing event
+  let closed = false;
   function close(): void {
+    if (closed) {
+      return;
+    }
     program && program.close();
     clearTmpOutput();
+    closed = true;
   }
 
   process.on("SIGINT", close); // handle termination by Ctrl+C
