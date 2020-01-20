@@ -6,10 +6,12 @@ import provideRoutes from "./provideRoutes";
 import NetError from "./netError";
 
 let app: Application;
-let server: Server;
+let server: Server | undefined;
+let previousPort = 0;
 
 function close(callback?: (err?: Error) => void): void {
   server && server.close(callback);
+  server = undefined;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -28,8 +30,8 @@ export default function mockServer(
   defPort: number,
   listenCallback: (port: number, server: Server) => void
 ): Application {
-  close(); // todo maybe we should use callback
-  app = express(); // todo use webpack instance
+  close();
+  app = express();
   app.set("json spaces", 2); // prettify json-response
 
   const mockedInfoPath = "/";
@@ -64,9 +66,11 @@ export default function mockServer(
   function listen(port: number): void {
     server = app
       .listen(port, function gotPort() {
-        listenCallback && listenCallback(port, server);
-        log.info("Started at", `http://localhost:${port}/`);
-        // log.info("Routes", "", provideRoutes(app, "/"));
+        if (port !== previousPort) {
+          log.info("Started at", `http://localhost:${port}/`);
+          previousPort = port;
+        }
+        listenCallback && listenCallback(port, server as Server);
       })
       .on("error", function listenErrorCallback(err: NetError) {
         if (err.code === "EADDRINUSE" || err.code === "EACCES") {
