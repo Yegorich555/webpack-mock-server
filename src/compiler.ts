@@ -23,6 +23,7 @@ function reportDiagnostic(diagnostic: ts.Diagnostic): void {
 // https://github.com/microsoft/TypeScript/wiki/Using-the-Compiler-API#writing-an-incremental-program-watcher
 export default function compiler(
   rootFile: string,
+  tsConfigFileName: string,
   extendCompilerOptions: ts.CompilerOptions,
   onChanged: (outPath: string) => void
 ): void {
@@ -91,7 +92,7 @@ export default function compiler(
   );
 
   const host = ts.createWatchCompilerHost(
-    "tsconfig.json",
+    tsConfigFileName,
     {
       ...extendCompilerOptions,
       // todo target can conflict with lib

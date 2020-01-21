@@ -78,11 +78,16 @@ const webpackMockServer = {
       };
 
       addProxyToMockServer(app);
-      compiler(opt.entry, opt.compilerOptions, outPath => {
-        mockServer(outPath, opt.port, port => {
-          storedPort = port;
-        });
-      });
+      compiler(
+        opt.entry,
+        opt.tsConfigFileName,
+        opt.compilerOptions,
+        outPath => {
+          mockServer(outPath, opt.port, port => {
+            storedPort = port;
+          });
+        }
+      );
     } catch (ex) {
       log.error("Unable to start server", ex);
     }

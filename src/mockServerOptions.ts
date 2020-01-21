@@ -23,7 +23,8 @@ class MockServerOptions {
   port = 8079;
 
   /*
-    Typescript compiler options (these default options impossible to override)
+    Typescript compiler options (default options impossible to override) 
+    that override readed one from tsconfig.json
    */
   compilerOptions: ts.CompilerOptions = {
     module: ts.ModuleKind.CommonJS,
@@ -33,10 +34,15 @@ class MockServerOptions {
     target: defineTarget()
   };
 
+  /*
+    Typescript config file (used for compilation [entry] files)
+   */
+  tsConfigFileName = "tsconfig.json";
+
   /**
    * Entry point for typescript-compiler
    */
-  entry = "webpack.mock.ts";
+  entry = "webpack.mock.ts"; // todo multiple entries support
   // todo json-files support
 }
 
