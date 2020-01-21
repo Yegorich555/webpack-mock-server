@@ -22,7 +22,7 @@ function reportDiagnostic(diagnostic: ts.Diagnostic): void {
 
 // https://github.com/microsoft/TypeScript/wiki/Using-the-Compiler-API#writing-an-incremental-program-watcher
 export default function compiler(
-  rootFile: string,
+  rootFile: string, // todo use files from tsConfigFileName ?
   tsConfigFileName: string,
   extendCompilerOptions: ts.CompilerOptions,
   onChanged: (outPath: string) => void
@@ -35,6 +35,7 @@ export default function compiler(
   }
   log.debug(`typescript version: ${ts.version}`);
 
+  // creating hooks
   let isOnChanged = true;
 
   const emptyWatcher: ts.FileWatcher = {
@@ -42,7 +43,6 @@ export default function compiler(
     close: (): void => {}
   };
 
-  // creating hooks
   const sysConfig: ts.System = {
     ...ts.sys
   };
@@ -74,10 +74,16 @@ export default function compiler(
   sysConfig.readFile = function readFile(path: string): string | undefined {
     log.debug("read", path);
     // @ts-ignore
-    return ts.sys.readFile(...arguments);
+    const result = ts.sys.readFile(...arguments);
+    if (!result && path === tsConfigFileName) {
+      log.debug(
+        `file ${tsConfigFileName} is not found. Compilation with default settings...`
+      );
+      return JSON.stringify({});
+    }
+    return result;
   };
 
-  // define tmpDir
   const tmpDir = nodePath.join(
     os.tmpdir(),
     "webpack-mock-server",
