@@ -3,6 +3,7 @@ import nodePath from "path";
 import fs from "fs";
 import os from "os";
 import log from "./log";
+import VersionContainer, { nodeJsVer } from "./versionContainer";
 
 const formatHost: ts.FormatDiagnosticsHost = {
   getCanonicalFileName: path => path,
@@ -19,22 +20,6 @@ function reportDiagnostic(diagnostic: ts.Diagnostic): void {
   );
 }
 
-class VersionContainer {
-  major: number;
-
-  minor: number;
-
-  patch: string | undefined;
-
-  constructor(version: string) {
-    const arr = version.split(/[v.]/g).filter(v => v !== "");
-    this.major = Number.parseInt(arr[0], 10);
-    this.minor = Number.parseInt(arr[1], 10);
-    // eslint-disable-next-line prefer-destructuring
-    this.patch = arr[2];
-  }
-}
-
 // https://github.com/microsoft/TypeScript/wiki/Using-the-Compiler-API#writing-an-incremental-program-watcher
 export default function compiler(
   rootFile: string,
@@ -43,8 +28,12 @@ export default function compiler(
 ): void {
   const tsVer = Number.parseFloat(ts.versionMajorMinor);
   if (tsVer < 2.7) {
-    throw new Error("WebpackMockServer. Typescript version >=2.7 is expected");
+    throw new Error(
+      `WebpackMockServer. Typescript version >=2.7 is expected. Current is ${ts.versionMajorMinor}`
+    );
   }
+  log.debug(`typescript version: ${ts.version}`);
+
   let isOnChanged = true;
 
   const emptyWatcher: ts.FileWatcher = {
@@ -59,6 +48,7 @@ export default function compiler(
 
   sysConfig.watchFile = function watchFile(path: string): ts.FileWatcher {
     if (path.includes("node_modules")) {
+      // todo use tsconfig.json exclude
       return emptyWatcher;
     }
     // @ts-ignore
@@ -86,15 +76,6 @@ export default function compiler(
     return ts.sys.readFile(...arguments);
   };
 
-  // define es target
-  const nodeJsVersion = new VersionContainer(process.version);
-  let esTarget = ts.ScriptTarget.ES3;
-  if (nodeJsVersion.major >= 10) {
-    esTarget = ts.ScriptTarget.ES2017;
-  } else if (nodeJsVersion.major >= 6) {
-    esTarget = ts.ScriptTarget.ES5;
-  }
-
   // define tmpDir
   const tmpDir = nodePath.join(
     os.tmpdir(),
@@ -108,17 +89,13 @@ export default function compiler(
     tmpDir,
     `${nodePath.basename(entryPoint, nodePath.extname(entryPoint))}.js`
   );
-  const host = ts.createWatchCompilerHost(
-    [entryPoint],
-    {
-      esModuleInterop: true,
-      allowJs: true,
-      skipLibCheck: true,
-      ...extendCompilerOptions,
 
-      outDir: tmpDir,
-      module: ts.ModuleKind.CommonJS,
-      target: esTarget
+  const host = ts.createWatchCompilerHost(
+    "tsconfig.json",
+    {
+      ...extendCompilerOptions,
+      // todo target can conflict with lib
+      outDir: tmpDir
       // todo wait for transpileOnly option: https://github.com/microsoft/TypeScript/issues/29651
     } as ts.CompilerOptions,
     sysConfig,
@@ -133,6 +110,13 @@ export default function compiler(
       }
     }
   );
+
+  const origCreateProgram = host.createProgram;
+  host.createProgram = function hookCreateProgram(): ts.EmitAndSemanticDiagnosticsBuilderProgram {
+    arguments[0] = [entryPoint]; // overwrite rootNames
+    // @ts-ignore
+    return origCreateProgram(...arguments);
+  };
 
   const program = ts.createWatchProgram(host);
 
@@ -149,7 +133,11 @@ export default function compiler(
         recursive: true
       });
       // eslint-disable-next-line no-empty
-    } catch (ex) {}
+    } catch (ex) {
+      const nodeJsRequired = new VersionContainer("12.10.0");
+      if (nodeJsVer > nodeJsRequired)
+        log.error("error in clearing tmp folder", ex);
+    }
   }
 
   // prevent double firing event

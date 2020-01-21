@@ -1,4 +1,3 @@
-// eslint-disable-next-line import/no-extraneous-dependencies
 import express, { Application } from "express";
 import { Server } from "http";
 import log from "./log";

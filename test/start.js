@@ -2,5 +2,10 @@
 // eslint-disable-next-line import/no-unresolved
 const webpackMockServer = require("../lib/index.js").default;
 
-// eslint-disable-next-line @typescript-eslint/no-empty-function
-webpackMockServer.use({ use: () => {} }, { verbose: true });
+webpackMockServer.use(
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  { use: () => {} },
+  {
+    verbose: true // , esModuleInterop: true, allowJs: true, skipLibCheck: true
+  }
+);

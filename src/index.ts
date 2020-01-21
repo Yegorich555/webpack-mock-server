@@ -1,5 +1,3 @@
-/* eslint-disable import/prefer-default-export */
-// eslint-disable-next-line import/no-extraneous-dependencies
 import { Application as ExpressApp } from "express";
 import http from "http";
 import log from "./log";
@@ -70,11 +68,15 @@ function addProxyToMockServer(app: ExpressApp): void {
 const webpackMockServer = {
   use(
     app: ExpressApp,
-    options: MockServerOptions | undefined = undefined
+    extendOptions: MockServerOptions | undefined = undefined
   ): void {
     try {
-      const opt = { ...defOptions, ...options };
-      log.verbose = opt.verbose;
+      const opt = { ...defOptions, ...extendOptions };
+      opt.compilerOptions = {
+        ...extendOptions?.compilerOptions,
+        ...defOptions.compilerOptions
+      };
+
       addProxyToMockServer(app);
       compiler(opt.entry, opt.compilerOptions, outPath => {
         mockServer(outPath, opt.port, port => {
@@ -82,7 +84,7 @@ const webpackMockServer = {
         });
       });
     } catch (ex) {
-      log.error("Unable to start server.", ex);
+      log.error("Unable to start server", ex);
     }
   }
 };
