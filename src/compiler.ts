@@ -100,6 +100,7 @@ export default function compiler(
   const host = ts.createWatchCompilerHost(
     tsConfigFileName,
     {
+      noEmit: false, // fix when 'jsconfig.json'
       ...extendCompilerOptions,
       // todo target can conflict with lib
       outDir: tmpDir
