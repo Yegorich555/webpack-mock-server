@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "description": "Mocks api requests for webpack-dev-server with hot-replacement",
   "main": "lib/index.js",
-  "types": "./lib/index.d.ts",
+  "types": "lib/index.d.ts",
   "scripts": {
     "test": "lint",
     "lint": "npm run lint-code && npm run lint-md",
@@ -59,7 +59,6 @@
     "express": "*"
   },
   "files": [
-    "src/mockServer.ts",
     "lib/*"
   ]
 }

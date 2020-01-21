@@ -1,3 +1,4 @@
+/* eslint-disable import/prefer-default-export */
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { Application as ExpressApp } from "express";
 import http from "http";
