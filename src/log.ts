@@ -1,3 +1,5 @@
+let isFirst = false;
+
 const log = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   info(message: string, uri: string, ...optionalParams: any[]): void {
@@ -13,10 +15,14 @@ const log = {
     if (!this.verbose) {
       return;
     }
+
     console.info(
-      `WebpackMockServer: ${message} \u001b[1m\u001b[34m${uri}\u001b[39m\u001b[22m`,
+      `${
+        isFirst ? "\n" : "" // add new-line - fix for webpack.logger
+      }WebpackMockServer: ${message} \u001b[1m\u001b[34m${uri}\u001b[39m\u001b[22m`,
       ...optionalParams
     );
+    isFirst = true;
   },
   error(
     message: string,
@@ -26,7 +32,7 @@ const log = {
   ): void {
     console.error(
       "\x1b[31m", // set red color
-      `\n\nWebpackMockServer. ${message}`,
+      `\nWebpackMockServer. ${message}`,
       ex || "",
       "\x1b[0m", // reset color
       "\n", // set new line

@@ -76,6 +76,7 @@ const webpackMockServer = {
         ...extendOptions?.compilerOptions,
         ...defOptions.compilerOptions
       };
+      log.verbose = opt.verbose;
 
       addProxyToMockServer(app);
       compiler(
