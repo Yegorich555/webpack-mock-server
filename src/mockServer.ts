@@ -59,7 +59,6 @@ export default function mockServer(
     }
   });
 
-  // todo improve this by getting written files from compiler
   attachedFileNames.forEach(v => requireUncached(v, true)(app));
 
   function listen(port: number): void {
