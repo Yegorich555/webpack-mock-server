@@ -1,7 +1,7 @@
 import ts, { ModuleResolutionKind } from "typescript";
 
 class MockServerOptions {
-  verbose = true;
+  verbose = false;
 
   port = 8079;
 
