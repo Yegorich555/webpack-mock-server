@@ -25,7 +25,7 @@ function requireUncached(str: string, ignoreCache = true): any {
 }
 
 export default function mockServer(
-  attachedPath: string,
+  attachedFileNames: string[],
   defPort: number,
   listenCallback: (port: number, server: Server) => void
 ): Application {
@@ -60,7 +60,7 @@ export default function mockServer(
   });
 
   // todo improve this by getting written files from compiler
-  requireUncached(attachedPath, true)(app);
+  attachedFileNames.forEach(v => requireUncached(v, true)(app));
 
   function listen(port: number): void {
     server = app

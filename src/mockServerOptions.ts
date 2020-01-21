@@ -35,14 +35,14 @@ class MockServerOptions {
   };
 
   /*
-    Typescript config file (used for compilation [entry] files)
+    Typescript config file (used for compilation [entry] files)    
    */
   tsConfigFileName = "tsconfig.json";
 
   /**
-   * Entry point for typescript-compiler
+   * Entry points for typescript-compiler
    */
-  entry = "webpack.mock.ts"; // todo multiple entries support
+  entry = ["webpack.mock.ts"];
   // todo json-files support
 }
 

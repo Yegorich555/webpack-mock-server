@@ -82,8 +82,8 @@ const webpackMockServer = {
         opt.entry,
         opt.tsConfigFileName,
         opt.compilerOptions,
-        outPath => {
-          mockServer(outPath, opt.port, port => {
+        outFileNames => {
+          mockServer(outFileNames, opt.port, port => {
             storedPort = port;
           });
         }
