@@ -12,17 +12,17 @@ function defineTarget(): ts.ScriptTarget {
 }
 
 class MockServerOptions {
-  /*
+  /**
     Disable/enable console.log
    */
   verbose = false;
 
-  /*
+  /**
     Port for webpack-mock-server
    */
   port = 8079;
 
-  /*
+  /**
     Typescript compiler options (default options impossible to override) 
     that override readed one from tsconfig.json
    */
@@ -34,7 +34,7 @@ class MockServerOptions {
     target: defineTarget()
   };
 
-  /*
+  /**
     Typescript config file (used for compilation [entry] files)    
    */
   tsConfigFileName = "tsconfig.json";
