@@ -1,4 +1,4 @@
-let isFirst = false;
+let isFirst = true;
 
 const log = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -22,7 +22,7 @@ const log = {
       }WebpackMockServer: ${message} \u001b[1m\u001b[34m${uri}\u001b[39m\u001b[22m`,
       ...optionalParams
     );
-    isFirst = true;
+    isFirst = false;
   },
   error(
     message: string,
