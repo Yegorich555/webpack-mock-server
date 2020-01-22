@@ -5,6 +5,7 @@ import NetError from "./netError";
 import MockServerOptions, { defOptions } from "./mockServerOptions";
 import mockServer from "./mockServer";
 import compiler from "./compiler";
+import clearNodeCache from "./clearNodeCache";
 
 let storedPort = 0;
 function addProxyToMockServer(app: ExpressApp): void {
@@ -83,7 +84,8 @@ const webpackMockServer = {
         opt.entry,
         opt.tsConfigFileName,
         opt.compilerOptions,
-        outFileNames => {
+        (outFileNames, outDir) => {
+          clearNodeCache(outDir);
           mockServer(outFileNames, opt.port, port => {
             storedPort = port;
           });

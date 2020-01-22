@@ -14,14 +14,18 @@ function close(callback?: (err?: Error) => void): void {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-function requireUncached(str: string, ignoreCache = true): any {
-  if (ignoreCache) {
-    delete require.cache[require.resolve(str)];
-  }
+function requireDefault(str: string): any {
   // eslint-disable-next-line import/no-dynamic-require, global-require, @typescript-eslint/no-var-requires
   const m = require(str);
   // eslint-disable-next-line no-unused-expressions
-  return m.default ? m.default : m;
+  const f = m.default ? m.default : m;
+  if (typeof f !== "function") {
+    log.error(`Expected [export default function] in module ${str}`);
+    // todo maybe search for multiple export functions
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    return (): void => {};
+  }
+  return f;
 }
 
 export default function mockServer(
@@ -29,6 +33,7 @@ export default function mockServer(
   defPort: number,
   listenCallback: (port: number, server: Server) => void
 ): Application {
+  log.debug("restarting/starting mock-server");
   close();
   app = express();
   app.set("json spaces", 2); // prettify json-response
@@ -59,14 +64,14 @@ export default function mockServer(
     }
   });
 
-  attachedFileNames.forEach(v => requireUncached(v, true)(app));
-
   function listen(port: number): void {
     server = app
       .listen(port, function gotPort() {
         if (port !== previousPort) {
           log.info("Started at", `http://localhost:${port}/`);
           previousPort = port;
+        } else {
+          log.debug("Started at", `http://localhost:${port}/`);
         }
         listenCallback && listenCallback(port, server as Server);
       })
@@ -78,7 +83,13 @@ export default function mockServer(
         }
       });
   }
-  listen(defPort);
+
+  try {
+    attachedFileNames.forEach(v => requireDefault(v)(app));
+    listen(defPort);
+  } catch (ex) {
+    log.error("Exception during attaching node-modules", ex);
+  }
 
   return app;
 }

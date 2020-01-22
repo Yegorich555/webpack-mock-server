@@ -25,7 +25,7 @@ export default function compiler(
   rootFiles: string[], // todo use undefined for reading 'files' section from tsconfig.json
   tsConfigFileName: string,
   extendCompilerOptions: ts.CompilerOptions,
-  onChanged: (outFileNames: string[]) => void
+  onChanged: (outFileNames: string[], outDir: string) => void
 ): void {
   const tsVer = Number.parseFloat(ts.versionMajorMinor);
   if (tsVer < 2.7) {
@@ -111,7 +111,7 @@ export default function compiler(
     reportDiagnostic,
     diagnostic => {
       if (isOnChanged && onChanged && diagnostic.code === 6194) {
-        onChanged(outFiles);
+        onChanged(outFiles, tmpDir);
         isOnChanged = false;
       } else {
         log.debug(ts.formatDiagnostic(diagnostic, formatHost));
