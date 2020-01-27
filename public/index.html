@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <!-- <link rel="icon" href="/favicon.ico" type="image/x-icon" /> -->
+    <!-- <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" /> -->
+    <link rel="shortcut icon"
+        href="data:image/x-icon;base64,AAABAAEAEBAAAAEAIABoBAAAFgAAACgAAAAQAAAAIAAAAAEAIAAAAAAAQAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA////AP///wX///9H/P/9wf3//bL///83////Av///wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD///8A////Af///yr5//qT2P3f68j90P/H/c//4v7m4vz//YL///8f////AP///wAAAAAAAAAAAP///wD///8A////G/z//Xvj/ufftvzB/5H6of+s+7j/oPuv/5b6pv/B/Mr+6/7u1P7//2r///8T////AP///wD///8L////Yer+7c7A/Mr9mPun/4v6nf+V+6X/wfzJ/7X8v/+R+6L/jPqd/577rf/K/dH68v/zwf///07///8F////P/H+8+3E/cz/l/um/5P7o/+n+rT/lemd/4/glf+I343/n+6n/6P7sf+Q+6D/n/ut/9D91//3//jX////H////0TV/dvyofuv/8D8yv+o76//YdRp/yLBLP9a0WL/Q8tL/yzENf9x2nj/tPS8/7v8xv+i+7H/5v7q3f///yL///9E1P3b8oz6nf+o+rT/WNFf/xa+If8YvyL/W9Fj/0TLTf8YvyL/GL4i/3fbfv+f+67/lPqk/+b+6t3///8i////RNX92/KN+p7/p/mz/1HPWf8XvyH/HMAm/3PYeP9Z0WD/Gb8j/xe/If9u2nb/n/uu/5X6pv/m/urd////Iv///0TV/dvyjfqe/6b5s/9Qz1j/N8hA/3HYd/9r1nH/cdh2/2jVb/8sxDX/bdl1/5/7rv+V+qb/5v7q3f///yL///9E1P3b8oz6nf+s+rj/leKa/23Wc/86yEP/Gr8k/x3AJ/9GzE7/c9h4/6PnqP+h+6//lPqk/+b+6t3///8i////RNj93vKr+7j/wv3L/7n0v/9b0mP/IMEq/xm/I/8ZvyP/JsIw/3HZeP/D+Mr/vfzH/6v7uP/n/urd////I////z70//brvvzI/5H6of+T+6P/qPm0/5Lnmv9NzlX/WtJi/53spv+l+rL/j/qg/5f6p//M/dT/+v/71f///x////8K/v//Wer+7cjB/Mr8mPun/4z6nf+Y+6f/ufnC/7H5vP+T+6T/jPqd/5/7rf/M/dT58f7zuv///0j///8E////AP///wD///8X/P/9c+P+59q3/ML+kfqh/6z8uP+g+6//l/qn/8H8yv3s/u/O////Yv///xD///8A////AAAAAAAAAAAA////AP///wH///8l+f/6jNn93+fJ/dH/yP3Q/uL+5t38//16////G////wD///8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA////AP///wT///9A/P/9uf3//an///8w////Af///wAAAAAAAAAAAAAAAAAAAAAA+B8AAOAPAADAAwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMADAADgDwAA+B8AAA==" />
+    <title>WebpackMockServer</title>
+    <script>
+        var routes = [{ method: 'get', path: '/' }]; // default for intellisense support during the development
+        routes = JSON.parse('{routes}');
+
+        document.addEventListener('DOMContentLoaded', function () {
+            var ul = document.querySelector('#app');
+            var prevEl;
+            var form = document.createElement("form");
+            form.setAttribute("target", "_blank");
+            document.body.appendChild(form);
+
+            for (var i = 0; i < routes.length; ++i) {
+                var r = routes[i];
+
+                var btn = document.createElement('button')
+                btn.append(r.method)
+                btn.route = r;
+                btn.addEventListener('click', function (e) {
+                    // getting response from mock-server
+                    var route = e.target.route;
+                    if (route.method === 'get' || route.method === 'post') {
+                        form.setAttribute("method", route.method);
+                        form.setAttribute("action", route.path);
+                        form.submit();
+                    } else {
+                        var xmlHttp = new XMLHttpRequest()
+                        xmlHttp.onreadystatechange = function () {
+                            if (xmlHttp.readyState == XMLHttpRequest.DONE) {
+                                // opening in a new window because 'form' case works only for 'get' 'post'
+                                var w = window.open("", "_blank");
+                                w.document.write('<div style="font-weight:bold">' + route.method + ' ' + route.path + '</div>');
+                                w.document.write('<div>response status: <span style="font-weight:bold">' + xmlHttp.status + '</span></div>');
+                                w.document.write('data:');
+                                try {
+                                    // checking if parsing possible
+                                    JSON.parse(xmlHttp.responseText);
+                                    w.document.write('<br/>');
+                                    w.document.write('<pre style="word-wrap: break-word; white-space: pre-wrap;">')
+                                    w.document.write(xmlHttp.responseText);
+                                    w.document.write('</pre>')
+                                } catch {
+                                    w.document.write('<span style="color: #da0707"> invalid json</span><br/><br/>');
+                                    w.document.write(xmlHttp.response);
+                                }
+
+                                w.document.close();
+                            }
+                        }
+                        xmlHttp.open(route.method.toUpperCase(), route.path)
+                        xmlHttp.send('{}')
+                    }
+                })
+
+                var url = document.createElement('span')
+                url.append(r.path)
+                // select all by the first click
+                url.addEventListener('click', function (e) {
+                    if (e.target === prevEl) {
+                        return;
+                    }
+                    prevEl = e.target;
+                    if (document.selection) { // IE
+                        var range = document.body.createTextRange();
+                        range.moveToElementText(e.target);
+                        range.select();
+                    } else if (window.getSelection) {
+                        var range = document.createRange();
+                        range.selectNode(e.target);
+                        window.getSelection().removeAllRanges();
+                        window.getSelection().addRange(range);
+                    }
+                })
+
+                var li = document.createElement('li');
+                li.className = r.method;
+                li.appendChild(btn);
+                li.appendChild(url)
+
+                ul.appendChild(li)
+            }
+        })
+    </script>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-family: Open Sans, sans-serif;
+            color: #3b4151;
+            margin: 0;
+            background: #fafafa;
+        }
+
+        *:focus {
+            outline: 4px dotted #404040;
+            outline-offset: -1px;
+            box-shadow: 0 0 12px 2px #6b6464;
+        }
+
+        h1 {
+            font-size: 20px;
+        }
+
+        ul {
+            margin: 0;
+            padding: 0;
+            list-style-type: none;
+            display: inline-flex;
+            flex-direction: column;
+        }
+
+        li {
+            margin: 2px;
+            border-radius: 3px;
+            border: 1px solid;
+        }
+
+        li>* {
+            padding: 6px;
+        }
+
+        li>span {
+            margin-left: 6px;
+            min-width: 260px;
+            display: inline-block;
+        }
+
+        button {
+            font: inherit;
+            border: none;
+            min-width: 80px;
+            text-align: center;
+            background: none;
+            font-weight: bold;
+            border-radius: 3px;
+            color: #3b3b3b;
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+
+        button:hover {
+            box-shadow: inset 0 0 0 99999px rgba(0, 0, 0, .1);
+            color: white;
+        }
+
+        .get {
+            background: #ebf3fb;
+            border-color: #80bffe;
+        }
+
+        .get>button {
+            background: #80bffe;
+        }
+
+        .post {
+            background: #e8f6f0;
+            border-color: #68d4a4;
+        }
+
+        .post>button {
+            background: #68d4a4;
+        }
+
+        .put {
+            background: #fbf1e6;
+            border-color: #fcb154;
+
+        }
+
+        .put>button {
+            background: #fcb154;
+        }
+
+        .delete {
+            background: #fae7e7;
+            border-color: #fa6161;
+        }
+
+        .delete>button {
+            background: #fa6161;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>WebpackMockServer. Routes:</h1>
+    <ul id="app"></ul>
+</body>

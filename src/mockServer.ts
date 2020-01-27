@@ -1,5 +1,7 @@
 import express, { Application } from "express";
 import { Server } from "http";
+import nodePath from "path";
+import fs from "fs";
 import log from "./log";
 import provideRoutes from "./provideRoutes";
 import NetError from "./netError";
@@ -42,21 +44,12 @@ export default function mockServer(
   app.get(mockedInfoPath, (_req, res) => {
     try {
       const routes = provideRoutes(app, mockedInfoPath);
-      // todo create user friendly view
-      const html = `
-      <h1>Routes: </h1>
-      <ul>${routes
-        .map(r => {
-          const isGet = r.method.includes("get");
-          return `
-            <li>
-              ${r.method}: ${isGet ? `<a href=${r.path}>${r.path}</a>` : r.path}
-            </li>
-            `;
-        })
-        .join("")}
-      </ul>
-      `;
+      const html = fs
+        .readFileSync(
+          nodePath.resolve(__dirname, "../public/index.html"),
+          "utf8"
+        )
+        .replace("{routes}", JSON.stringify(routes));
       res.send(html);
     } catch (ex) {
       res.send("Mock server is ready");

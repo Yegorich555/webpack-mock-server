@@ -6,6 +6,10 @@ webpackMockServer.use(
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   { use: () => {} },
   {
-    verbose: true // , esModuleInterop: true, allowJs: true, skipLibCheck: true
+    verbose: true,
+    entry: ["test/webpack.mock.ts"],
+    compilerOptions: {
+      skipLibCheck: true
+    }
   }
 );
