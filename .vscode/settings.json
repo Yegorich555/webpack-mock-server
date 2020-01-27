@@ -20,5 +20,8 @@
     "editor.defaultFormatter": "esbenp.prettier-vscode",
     "editor.formatOnSave": true
   },
-  "todo-tree.filtering.excludeGlobs": ["**/lib/*"]
+  "todo-tree.filtering.excludeGlobs": [
+    "**/lib/*"
+  ],
+  "typescript.tsdk": "node_modules\\typescript\\lib"
 }

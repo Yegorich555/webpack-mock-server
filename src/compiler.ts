@@ -12,8 +12,16 @@ const formatHost: ts.FormatDiagnosticsHost = {
 };
 
 function reportDiagnostic(diagnostic: ts.Diagnostic): void {
+  let linePointer = "";
+  if (diagnostic.file) {
+    const { line, character } = diagnostic.file.getLineAndCharacterOfPosition(
+      diagnostic.start || 0
+    );
+    linePointer = `in ${diagnostic.file?.fileName} (${line + 1},${character +
+      1})`;
+  }
   log.error(
-    `TS${diagnostic.code}:\n${ts.flattenDiagnosticMessageText(
+    `TS${diagnostic.code}: ${linePointer}\n${ts.flattenDiagnosticMessageText(
       diagnostic.messageText,
       formatHost.getNewLine()
     )}`
