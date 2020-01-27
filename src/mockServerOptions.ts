@@ -23,16 +23,29 @@ class MockServerOptions {
   port = 8079;
 
   /**
-    Typescript compiler options (default options impossible to override) 
-    that override readed one from tsconfig.json
+    Typescript compiler options that can be overrided by 'tsconfig.json'
    */
   compilerOptions: ts.CompilerOptions = {
-    module: ts.ModuleKind.CommonJS,
-    skipLibCheck: true,
-    declaration: false,
-    moduelResolution: ModuleResolutionKind.NodeJs,
-    target: defineTarget()
+    noUnusedLocals: false,
+    noUnusedParameters: false,
+    noEmitHelpers: false,
+    skipLibCheck: true
   };
+
+  /**
+    Typescript compiler options (default options impossible to override) 
+    These options impossible to override
+   */
+  // eslint-disable-next-line class-methods-use-this
+  get strictCompilerOptions(): ts.CompilerOptions {
+    return {
+      noEmit: false, // fix when 'jsconfig.json'
+      module: ts.ModuleKind.CommonJS,
+      declaration: false,
+      moduelResolution: ModuleResolutionKind.NodeJs,
+      target: defineTarget()
+    } as ts.CompilerOptions;
+  }
 
   /**
     Typescript config file (used for compilation [entry] files)    

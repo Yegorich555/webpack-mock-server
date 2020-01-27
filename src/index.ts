@@ -74,8 +74,9 @@ const webpackMockServer = {
     try {
       const opt = { ...defOptions, ...extendOptions };
       opt.compilerOptions = {
+        ...defOptions.compilerOptions,
         ...extendOptions?.compilerOptions,
-        ...defOptions.compilerOptions
+        ...defOptions.strictCompilerOptions
       };
       log.verbose = opt.verbose;
 

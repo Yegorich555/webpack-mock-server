@@ -105,15 +105,16 @@ export default function compiler(
     )
   );
 
+  const options = {
+    ...extendCompilerOptions,
+    // todo target can conflict with lib
+    outDir: tmpDir
+    // todo wait for transpileOnly option: https://github.com/microsoft/TypeScript/issues/29651
+  } as ts.CompilerOptions;
+
   const host = ts.createWatchCompilerHost(
     tsConfigFileName,
-    {
-      noEmit: false, // fix when 'jsconfig.json'
-      ...extendCompilerOptions,
-      // todo target can conflict with lib
-      outDir: tmpDir
-      // todo wait for transpileOnly option: https://github.com/microsoft/TypeScript/issues/29651
-    } as ts.CompilerOptions,
+    options,
     sysConfig,
     ts.createEmitAndSemanticDiagnosticsBuilderProgram,
     reportDiagnostic,
@@ -130,11 +131,14 @@ export default function compiler(
   const origCreateProgram = host.createProgram;
   host.createProgram = function hookCreateProgram(): ts.EmitAndSemanticDiagnosticsBuilderProgram {
     if (rootFiles && rootFiles.length) {
-      // overwrite rootNames
+      // overwritting rootNames
       arguments[0] = rootFiles.map(rootFile =>
         nodePath.join(process.cwd(), rootFile)
       );
     }
+
+    log.debug("defined root names", "", arguments[0]);
+    log.debug("TS options", "", arguments[1]);
     // @ts-ignore
     return origCreateProgram(...arguments);
   };
