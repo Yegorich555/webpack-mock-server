@@ -78,7 +78,12 @@ export default function mockServer(
   }
 
   try {
-    attachedFileNames.forEach(v => requireDefault(v)(app));
+    if (attachedFileNames.length === 0) {
+      log.error("There are no rootFiles");
+    } else {
+      log.debug("requiring root files:", "", attachedFileNames);
+      attachedFileNames.forEach(v => requireDefault(v)(app));
+    }
     listen(defPort);
   } catch (ex) {
     log.error("Exception during attaching node-modules", ex);

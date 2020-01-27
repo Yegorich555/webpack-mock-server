@@ -17,6 +17,9 @@
     "type": "git",
     "url": "git+https://github.com/Yegorich555/webpack-mock-server.git"
   },
+  "engines": {
+    "node": ">=8.9.0"
+  },
   "keywords": [
     "webpack",
     "mock",

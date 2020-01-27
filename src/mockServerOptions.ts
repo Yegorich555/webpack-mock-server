@@ -26,6 +26,8 @@ class MockServerOptions {
     Typescript compiler options that can be overrided by 'tsconfig.json'
    */
   compilerOptions: ts.CompilerOptions = {
+    strictNullChecks: false,
+    noImplicitAny: false,
     noUnusedLocals: false,
     noUnusedParameters: false,
     noEmitHelpers: false,
@@ -33,8 +35,8 @@ class MockServerOptions {
   };
 
   /**
-    Typescript compiler options (default options impossible to override) 
-    These options impossible to override
+   * Typescript compiler options (default options impossible to override)
+   * These options impossible to override
    */
   // eslint-disable-next-line class-methods-use-this
   get strictCompilerOptions(): ts.CompilerOptions {
@@ -48,14 +50,16 @@ class MockServerOptions {
   }
 
   /**
-    Typescript config file (used for compilation [entry] files)    
+   * Typescript config file (used for compilation [entry] files)
    */
   tsConfigFileName = "tsconfig.json";
 
   /**
    * Entry points for typescript-compiler
+   * If pointed an 'empty array' or 'undefined' entry will be defined
+   * from [tsConfigFileName]: 'files' and 'includes' sections
    */
-  entry = ["webpack.mock.ts"];
+  entry: string[] | undefined = ["webpack.mock.ts"];
   // todo json-files support
 }
 

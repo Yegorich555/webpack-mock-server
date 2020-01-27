@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 // eslint-disable-next-line import/no-unresolved
-const webpackMockServer = require("../lib/index.js");
+const webpackMockServer = require("../lib/index.js").default;
 
 module.exports = {
   stats: { children: false },

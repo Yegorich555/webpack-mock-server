@@ -28,9 +28,14 @@ function reportDiagnostic(diagnostic: ts.Diagnostic): void {
   );
 }
 
+type outPath = {
+  path: string;
+  exists: boolean;
+};
+
 // https://github.com/microsoft/TypeScript/wiki/Using-the-Compiler-API#writing-an-incremental-program-watcher
 export default function compiler(
-  rootFiles: string[], // todo use undefined for reading 'files' section from tsconfig.json
+  rootFiles: string[] | undefined,
   tsConfigFileName: string,
   extendCompilerOptions: ts.CompilerOptions,
   onChanged: (outFileNames: string[], outDir: string) => void
@@ -45,6 +50,8 @@ export default function compiler(
 
   // creating hooks
   let isOnChanged = true;
+
+  const outFiles: outPath[] = [];
 
   const emptyWatcher: ts.FileWatcher = {
     // eslint-disable-next-line @typescript-eslint/no-empty-function
@@ -72,9 +79,22 @@ export default function compiler(
     return ts.sys.watchDirectory(...arguments);
   };
 
-  sysConfig.writeFile = function writeFile(path: string): void {
+  sysConfig.writeFile = function writeFile(path: string, data: string): void {
     log.debug("write", path);
     isOnChanged = true;
+
+    const normPath = nodePath.normalize(path);
+    const f = outFiles.find(v => v.path === normPath);
+    if (f) {
+      f.exists = true;
+    }
+    if (data) {
+      arguments[1] = data.replace(
+        /require\(["']([^./\\][^\n\r]+)["']\)/g,
+        (_str, matchGroup1: string) =>
+          `require(require.resolve("${matchGroup1}", {paths:[process.cwd(), "${process.env.NODE_PATH}"]} ))`
+      );
+    }
     // @ts-ignore
     return ts.sys.writeFile(...arguments);
   };
@@ -92,17 +112,16 @@ export default function compiler(
     return result;
   };
 
+  sysConfig.deleteFile = function deleteFile(path: string): void {
+    log.debug("delete", path);
+    // @ts-ignore
+    return ts.sys.deleteFile(...arguments);
+  };
+
   const tmpDir = nodePath.join(
     os.tmpdir(),
     "webpack-mock-server",
     new Date().getTime().toString()
-  );
-
-  const outFiles = rootFiles.map(rootFile =>
-    nodePath.join(
-      tmpDir,
-      `${nodePath.basename(rootFile, nodePath.extname(rootFile))}.js`
-    )
   );
 
   const options = {
@@ -120,7 +139,10 @@ export default function compiler(
     reportDiagnostic,
     diagnostic => {
       if (isOnChanged && onChanged && diagnostic.code === 6194) {
-        onChanged(outFiles, tmpDir);
+        onChanged(
+          outFiles.filter(v => v.exists).map(v => v.path),
+          tmpDir
+        );
         isOnChanged = false;
       } else {
         log.debug(ts.formatDiagnostic(diagnostic, formatHost));
@@ -137,6 +159,15 @@ export default function compiler(
       );
     }
 
+    // mapping entries to outFileNames
+    arguments[0].forEach((v: string) => {
+      const ePath = v.replace(/(.ts)$/, ".js");
+      const path = nodePath.join(tmpDir, nodePath.basename(ePath));
+      if (!outFiles.find(f => f.path === path)) {
+        outFiles.push({ path, exists: false });
+      }
+    });
+
     log.debug("defined root names", "", arguments[0]);
     log.debug("TS options", "", arguments[1]);
     // @ts-ignore
@@ -144,7 +175,6 @@ export default function compiler(
   };
 
   const program = ts.createWatchProgram(host);
-
   /*
    *  self-destroying
    */

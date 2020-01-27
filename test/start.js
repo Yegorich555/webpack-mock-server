@@ -3,7 +3,8 @@
 const webpackMockServer = require("../lib/index.js").default;
 
 webpackMockServer.use(
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  // eslint-disable-next-line
+  // @ts-ignore
   { use: () => {} },
   {
     verbose: true,
