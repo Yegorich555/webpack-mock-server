@@ -5,7 +5,7 @@
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "scripts": {
-    "test": "lint",
+    "test": "npm run lint",
     "lint": "npm run lint-code && npm run lint-md",
     "lint-fix": "npm run lint-code -- --fix && npm run lint-md -- --fix",
     "lint-code": "./node_modules/.bin/eslint ./**/*.{js,jsx,ts,tsx,json}",
