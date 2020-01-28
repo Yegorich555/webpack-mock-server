@@ -31,6 +31,7 @@ function reportDiagnostic(diagnostic: ts.Diagnostic): void {
 type outPath = {
   path: string;
   exists: boolean;
+  rootName: string;
 };
 
 // https://github.com/microsoft/TypeScript/wiki/Using-the-Compiler-API#writing-an-incremental-program-watcher
@@ -49,9 +50,9 @@ export default function compiler(
   log.debug(`typescript version: ${ts.version}`);
 
   // creating hooks
-  let isOnChanged = true;
+  let isOutputChanged = true;
 
-  const outFiles: outPath[] = [];
+  let outFiles: outPath[] = [];
 
   const emptyWatcher: ts.FileWatcher = {
     // eslint-disable-next-line @typescript-eslint/no-empty-function
@@ -81,13 +82,16 @@ export default function compiler(
 
   sysConfig.writeFile = function writeFile(path: string, data: string): void {
     log.debug("write", path);
-    isOnChanged = true;
+    isOutputChanged = true;
 
+    // mark output-server-required-file as exists
     const normPath = nodePath.normalize(path);
     const f = outFiles.find(v => v.path === normPath);
     if (f) {
       f.exists = true;
     }
+
+    // fix 'import from node_modules' when file move into temp-dir
     if (data) {
       arguments[1] = data.replace(
         /require\(["']([^./\\][^\n\r]+)["']\)/g,
@@ -112,12 +116,6 @@ export default function compiler(
     return result;
   };
 
-  sysConfig.deleteFile = function deleteFile(path: string): void {
-    log.debug("delete", path);
-    // @ts-ignore
-    return ts.sys.deleteFile(...arguments);
-  };
-
   const tmpDir = nodePath.join(
     os.tmpdir(),
     "webpack-mock-server",
@@ -138,12 +136,12 @@ export default function compiler(
     ts.createEmitAndSemanticDiagnosticsBuilderProgram,
     reportDiagnostic,
     diagnostic => {
-      if (isOnChanged && onChanged && diagnostic.code === 6194) {
+      if (isOutputChanged && onChanged && diagnostic.code === 6194) {
         onChanged(
           outFiles.filter(v => v.exists).map(v => v.path),
           tmpDir
         );
-        isOnChanged = false;
+        isOutputChanged = false;
       } else {
         log.debug(ts.formatDiagnostic(diagnostic, formatHost));
       }
@@ -151,7 +149,10 @@ export default function compiler(
   );
 
   const origCreateProgram = host.createProgram;
-  host.createProgram = function hookCreateProgram(): ts.EmitAndSemanticDiagnosticsBuilderProgram {
+  host.createProgram = function hookCreateProgram(
+    rootNames,
+    tsOptions
+  ): ts.EmitAndSemanticDiagnosticsBuilderProgram {
     if (rootFiles && rootFiles.length) {
       // overwritting rootNames
       arguments[0] = rootFiles.map(rootFile =>
@@ -159,17 +160,33 @@ export default function compiler(
       );
     }
 
-    // mapping entries to outFileNames
-    arguments[0].forEach((v: string) => {
-      const ePath = v.replace(/(.ts)$/, ".js");
-      const path = nodePath.join(tmpDir, nodePath.basename(ePath));
-      if (!outFiles.find(f => f.path === path)) {
-        outFiles.push({ path, exists: false });
-      }
-    });
+    /* mapping entries to outFileNames */
 
-    log.debug("defined root names", "", arguments[0]);
-    log.debug("TS options", "", arguments[1]);
+    if (!rootNames || !rootNames.length) {
+      if (outFiles.length) {
+        isOutputChanged = true;
+      }
+      outFiles = [];
+    } else {
+      // remove output files that was deleted
+      outFiles.forEach((v, i) => {
+        if (!rootNames.includes(v.rootName)) {
+          isOutputChanged = true;
+          outFiles.splice(i, 1);
+        }
+      });
+
+      // add new rootNames
+      rootNames.forEach(rootName => {
+        const ePath = rootName.replace(/(.ts)$/, ".js");
+        const path = nodePath.join(tmpDir, nodePath.basename(ePath));
+        if (!outFiles.find(f => f.path === path)) {
+          outFiles.push({ path, exists: false, rootName });
+        }
+      });
+    }
+    log.debug("defined root names", "", rootNames);
+    log.debug("TS options", "", tsOptions);
     // @ts-ignore
     return origCreateProgram(...arguments);
   };

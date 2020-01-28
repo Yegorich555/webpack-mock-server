@@ -8,7 +8,8 @@ webpackMockServer.use(
   { use: () => {} },
   {
     verbose: true,
-    entry: ["test/webpack.mock.ts"],
+    entry: [], // ["test/webpack.mock.ts"],
+    tsConfigFileName: "test/tsconfig.json",
     compilerOptions: {
       skipLibCheck: true
     }
