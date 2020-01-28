@@ -64,9 +64,13 @@
   "files": [
     "lib/*",
     "public/*"
+<<<<<<< HEAD
   ],
   "publishConfig": {
     "save-prefix": "^",
     "save-dev": true
   }
+=======
+  ]
+>>>>>>> master
 }
