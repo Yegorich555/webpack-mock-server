@@ -23,15 +23,17 @@
   "keywords": [
     "webpack",
     "mock",
+    "mocker",
     "api",
     "webpack-dev-server",
-    "webpack-api-mocker",
-    "json",
+    "typescript",
     "ts",
     "js",
     "hot",
     "replacement",
-    "hmr"
+    "hmr",
+    "expressjs",
+    "middleware"
   ],
   "author": "yegorich555",
   "license": "MIT",
