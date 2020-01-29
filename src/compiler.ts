@@ -4,6 +4,7 @@ import fs from "fs";
 import os from "os";
 import log from "./log";
 import VersionContainer, { nodeJsVer } from "./versionContainer";
+import { OutputMockFile } from "./outputMockFile";
 
 const formatHost: ts.FormatDiagnosticsHost = {
   getCanonicalFileName: path => path,
@@ -28,18 +29,12 @@ function reportDiagnostic(diagnostic: ts.Diagnostic): void {
   );
 }
 
-type outPath = {
-  path: string;
-  exists: boolean;
-  rootName: string;
-};
-
 // https://github.com/microsoft/TypeScript/wiki/Using-the-Compiler-API#writing-an-incremental-program-watcher
 export default function compiler(
   rootFiles: string[] | undefined,
   tsConfigFileName: string,
   extendCompilerOptions: ts.CompilerOptions,
-  onChanged: (outFileNames: string[], outDir: string) => void
+  onChanged: (OutputMockFiles: OutputMockFile[], outDir: string) => void
 ): void {
   const tsVer = Number.parseFloat(ts.versionMajorMinor);
   if (tsVer < 2.7) {
@@ -52,7 +47,7 @@ export default function compiler(
   // creating hooks
   let isOutputChanged = true;
 
-  let outFiles: outPath[] = [];
+  let outFiles: OutputMockFile[] = [];
 
   const emptyWatcher: ts.FileWatcher = {
     // eslint-disable-next-line @typescript-eslint/no-empty-function
@@ -124,7 +119,6 @@ export default function compiler(
 
   const options = {
     ...extendCompilerOptions,
-    // todo target can conflict with lib
     outDir: tmpDir
     // todo wait for transpileOnly option: https://github.com/microsoft/TypeScript/issues/29651
   } as ts.CompilerOptions;
@@ -138,7 +132,7 @@ export default function compiler(
     diagnostic => {
       if (isOutputChanged && onChanged && diagnostic.code === 6194) {
         onChanged(
-          outFiles.filter(v => v.exists).map(v => v.path),
+          outFiles.filter(v => v.exists),
           tmpDir
         );
         isOutputChanged = false;

@@ -5,6 +5,7 @@ import fs from "fs";
 import log from "./log";
 import provideRoutes from "./provideRoutes";
 import NetError from "./netError";
+import { OutputMockFile } from "./outputMockFile";
 
 let app: Application;
 let server: Server | undefined;
@@ -16,22 +17,31 @@ function close(callback?: (err?: Error) => void): void {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-function requireDefault(str: string): any {
+function requireDefault(file: OutputMockFile): (usedApp: Application) => void {
   // eslint-disable-next-line import/no-dynamic-require, global-require, @typescript-eslint/no-var-requires
-  const m = require(str);
-  // eslint-disable-next-line no-unused-expressions
-  const f = m.default ? m.default : m;
-  if (typeof f !== "function") {
-    log.error(`Expected [export default function] in module ${str}`);
-    // todo maybe search for multiple export functions
-    // eslint-disable-next-line @typescript-eslint/no-empty-function
-    return (): void => {};
+  const m = require(file.path);
+
+  const arr: Array<(usedApp: Application) => void> = [];
+  function moduleEachWrapper(usedApp: Application): void {
+    arr.forEach(f => f(usedApp));
   }
-  return f;
+
+  Object.keys(m).forEach(key => {
+    const f = m[key];
+    if (typeof f !== "function") {
+      log.error(
+        `Wrong 'export ${key} = ${f}' from ${file.rootName}: expected exporting only functions`
+      );
+    } else {
+      arr.push(f);
+    }
+  });
+
+  return moduleEachWrapper;
 }
 
 export default function mockServer(
-  attachedFileNames: string[],
+  attachedFileNames: OutputMockFile[],
   defPort: number,
   listenCallback: (port: number, server: Server) => void
 ): Application {

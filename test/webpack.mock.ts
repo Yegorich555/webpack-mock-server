@@ -1,5 +1,7 @@
 import { Application } from "express";
 
+// export const t = 5;
+
 export default (app: Application): void => {
   app.get("/test", (_req, res) => {
     const response = [];

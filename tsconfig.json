@@ -1,6 +1,5 @@
 {
   "compilerOptions": {
-    "baseUrl": "./src",
     "outDir": "./lib",
     "target": "es6",
     "declaration": true,
@@ -10,8 +9,6 @@
     "allowJs": true,
     "checkJs": true
   },
-  "files": [
-    "./src/index.ts"
-  ],
+  "include": ["src/*"],
   "exclude": ["node_modules", "lib"]
 }

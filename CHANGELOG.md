@@ -1,6 +1,11 @@
 <!-- markdownlint-disable MD024 -->
 <!-- markdownlint-disable MD041 -->
 
+## 0.0.3 (comming soon)
+
+* add support of multiple exports from mock-files
+* fix 'there is no index.html in installed package'
+
 ## 0.0.2 (January 28, 2020)
 
 * fix 'verbose option is ignored'
