@@ -146,16 +146,20 @@ export default function compiler(
     rootNames,
     tsOptions
   ): ts.EmitAndSemanticDiagnosticsBuilderProgram {
+    let definedRootNames = rootNames || [];
+
     if (rootFiles && rootFiles.length) {
       // overwritting rootNames
       arguments[0] = rootFiles.map(rootFile =>
         nodePath.join(process.cwd(), rootFile)
       );
+      // eslint-disable-next-line prefer-destructuring
+      definedRootNames = arguments[0] as string[];
     }
 
     /* mapping entries to outFileNames */
 
-    if (!rootNames || !rootNames.length) {
+    if (!definedRootNames.length) {
       if (outFiles.length) {
         isOutputChanged = true;
       }
@@ -163,13 +167,13 @@ export default function compiler(
     } else {
       // remove output files that was deleted
       outFiles.forEach((v, i) => {
-        if (!rootNames.includes(v.rootName)) {
+        if (!definedRootNames.includes(v.rootName)) {
           isOutputChanged = true;
           outFiles.splice(i, 1);
         }
       });
       // add new rootNames
-      rootNames.forEach(rootName => {
+      definedRootNames.forEach(rootName => {
         const ePath = rootName.replace(/(.ts)$/, ".js");
         const outPath = nodePath.join(
           tmpDir,
@@ -180,7 +184,7 @@ export default function compiler(
         }
       });
     }
-    log.debug("defined root names", "", rootNames);
+    log.debug("defined root names", "", definedRootNames);
     log.debug("TS options", "", tsOptions);
     // @ts-ignore
     return origCreateProgram(...arguments);
