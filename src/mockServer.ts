@@ -91,7 +91,11 @@ export default function mockServer(
     if (attachedFileNames.length === 0) {
       log.error("There are no rootFiles");
     } else {
-      log.debug("requiring root files:", "", attachedFileNames);
+      log.debug(
+        "import rootFiles:",
+        "",
+        attachedFileNames.map(v => v.path)
+      );
       attachedFileNames.forEach(v => requireDefault(v)(app));
     }
     listen(defPort);

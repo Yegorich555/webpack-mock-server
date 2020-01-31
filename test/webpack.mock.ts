@@ -1,6 +1,8 @@
 import { Application } from "express";
 
-// export const t = 5;
+import testAddon from "../webpack.test.mockOut";
+
+export { testAddon };
 
 export default (app: Application): void => {
   app.get("/test", (_req, res) => {

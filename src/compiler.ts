@@ -60,7 +60,6 @@ export default function compiler(
 
   sysConfig.watchFile = function watchFile(path: string): ts.FileWatcher {
     if (path.includes("node_modules")) {
-      // todo use tsconfig.json exclude
       return emptyWatcher;
     }
     // @ts-ignore
@@ -86,7 +85,7 @@ export default function compiler(
       f.exists = true;
     }
 
-    // fix 'import from node_modules' when file move into temp-dir
+    // fix 'import from node_modules' when file is moved into temp-dir
     if (data) {
       arguments[1] = data.replace(
         /require\(["']([^./\\][^\n\r]+)["']\)/g,
@@ -169,13 +168,15 @@ export default function compiler(
           outFiles.splice(i, 1);
         }
       });
-
       // add new rootNames
       rootNames.forEach(rootName => {
         const ePath = rootName.replace(/(.ts)$/, ".js");
-        const path = nodePath.join(tmpDir, nodePath.basename(ePath));
-        if (!outFiles.find(f => f.path === path)) {
-          outFiles.push({ path, exists: false, rootName });
+        const outPath = nodePath.join(
+          tmpDir,
+          nodePath.relative(tsOptions?.rootDir || process.cwd(), ePath)
+        );
+        if (!outFiles.find(f => f.path === outPath)) {
+          outFiles.push({ path: outPath, exists: false, rootName });
         }
       });
     }

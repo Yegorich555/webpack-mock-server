@@ -121,6 +121,7 @@ module.exports = {
       "*.mock.ts"
   ],
   "files": [], // beside 'include' option you can point exact files here
+  "exclude": ["*test.mock.ts"] // note: exclude option can override 'include' and 'files' options
 }
 
 ```
@@ -167,6 +168,7 @@ module.exports = {
                     skipLibCheck: true
                 },
                 strictCompilerOptions: { // these options impossible to override
+                    rootDir: process.cwd(),
                     noEmit: false,
                     module: ts.ModuleKind.CommonJS,
                     declaration: false,
@@ -183,7 +185,7 @@ module.exports = {
 
 ## Options
 
-**Note:** Every path-file-name in options has to be pointed relative to the *currentWorkingDirectory* (*process.cwd()* in NodeJs)
+**Note:** Every path-file-name in options has to be pointed relative to the *currentWorkingDirectory* (*process.cwd()* in NodeJs) **or** point an absolute path
 
 | Param                 | Type                       | Default             | Description                                                                                                                                                                                                          |
 | --------------------- | -------------------------- | ------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |

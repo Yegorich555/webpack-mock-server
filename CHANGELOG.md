@@ -3,6 +3,7 @@
 
 ## 0.0.3 (comming soon)
 
+* fix wrong definition of outputFilePath when used **import * from '../importedFile'** (with '../' in path)
 * add support of multiple exports from mock-files
 * fix 'there is no index.html in installed package'
 

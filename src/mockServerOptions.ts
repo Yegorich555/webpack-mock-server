@@ -41,6 +41,7 @@ class MockServerOptions {
   // eslint-disable-next-line class-methods-use-this
   get strictCompilerOptions(): ts.CompilerOptions {
     return {
+      rootDir: process.cwd(),
       noEmit: false, // fix when 'jsconfig.json'
       module: ts.ModuleKind.CommonJS,
       declaration: false,
