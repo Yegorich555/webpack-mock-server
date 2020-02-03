@@ -40,12 +40,23 @@ function requireDefault(file: OutputMockFile): (usedApp: Application) => void {
   return moduleEachWrapper;
 }
 
+let isFirstStart = false;
 export default function mockServer(
   attachedFileNames: OutputMockFile[],
   defPort: number,
   listenCallback: (port: number, server: Server) => void
 ): Application {
-  log.debug("restarting/starting mock-server");
+  log.debug(!server ? "starting" : "re-starting");
+
+  /*
+   *  self-destroying
+   */
+  if (isFirstStart) {
+    process.on("SIGINT", () => close()); // handle termination by Ctrl+C
+    process.on("beforeExit", () => close());
+    isFirstStart = false;
+  }
+
   close();
   app = express();
   app.set("json spaces", 2); // prettify json-response
@@ -105,9 +116,3 @@ export default function mockServer(
 
   return app;
 }
-
-/*
- *  self-destroying
- */
-process.on("SIGINT", () => close()); // handle termination by Ctrl+C
-process.on("beforeExit", () => close());
