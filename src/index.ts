@@ -22,7 +22,12 @@ function addProxyToMockServer(app: ExpressApp): void {
         headers: clientReq.headers
       };
 
-      if (clientReq.url === "/" || !storedPort) {
+      if (
+        clientReq.url === "/" ||
+        clientReq.url.startsWith("/?") ||
+        clientReq.url.startsWith("?") ||
+        !storedPort
+      ) {
         next();
         return;
       }
