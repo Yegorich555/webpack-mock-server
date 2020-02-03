@@ -5,7 +5,7 @@ import fs from "fs";
 import log from "./log";
 import provideRoutes from "./provideRoutes";
 import NetError from "./netError";
-import { OutputMockFile } from "./outputMockFile";
+import { OutputMockFile } from "./compilerOutRootFiles";
 
 let app: Application;
 let server: Server | undefined;

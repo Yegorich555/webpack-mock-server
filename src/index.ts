@@ -3,7 +3,6 @@ import log from "./log";
 import MockServerOptions, { defOptions } from "./mockServerOptions";
 import mockServer from "./mockServer";
 import compiler from "./compiler";
-import clearNodeCache from "./clearNodeCache";
 import mockServerMiddleware from "./mockServerMiddleware";
 import mockServerHelper, { MockServerHelper } from "./mockServerHelper";
 
@@ -32,8 +31,7 @@ const webpackMockServer = {
         opt.entry,
         opt.tsConfigFileName,
         opt.compilerOptions,
-        (outFileNames, outDir) => {
-          clearNodeCache(outDir);
+        outFileNames => {
           mockServer(outFileNames, opt.port, port => {
             mockServerMiddleware(app, port);
           });

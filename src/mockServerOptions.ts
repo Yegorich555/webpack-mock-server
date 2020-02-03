@@ -1,4 +1,6 @@
 import ts, { ModuleResolutionKind } from "typescript";
+import nodePath from "path";
+import os from "os";
 import { nodeJsVer } from "./versionContainer";
 
 function defineTarget(): ts.ScriptTarget {
@@ -10,6 +12,12 @@ function defineTarget(): ts.ScriptTarget {
   }
   return ts.ScriptTarget.ES3;
 }
+
+const outDir: string = nodePath.join(
+  os.tmpdir(),
+  "webpack-mock-server",
+  new Date().getTime().toString()
+);
 
 class MockServerOptions {
   /**
@@ -32,6 +40,7 @@ class MockServerOptions {
     noUnusedParameters: false,
     noEmitHelpers: false,
     skipLibCheck: true
+    // todo wait for transpileOnly option: https://github.com/microsoft/TypeScript/issues/29651
   };
 
   /**
@@ -41,6 +50,7 @@ class MockServerOptions {
   // eslint-disable-next-line class-methods-use-this
   get strictCompilerOptions(): ts.CompilerOptions {
     return {
+      outDir, // {os.tmpdir()}/webpack-mock-server/{new Date().getTime()};
       rootDir: process.cwd(),
       noEmit: false, // fix when 'jsconfig.json'
       module: ts.ModuleKind.CommonJS,

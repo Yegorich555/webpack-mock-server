@@ -1,10 +1,8 @@
 import ts from "typescript";
-import nodePath from "path";
 import fs from "fs";
-import os from "os";
 import log from "./log";
 import VersionContainer, { nodeJsVer } from "./versionContainer";
-import { OutputMockFile } from "./outputMockFile";
+import CompilerOutRootFiles, { OutputMockFile } from "./compilerOutRootFiles";
 
 const formatHost: ts.FormatDiagnosticsHost = {
   getCanonicalFileName: path => path,
@@ -29,12 +27,22 @@ function reportDiagnostic(diagnostic: ts.Diagnostic): void {
   );
 }
 
+/** Clear Node cache for files in tmpFolder */
+function clearNodeCache(rootPath: string): void {
+  Object.keys(require.cache).forEach(key => {
+    if (require.cache[key].filename.startsWith(rootPath)) {
+      log.debug("delete node-cache for", key);
+      delete require.cache[key];
+    }
+  });
+}
+
 // https://github.com/microsoft/TypeScript/wiki/Using-the-Compiler-API#writing-an-incremental-program-watcher
 export default function compiler(
   rootFiles: string[] | undefined,
   tsConfigFileName: string,
   extendCompilerOptions: ts.CompilerOptions,
-  onChanged: (OutputMockFiles: OutputMockFile[], outDir: string) => void
+  onChanged: (OutputMockFiles: OutputMockFile[]) => void
 ): void {
   const tsVer = Number.parseFloat(ts.versionMajorMinor);
   if (tsVer < 2.7) {
@@ -47,7 +55,7 @@ export default function compiler(
   // creating hooks
   let isOutputChanged = true;
 
-  let outFiles: OutputMockFile[] = [];
+  const outMockFiles = new CompilerOutRootFiles();
 
   const emptyWatcher: ts.FileWatcher = {
     // eslint-disable-next-line @typescript-eslint/no-empty-function
@@ -78,14 +86,7 @@ export default function compiler(
     log.debug("write", path);
     isOutputChanged = true;
 
-    // mark output-server-required-file as exists
-    const normPath = nodePath.normalize(path);
-    const f = outFiles.find(v => v.path === normPath);
-    if (f) {
-      f.exists = true;
-    }
-
-    // fix 'import from node_modules' when file is moved into temp-dir
+    // fix 'import from node_modules' when file is moved into tmp-dir
     if (data) {
       arguments[1] = data.replace(
         /require\(["']([^./\\][^\n\r]+)["']\)/g,
@@ -110,30 +111,16 @@ export default function compiler(
     return result;
   };
 
-  const tmpDir = nodePath.join(
-    os.tmpdir(),
-    "webpack-mock-server",
-    new Date().getTime().toString()
-  );
-
-  const options = {
-    ...extendCompilerOptions,
-    outDir: tmpDir
-    // todo wait for transpileOnly option: https://github.com/microsoft/TypeScript/issues/29651
-  } as ts.CompilerOptions;
-
   const host = ts.createWatchCompilerHost(
     tsConfigFileName,
-    options,
+    extendCompilerOptions,
     sysConfig,
     ts.createEmitAndSemanticDiagnosticsBuilderProgram,
     reportDiagnostic,
     diagnostic => {
       if (isOutputChanged && onChanged && diagnostic.code === 6194) {
-        onChanged(
-          outFiles.filter(v => v.exists),
-          tmpDir
-        );
+        clearNodeCache(extendCompilerOptions.outDir as string);
+        onChanged(outMockFiles.files);
         isOutputChanged = false;
       } else {
         log.debug(ts.formatDiagnostic(diagnostic, formatHost));
@@ -143,47 +130,21 @@ export default function compiler(
 
   const origCreateProgram = host.createProgram;
   host.createProgram = function hookCreateProgram(
-    rootNames,
-    tsOptions
+    tsRootNames,
+    allOptions
   ): ts.EmitAndSemanticDiagnosticsBuilderProgram {
-    let definedRootNames = rootNames || [];
+    const definedRootNames =
+      rootFiles && rootFiles.length ? rootFiles : tsRootNames;
+    arguments[0] = definedRootNames;
+    // todo tsOptions.rootDirs?
+    const tsOptions = allOptions as ts.CompilerOptions;
 
-    if (rootFiles && rootFiles.length) {
-      // overwritting rootNames
-      arguments[0] = rootFiles.map(rootFile =>
-        nodePath.join(process.cwd(), rootFile)
-      );
-      // eslint-disable-next-line prefer-destructuring
-      definedRootNames = arguments[0] as string[];
-    }
+    outMockFiles.update(
+      definedRootNames,
+      tsOptions.rootDir as string,
+      tsOptions.outDir as string
+    );
 
-    /* mapping entries to outFileNames */
-
-    if (!definedRootNames.length) {
-      if (outFiles.length) {
-        isOutputChanged = true;
-      }
-      outFiles = [];
-    } else {
-      // remove output files that was deleted
-      outFiles.forEach((v, i) => {
-        if (!definedRootNames.includes(v.rootName)) {
-          isOutputChanged = true;
-          outFiles.splice(i, 1);
-        }
-      });
-      // add new rootNames
-      definedRootNames.forEach(rootName => {
-        const ePath = rootName.replace(/(.ts)$/, ".js");
-        const outPath = nodePath.join(
-          tmpDir,
-          nodePath.relative(tsOptions?.rootDir || process.cwd(), ePath)
-        );
-        if (!outFiles.find(f => f.path === outPath)) {
-          outFiles.push({ path: outPath, exists: false, rootName });
-        }
-      });
-    }
     log.debug("defined root names", "", definedRootNames);
     log.debug("TS options", "", tsOptions);
     // @ts-ignore
@@ -197,10 +158,10 @@ export default function compiler(
 
   // clearing previous tmp-folder before exit
   function clearTmpOutput(): void {
-    log.debug("clearing tmp folder ", tmpDir);
+    log.debug("clearing tmp folder ", extendCompilerOptions.outDir);
     // recursive option is expiremental and supported in node >= v12.10.0: https://nodejs.org/api/fs.html#fs_fs_rmdir_path_options_callback
     try {
-      fs.rmdirSync(tmpDir, {
+      fs.rmdirSync(extendCompilerOptions.outDir as string, {
         recursive: true
       });
       // eslint-disable-next-line no-empty
