@@ -3,6 +3,7 @@
 
 ## [0.0.5](https://github.com/Yegorich555/webpack-mock-server/compare/v0.0.4...v0.0.5) (coming soon)
 
+* add mockServerHelper, add 'webpackMockServer.add' and 'webpackMockServer.defaultOptions'
 * fix piping for routes with optional parameters
 
 ## [0.0.4](https://github.com/Yegorich555/webpack-mock-server/compare/v0.0.3...v0.0.4) (January 31, 2020)

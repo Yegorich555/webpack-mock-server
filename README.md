@@ -40,9 +40,10 @@ module.exports = {
 }
 
 // webpack.mock.ts - feel free to mock responses yourself
-import { Application } from "express";
+import webpackMockServer from "webpack-mock-server";
 
-export default (app: Application): void => {
+// app is expressjs application
+export default webpackMockServer.add((app, helper) => {
   // you can find more about expressjs here: https://expressjs.com/
   app.get("/testGet", (_req, res) => {
     res.json("JS get-object can be here");
@@ -56,7 +57,7 @@ export default (app: Application): void => {
   app.pust("/testPut", (_req, res) => {
     res.json("JS put-object can be here");
   });
-};
+})
 ```
 
 ### Usage with multiple/custom entries (instead of default **webpack.mock.ts**)
@@ -68,7 +69,7 @@ const webpackMockServer = require("webpack-mock-server").default;
 module.exports = {
     devServer: {
          before: app =>
-             webpackMockServer.use(app, { //webpackServer.mockOptions here
+             webpackMockServer.use(app, { //MockServerOptions here
                 entry: [ //exact fileNames are expected (no wildcard or folder - use custom tsConfig instead)
                     "api/users.mock.ts",
                     "api/goods.mock.js"
@@ -81,14 +82,14 @@ module.exports = {
 ... // take the example for ts-file above
 
 // api/goods.mock.js
-export default (app) => {
+export default webpackMockServer.add((app, helper) => {
   app.get("/testGetGoods", (_req, res) => {
     res.json([{
         id: 1,
         name: "pen"
     }]);
   });
-};
+})
 ```
 
 ### Usage with multiple entries by pattern (wildcard)

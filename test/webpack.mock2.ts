@@ -1,13 +1,15 @@
-import { Application } from "express";
+import webpackMockServer from "../src/index";
 
-export default (app: Application): void => {
-  app.get("/test2", (_req, res) => {
+export default webpackMockServer.add((app, helper) => {
+  app.get("/mockFile_2", (_req, res) => {
     const response = [];
     for (let i = 0; i < 101; ++i) {
       response.push({
+        id: helper.getRandomInt(),
         lastDate: new Date()
       });
     }
+
     res.json(response);
   });
-};
+});

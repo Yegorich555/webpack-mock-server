@@ -5,8 +5,14 @@ import mockServer from "./mockServer";
 import compiler from "./compiler";
 import clearNodeCache from "./clearNodeCache";
 import mockServerMiddleware from "./mockServerMiddleware";
+import mockServerHelper, { MockServerHelper } from "./mockServerHelper";
 
 const webpackMockServer = {
+  /**
+   * Applies wepackMiddleware on existed express-application
+   * @param app expressjs application that is used for mapping-routes
+   * @param extendOptions MockServerOptions that overrides default options
+   */
   use(
     app: ExpressApp,
     extendOptions: MockServerOptions | undefined = undefined
@@ -36,6 +42,21 @@ const webpackMockServer = {
     } catch (ex) {
       log.error("Unable to start server", ex);
     }
+  },
+  /**
+   * Add mock functions into webackMockServer
+   * @param mockFunction
+   */
+  add(
+    mockFunction: (app: ExpressApp, helper: MockServerHelper) => void
+  ): (app: ExpressApp) => void {
+    return (app: ExpressApp): void => {
+      mockFunction(app, mockServerHelper);
+    };
+  },
+  /** Default MockServer options (readonly) */
+  get defaultOptions(): MockServerOptions {
+    return JSON.parse(JSON.stringify(defOptions));
   }
 };
 

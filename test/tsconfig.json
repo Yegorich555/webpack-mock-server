@@ -1,6 +1,6 @@
 {
   "extends": "../tsconfig.json",
   "include": ["../test/*mock*.ts"],
-  "exclude": ["../test/*mock2.ts"],
+  "exclude": ["../test/*mockExclude.ts"],
   "files": []
 }
