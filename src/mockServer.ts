@@ -40,7 +40,7 @@ function requireDefault(file: OutputMockFile): (usedApp: Application) => void {
   return moduleEachWrapper;
 }
 
-let isFirstStart = false;
+let isFirstStart = true;
 export default function mockServer(
   attachedFileNames: OutputMockFile[],
   defPort: number,
