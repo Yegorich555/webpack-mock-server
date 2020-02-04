@@ -8,22 +8,23 @@ export type OutputMockFile = {
 export default class CompilerOutRootFiles {
   files: OutputMockFile[] = [];
 
+  /** Returns true if list of rootNames is changed */
   update(
     rootNames: readonly string[] | undefined,
     inDir: string,
     outDir: string
   ): boolean {
-    let isOutputChanged = false; // improve this
+    let isChanged = false;
     if (!rootNames || !rootNames.length) {
       if (this.files.length) {
-        isOutputChanged = true;
+        isChanged = true;
       }
       this.files = [];
     } else {
       // remove output files that was deleted
       this.files.forEach((v, i) => {
         if (!rootNames.includes(v.rootName)) {
-          isOutputChanged = true;
+          isChanged = true;
           this.files.splice(i, 1);
         }
       });
@@ -31,15 +32,13 @@ export default class CompilerOutRootFiles {
       // add new rootNames
       rootNames.forEach(rootName => {
         const ePath = rootName.replace(/(.ts)$/, ".js");
-        const outPath = nodePath.join(
-          outDir,
-          nodePath.relative(inDir || process.cwd(), ePath)
-        );
+        const outPath = nodePath.join(outDir, nodePath.relative(inDir, ePath));
         if (!this.files.find(f => f.path === outPath)) {
+          isChanged = true;
           this.files.push({ path: outPath, rootName });
         }
       });
     }
-    return isOutputChanged;
+    return isChanged;
   }
 }
