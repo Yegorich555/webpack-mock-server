@@ -139,7 +139,7 @@ export default function compiler(
     // todo tsOptions.rootDirs?
     const tsOptions = allOptions as ts.CompilerOptions;
 
-    outMockFiles.update(
+    isOutputChanged = outMockFiles.update(
       definedRootNames,
       tsOptions.rootDir as string,
       tsOptions.outDir as string
