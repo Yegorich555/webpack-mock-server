@@ -58,4 +58,4 @@ const webpackMockServer = {
   }
 };
 
-export default webpackMockServer;
+export = webpackMockServer;

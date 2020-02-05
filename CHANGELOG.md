@@ -1,8 +1,9 @@
 <!-- markdownlint-disable MD024 -->
 <!-- markdownlint-disable MD041 -->
 
-## [0.0.5](https://github.com/Yegorich555/webpack-mock-server/compare/v0.0.4...v0.0.5) (coming soon)
+## [0.1.0](https://github.com/Yegorich555/webpack-mock-server/compare/v0.0.4...v0.0.5) (coming soon)
 
+* BREAKING CHANGE: improve export for NodeJs-require (use **require('...')** instead of **require('...').default**)
 * add mockServerHelper, add 'webpackMockServer.add' and 'webpackMockServer.defaultOptions'
 * fix memory liquid on infinite handling 'process.on' events (each reloading from tsCompiler)
 * fix piping for routes with optional parameters

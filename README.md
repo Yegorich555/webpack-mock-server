@@ -31,7 +31,7 @@ npm install webpack-mock-server express typescript
 
 ```js
 // webpack.config.js
-const webpackMockServer = require("webpack-mock-server").default;
+const webpackMockServer = require("webpack-mock-server");
 
 module.exports = {
     devServer: {
@@ -64,7 +64,7 @@ export default webpackMockServer.add((app, helper) => {
 
 ```js
 // webpack.config.js
-const webpackMockServer = require("webpack-mock-server").default;
+const webpackMockServer = require("webpack-mock-server");
 
 module.exports = {
     devServer: {
@@ -96,7 +96,7 @@ export default webpackMockServer.add((app, helper) => {
 
 ```js
 // webpack.config.js
-const webpackMockServer = require("webpack-mock-server").default;
+const webpackMockServer = require("webpack-mock-server");
 
 module.exports = {
     devServer: {
@@ -133,7 +133,7 @@ As expressjs middleware: <http://expressjs.com/en/guide/using-middleware.html)>
 
 ```js
 // webpack.config.js
-const webpackMockServer = require("webpack-mock-server").default;
+const webpackMockServer = require("webpack-mock-server");
 
 const express = require('express');
 const app = express();
@@ -150,7 +150,7 @@ app.listen(1782);
 
 ```js
 // webpack.config.js
-const webpackMockServer = require("webpack-mock-server").default;
+const webpackMockServer = require("webpack-mock-server");
 
 module.exports = {
     devServer: {

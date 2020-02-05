@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 // eslint-disable-next-line import/no-unresolved
-const webpackMockServer = require("../lib/index.js").default;
+const webpackMockServer = require("../lib/index.js");
 
 webpackMockServer.use(
   // eslint-disable-next-line
