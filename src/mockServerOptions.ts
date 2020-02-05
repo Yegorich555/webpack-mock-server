@@ -31,21 +31,19 @@ class MockServerOptions {
   port = 8079;
 
   /**
-    Typescript compiler options that can be overrided by 'tsconfig.json'
+    Typescript compiler options that override options from 'tsconfig.json'
    */
   compilerOptions: ts.CompilerOptions = {
     strictNullChecks: false,
     noImplicitAny: false,
     noUnusedLocals: false,
     noUnusedParameters: false,
-    noEmitHelpers: false,
     skipLibCheck: true
     // todo wait for transpileOnly option: https://github.com/microsoft/TypeScript/issues/29651
   };
 
   /**
-   * Typescript compiler options (default options impossible to override)
-   * These options impossible to override
+   * Must-have Typescript compiler options (impossible to override)
    */
   // eslint-disable-next-line class-methods-use-this
   get strictCompilerOptions(): ts.CompilerOptions {
@@ -53,6 +51,8 @@ class MockServerOptions {
       outDir, // {os.tmpdir()}/webpack-mock-server/{new Date().getTime()};
       rootDir: process.cwd(),
       noEmit: false, // fix when 'jsconfig.json'
+      noEmitHelpers: false,
+      esModuleInterop: true,
       module: ts.ModuleKind.CommonJS,
       declaration: false,
       moduelResolution: ModuleResolutionKind.NodeJs,

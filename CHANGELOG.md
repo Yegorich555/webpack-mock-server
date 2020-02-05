@@ -5,6 +5,7 @@
 
 * BREAKING CHANGE: improve export for NodeJs-require (use **require('...')** instead of **require('...').default**)
 * add mockServerHelper, add 'webpackMockServer.add' and 'webpackMockServer.defaultOptions'
+* fix mockServerOptions: put noEmitHelpers and esModuleInterop to strictCompilerOptions
 * fix memory liquid on infinite handling 'process.on' events (each reloading from tsCompiler)
 * fix piping for routes with optional parameters
 

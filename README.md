@@ -171,18 +171,19 @@ module.exports = {
                 verbose: false, // send info via console.log
                 entry: ["webpack.mock.ts"],
                 tsConfigFileName: "tsconfig.json",
-                compilerOptions: { // typescript.CompilerOptions that overrides tsconfig.json:[compilerOptions]
+                compilerOptions: { // typescript.CompilerOptions that override tsconfig.json:[compilerOptions]
                     strictNullChecks: false,
                     noImplicitAny: false,
                     noUnusedLocals: false,
                     noUnusedParameters: false,
-                    noEmitHelpers: false,
                     skipLibCheck: true
                 },
                 strictCompilerOptions: { // these options impossible to override
                     outDir: "" // used the following: {os.tmpdir()}/webpack-mock-server/{new Date().getTime()}
                     rootDir: process.cwd(),
                     noEmit: false,
+                    noEmitHelpers: false,
+                    esModuleInterop: true,
                     module: ts.ModuleKind.CommonJS,
                     declaration: false,
                     moduelResolution: ModuleResolutionKind.NodeJs,

@@ -102,12 +102,10 @@ export default function compiler(
     log.debug("read", path);
     // @ts-ignore
     const result = ts.sys.readFile(...arguments);
-    // todo check for inherited tsconfig.json
     if (!result && path === tsConfigFileName) {
       log.debug(
         `file ${tsConfigFileName} is not found. Compilation with default settings...`
       );
-      // todo overwrite readed include, files, exclude if entry is pointed
       return JSON.stringify({});
     }
     return result;
@@ -137,7 +135,6 @@ export default function compiler(
   ): ts.EmitAndSemanticDiagnosticsBuilderProgram {
     const definedRootNames = entry && entry.length ? entry : tsRootNames;
     arguments[0] = definedRootNames;
-    // todo tsOptions.rootDirs?
     const tsOptions = allOptions as ts.CompilerOptions;
 
     isOutputChanged = outMockFiles.update(
