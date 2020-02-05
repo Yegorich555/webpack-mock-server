@@ -70,7 +70,7 @@ class MockServerOptions {
    * If pointed an 'empty array' or 'undefined' entry will be defined
    * from [tsConfigFileName]: 'files' and 'includes' sections
    */
-  entry: string[] | undefined = ["webpack.mock.ts"];
+  entry: string | string[] | undefined = ["webpack.mock.ts"];
 }
 
 export default MockServerOptions;

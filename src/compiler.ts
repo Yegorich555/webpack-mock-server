@@ -39,7 +39,7 @@ function clearNodeCache(rootPath: string): void {
 
 // https://github.com/microsoft/TypeScript/wiki/Using-the-Compiler-API#writing-an-incremental-program-watcher
 export default function compiler(
-  entry: string[] | undefined,
+  entry: string | string[] | undefined,
   tsConfigFileName: string,
   extendCompilerOptions: ts.CompilerOptions,
   onChanged: (OutputMockFiles: OutputMockFile[]) => void
@@ -51,6 +51,22 @@ export default function compiler(
     );
   }
   log.debug(`typescript version: ${ts.version}`);
+
+  const entries = entry && (Array.isArray(entry) ? entry : [entry]);
+  entries &&
+    entries.forEach(v => {
+      if (typeof v !== "string") {
+        throw new Error(
+          `WebpackMockServer. Option [entry]. Only 'string' is expected: ${v}`
+        );
+      }
+      if (v.includes("*")) {
+        throw new Error(
+          `WebpackMockServer. Option [entry]. Wildcard is not supported. Set 'Null' to [entry] and use tsConfig.json with 'files' and 'include' options instead.
+           More details here: https://github.com/Yegorich555/webpack-mock-server#options`
+        );
+      }
+    });
 
   // creating hooks
   let isOutputChanged = true;
@@ -133,7 +149,7 @@ export default function compiler(
     tsRootNames,
     allOptions
   ): ts.EmitAndSemanticDiagnosticsBuilderProgram {
-    const definedRootNames = entry && entry.length ? entry : tsRootNames;
+    const definedRootNames = entries && entries.length ? entries : tsRootNames;
     arguments[0] = definedRootNames;
     const tsOptions = allOptions as ts.CompilerOptions;
 

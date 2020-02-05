@@ -15,7 +15,7 @@ module.exports = {
     publicPath: __dirname,
     before: app =>
       webpackMockServer.use(app, {
-        entry: ["test/webpack.mock.ts"],
+        entry: "test/webpack.mock.ts",
         tsConfigFileName: "test/tsconfig.json",
         verbose: true
       })
