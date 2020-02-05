@@ -10,7 +10,7 @@ Uses for mocking api responses
 
 ## Features
 
-- Typescript support (>=v2.7): supports **.js**, **.ts** files
+- Typescript support (>=v2.7): supports **.js**, **.ts**, **.json** files
 - ES6 export/import support
 - Hot replacement support
 - Does not require proxy-path-pattern (because this is middleware that pipes routes to splitted server without proxy-path-pattern)
@@ -50,6 +50,11 @@ export default webpackMockServer.add((app, helper) => {
   });
   app.post("/testPost", (_req, res) => {
     res.json("JS post-object can be here");
+  });
+
+  // you can return any file easy. Example for json response from file:
+   app.get("/testResponseFromJsonFile", (_req, res) => {
+    res.sendFile(require.resolve("./response.json"));
   });
 })
 

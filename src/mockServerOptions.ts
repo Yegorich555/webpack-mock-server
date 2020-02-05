@@ -71,7 +71,6 @@ class MockServerOptions {
    * from [tsConfigFileName]: 'files' and 'includes' sections
    */
   entry: string[] | undefined = ["webpack.mock.ts"];
-  // todo json-files support
 }
 
 export default MockServerOptions;

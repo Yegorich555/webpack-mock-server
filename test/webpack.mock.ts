@@ -15,6 +15,13 @@ export default webpackMockServer.add(app => {
     }
     res.json(response);
   });
+  app.get("/testResponseFromJsonFile", (_req, res) => {
+    res.sendFile(require.resolve("./response.json"));
+  });
+  app.get("/testResponseFromJsonFile2", (_req, res) => {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires, global-require
+    res.json(require("./response.json"));
+  });
 });
 
 export const result2 = webpackMockServer.add(app => {

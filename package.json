@@ -29,6 +29,7 @@
     "typescript",
     "ts",
     "js",
+    "json",
     "hot",
     "replacement",
     "hmr",
