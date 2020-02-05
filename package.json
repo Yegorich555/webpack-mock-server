@@ -11,6 +11,8 @@
     "lint-code": "./node_modules/.bin/eslint ./**/*.{js,jsx,ts,tsx,json}",
     "lint-md": "./node_modules/.bin/markdownlint **/*.md --ignore node_modules",
     "serve": "npm run build && node ./test/start",
+    "serve-webpack": "npm run build && npm run run-webpack",
+    "run-webpack": "./node_modules/.bin/webpack-dev-server --hot --config test/webpack.config.js",
     "build": "tsc"
   },
   "repository": {
@@ -57,6 +59,8 @@
     "express": "^4.17.1",
     "prettier": "^1.19.1",
     "typescript": "^3.7.4",
+    "webpack": "^4.41.5",
+    "webpack-cli": "^3.3.10",
     "webpack-dev-server": "^3.10.1"
   },
   "dependencies": {},
