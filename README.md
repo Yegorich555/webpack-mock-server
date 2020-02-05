@@ -14,15 +14,15 @@ Uses for mocking api responses
 - ES6 export/import support
 - Hot replacement support
 - Does not require proxy-path-pattern (because this is middleware that pipes routes to splitted server without proxy-path-pattern)
-- Can be used without webpack (because this is expressjs middleware: )
+- Can be used without webpack (because this is expressjs [middleware](http://expressjs.com/en/guide/using-middleware.html) )
 - Shows every configured response in user-friendly *index.html* (just click on mock-server-url in console after as mockServer is started)
 
 ## Installing
 
-Using npm (express, typescript are required):
+Using npm:
 
 ```npm
-npm install webpack-mock-server express typescript
+npm install webpack-mock-server
 ```
 
 ## Examples
@@ -46,18 +46,23 @@ import webpackMockServer from "webpack-mock-server";
 export default webpackMockServer.add((app, helper) => {
   // you can find more about expressjs here: https://expressjs.com/
   app.get("/testGet", (_req, res) => {
-    res.json("JS get-object can be here");
+    res.json("JS get-object can be here. Random int:" + helper.getRandomInt());
   });
   app.post("/testPost", (_req, res) => {
     res.json("JS post-object can be here");
   });
+})
+
+// multiple exports are supported
+export const result = webpackMockServer.add((app, helper) => {
   app.delete("/testDelete", (_req, res) => {
-    res.json("JS delete-object can be here");
+    res.json("JS delete-object can be here. Random int:" + helper.getRandomInt());
   });
   app.pust("/testPut", (_req, res) => {
     res.json("JS put-object can be here");
   });
 })
+  
 ```
 
 ### Usage with multiple/custom entries (instead of default **webpack.mock.ts**)
@@ -85,7 +90,7 @@ module.exports = {
 export default webpackMockServer.add((app, helper) => {
   app.get("/testGetGoods", (_req, res) => {
     res.json([{
-        id: 1,
+        id: helper.getRandomInt(1, 999),
         name: "pen"
     }]);
   });
@@ -150,6 +155,7 @@ app.listen(1782);
 
 ```js
 // webpack.config.js
+...
 const webpackMockServer = require("webpack-mock-server");
 
 module.exports = {
@@ -169,6 +175,7 @@ module.exports = {
                     skipLibCheck: true
                 },
                 strictCompilerOptions: { // these options impossible to override
+                    outDir: "" // used the following: {os.tmpdir()}/webpack-mock-server/{new Date().getTime()}
                     rootDir: process.cwd(),
                     noEmit: false,
                     module: ts.ModuleKind.CommonJS,
@@ -188,11 +195,11 @@ module.exports = {
 
 **Note:** Every path-file-name in options has to be pointed relative to the *currentWorkingDirectory* (*process.cwd()* in NodeJs) **or** point an absolute path
 
-| Param                 | Type                       | Default             | Description                                                                                                                                                                                                          |
-| --------------------- | -------------------------- | ------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| entry                 | String[], null             | ["webpack.mock.ts"] | Entry points for typescript-compiler (exact fileNames are expected). Set an **empty array** or **null** for using **files** and **includes** sections from *tsConfigFileName*. Otherwise these sections are ignored! |
-| port                  | Number                     | 8079                | app searches for free port (starts searching from pointed)                                                                                                                                                           |
-| verbose               | Boolean                    | false               | show debug info in NodeJs via console.log                                                                                                                                                                            |
-| compilerOptions       | typescript.CompilerOptions | ...                 | see the latest example above                                                                                                                                                                                         |
-| strictCompilerOptions | typescript.CompilerOptions | ...                 | **readOnly**. See the latest example above. These options impossible to override                                                                                                                                     |
-| tsConfigFileName      | String                     | "tsconfig.json"     | pointer to typescript config file                                                                                                                                                                                    |
+| Param                 | Type                       | Default             | Description                                                                                                                                                                                                                      |
+| --------------------- | -------------------------- | ------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| entry                 | String[], null             | ["webpack.mock.ts"] | Entry points for typescript-compiler (exact fileNames are expected). Set an **empty array** or **null** for using **files**, **include** and **exlcude** sections from *tsConfigFileName*. Otherwise these sections are ignored! |
+| port                  | Number                     | 8079                | app searches for free port (starts searching from pointed)                                                                                                                                                                       |
+| verbose               | Boolean                    | false               | show debug info in NodeJs via console.log                                                                                                                                                                                        |
+| compilerOptions       | typescript.CompilerOptions | ...                 | see the latest example above                                                                                                                                                                                                     |
+| strictCompilerOptions | typescript.CompilerOptions | ...                 | **readOnly**. See the latest example above. These options impossible to override                                                                                                                                                 |
+| tsConfigFileName      | String                     | "tsconfig.json"     | pointer to typescript config file                                                                                                                                                                                                |

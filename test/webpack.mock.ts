@@ -1,11 +1,10 @@
-import { Application } from "express";
-
+import webpackMockServer from "../src/index";
 import testAddon from "../webpack.test.mockOut";
 
 export { testAddon };
 
-export default (app: Application): void => {
-  app.get("/test", (_req, res) => {
+export default webpackMockServer.add(app => {
+  app.get("/testDefaultExport", (_req, res) => {
     const response = [];
     for (let i = 0; i < 101; ++i) {
       response.push({
@@ -16,7 +15,9 @@ export default (app: Application): void => {
     }
     res.json(response);
   });
+});
 
+export const result2 = webpackMockServer.add(app => {
   app.get(["/getFavIcon"], (_req, res) => {
     // res.type("application/...");
     res.download("public/favicon.ico", "favicon.ico");
@@ -49,4 +50,4 @@ export default (app: Application): void => {
       });
     }
   });
-};
+});
