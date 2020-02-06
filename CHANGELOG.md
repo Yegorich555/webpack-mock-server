@@ -4,6 +4,7 @@
 ## [0.1.0](https://github.com/Yegorich555/webpack-mock-server/compare/v0.0.4...v0.0.5) (coming soon)
 
 * BREAKING CHANGE: improve export for NodeJs-require (use **require('...')** instead of **require('...').default**)
+* add logResponse, logRequest, before to mockServerOptions
 * add 'single string' support for mockServerOptions.entry. Add type and wildcard checking
 * add mockServerHelper, add 'webpackMockServer.add' and 'webpackMockServer.defaultOptions'
 * fix '__dirname' provides tmpName instead of sourceName

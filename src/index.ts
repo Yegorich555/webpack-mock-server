@@ -17,7 +17,7 @@ const webpackMockServer = {
     extendOptions: MockServerOptions | undefined = undefined
   ): void {
     try {
-      const opt = { ...defOptions, ...extendOptions };
+      const opt = { ...defOptions, ...extendOptions } as MockServerOptions;
       opt.compilerOptions = {
         ...defOptions.compilerOptions,
         ...extendOptions?.compilerOptions,
@@ -32,7 +32,7 @@ const webpackMockServer = {
         opt.tsConfigFileName,
         opt.compilerOptions,
         outFileNames => {
-          mockServer(outFileNames, opt.port, port => {
+          mockServer(outFileNames, opt, port => {
             mockServerMiddleware(app, port);
           });
         }

@@ -6,6 +6,7 @@ import log from "./log";
 import provideRoutes from "./provideRoutes";
 import NetError from "./netError";
 import { OutputMockFile } from "./compilerOutRootFiles";
+import MockServerOptions from "./mockServerOptions";
 
 let app: Application;
 let server: Server | undefined;
@@ -43,7 +44,7 @@ function requireDefault(file: OutputMockFile): (usedApp: Application) => void {
 let isFirstStart = true;
 export default function mockServer(
   attachedFileNames: OutputMockFile[],
-  defPort: number,
+  options: MockServerOptions,
   listenCallback: (port: number, server: Server) => void
 ): Application {
   log.debug(!server ? "starting" : "re-starting");
@@ -60,6 +61,69 @@ export default function mockServer(
   close();
   app = express();
   app.set("json spaces", 2); // prettify json-response
+
+  options.before && app.use(options.before);
+
+  // logMiddleware
+  if (options.logRequests || options.logResponses) {
+    app.use((req, res, next) => {
+      if (options.logRequests) {
+        log.info(`Got request: ${req.method}`, req.url, {
+          httpVersion: req.httpVersion,
+          headers: req.headers,
+          params: req.params,
+          cookies: req.cookies
+        });
+      }
+
+      if (!options.logResponses) {
+        next();
+        return;
+      }
+
+      const oldWrite = res.write;
+      const oldEnd = res.end;
+      // @ts-ignore
+      const chunks = [];
+
+      // @ts-ignore
+      res.write = function hookWrite(chunk): boolean {
+        chunks.push(chunk);
+        // @ts-ignore
+        return oldWrite.apply(res, arguments);
+      };
+
+      let resBody: string | undefined;
+
+      // @ts-ignore
+      res.end = function hookEnd(chunk): void {
+        if (chunk) chunks.push(chunk);
+        try {
+          // @ts-ignore
+          resBody = Buffer.concat(chunks).toString("utf8");
+        } catch (ex) {
+          log.error("", ex);
+        }
+
+        // @ts-ignore
+        oldEnd.apply(res, arguments);
+      };
+
+      next();
+
+      const headers = res.getHeaders();
+      const contentType = headers["content-type"];
+      const isJson =
+        typeof contentType === "string" &&
+        contentType.startsWith("application/json");
+      log.info(`Sent response for ${req.method}`, req.url, {
+        headers,
+        statusCode: res.statusCode,
+        statusMessage: res.statusMessage,
+        body: (isJson && resBody && JSON.parse(resBody)) || "[byteArray]"
+      });
+    });
+  }
 
   const mockedInfoPath = "/";
   app.get(mockedInfoPath, (_req, res) => {
@@ -109,7 +173,7 @@ export default function mockServer(
       );
       attachedFileNames.forEach(v => requireDefault(v)(app));
     }
-    listen(defPort);
+    listen(options.port);
   } catch (ex) {
     log.error("Exception during attaching node-modules", ex);
   }

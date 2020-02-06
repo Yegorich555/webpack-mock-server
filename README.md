@@ -34,9 +34,9 @@ npm install webpack-mock-server
 const webpackMockServer = require("webpack-mock-server");
 
 module.exports = {
-    devServer: {
-        before: webpackMockServer.use
-    }
+  devServer: {
+    before: webpackMockServer.use
+  }
 }
 
 // webpack.mock.ts - feel free to mock responses yourself
@@ -78,15 +78,20 @@ export const result = webpackMockServer.add((app, helper) => {
 const webpackMockServer = require("webpack-mock-server");
 
 module.exports = {
-    devServer: {
-         before: app =>
-             webpackMockServer.use(app, { //MockServerOptions here
-                entry: [ //exact fileNames are expected (no wildcard or folder - use custom tsConfig instead)
-                    "api/users.mock.ts",
-                    "api/goods.mock.js"
-                ]
-            })
-    }
+  devServer: {
+    before: app =>
+        webpackMockServer.use(app, { //MockServerOptions here
+          entry: [ //exact fileNames are expected (no wildcard or folder - use custom tsConfig instead)
+              "api/users.mock.ts",
+              "api/goods.mock.js"
+          ],
+          before: (req, res, next) => { // you can use this for custom-logging instead of logResponses: true, logRequests: true
+              console.log(`Got request: ${req.method} ${req.url}`);
+              next();
+              console.log(`Sent response: ${req.method} ${req.url}`);
+          }
+      })
+  }
 }
 
 // api/users.mock.ts
@@ -110,16 +115,16 @@ export default webpackMockServer.add((app, helper) => {
 const webpackMockServer = require("webpack-mock-server");
 
 module.exports = {
-    devServer: {
-         before: app =>
-            webpackMockServer.use(app, {
-                /* set an empty-array or null to [entry], so entry will be defined
-                   from 'files' and 'includes' sections in [tsConfigFileName]
-                */
-                entry: [],
-                tsConfigFileName: "mock/tsconfig.json", // use a different tsconfig-file that is contained entries
-            })
-    }
+  devServer: {
+    before: app =>
+      webpackMockServer.use(app, {
+          /* set an empty-array or null to [entry], so entry will be defined
+              from 'files' and 'includes' sections in [tsConfigFileName]
+          */
+          entry: [],
+          tsConfigFileName: "mock/tsconfig.json" // use a different tsconfig-file that is contained entries
+      })
+  }
 }
 
 // ./mock/tsconfig.json
@@ -140,7 +145,7 @@ module.exports = {
 
 ### Usage without webpack
 
-As expressjs middleware: <http://expressjs.com/en/guide/using-middleware.html)>
+As expressjs middleware: <http://expressjs.com/en/guide/using-middleware.html>
 
 ```js
 // webpack.config.js
@@ -165,34 +170,37 @@ app.listen(1782);
 const webpackMockServer = require("webpack-mock-server");
 
 module.exports = {
-    devServer: {
-         before: app =>
-            webpackMockServer.use(app, {
-                port: 8079, // app searches for free port (starts searching from pointed)
-                verbose: false, // send info via console.log
-                entry: ["webpack.mock.ts"],
-                tsConfigFileName: "tsconfig.json",
-                compilerOptions: { // typescript.CompilerOptions that override tsconfig.json:[compilerOptions]
-                    strictNullChecks: false,
-                    noImplicitAny: false,
-                    noUnusedLocals: false,
-                    noUnusedParameters: false,
-                    skipLibCheck: true,
-                    resolveJsonModule: true
-                },
-                strictCompilerOptions: { // these options impossible to override
-                    outDir: "" // used the following: {os.tmpdir()}/webpack-mock-server/{new Date().getTime()}
-                    rootDir: process.cwd(),
-                    noEmit: false,
-                    noEmitHelpers: false,
-                    esModuleInterop: true,
-                    module: ts.ModuleKind.CommonJS,
-                    declaration: false,
-                    moduelResolution: ModuleResolutionKind.NodeJs,
-                    target: defineTarget() // it defines target-ES based on NODE version
-                }
-            })
-    }
+  devServer: {
+    before: app =>
+      webpackMockServer.use(app, {
+          port: 8079, // app searches for free port (starts searching from pointed)
+          verbose: false, // send info via console.log
+          logRequests: false,
+          logResponses: false,
+          before: undefined, //can be used for logging
+          entry: ["webpack.mock.ts"],
+          tsConfigFileName: "tsconfig.json",
+          compilerOptions: { // typescript.CompilerOptions that override tsconfig.json:[compilerOptions]
+              strictNullChecks: false,
+              noImplicitAny: false,
+              noUnusedLocals: false,
+              noUnusedParameters: false,
+              skipLibCheck: true,
+              resolveJsonModule: true
+          },
+          strictCompilerOptions: { // these options impossible to override
+              outDir: "" // used the following: {os.tmpdir()}/webpack-mock-server/{new Date().getTime()}
+              rootDir: process.cwd(),
+              noEmit: false,
+              noEmitHelpers: false,
+              esModuleInterop: true,
+              module: ts.ModuleKind.CommonJS,
+              declaration: false,
+              moduelResolution: ModuleResolutionKind.NodeJs,
+              target: defineTarget() // it defines target-ES based on NODE version
+          }
+      })
+  }
 }
 
 // webpack.mock.ts - example you can find above
@@ -206,15 +214,18 @@ module.exports = {
 | Param                 | Type                       | Default             | Description                                                                                                                                                                                                                      |
 | --------------------- | -------------------------- | ------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | entry                 | String, String[], null     | ["webpack.mock.ts"] | Entry points for typescript-compiler (exact fileNames are expected). Set an **empty array** or **null** for using **files**, **include** and **exlcude** sections from *tsConfigFileName*. Otherwise these sections are ignored! |
-| port                  | Number                     | 8079                | app searches for free port (starts searching from pointed)                                                                                                                                                                       |
-| verbose               | Boolean                    | false               | show debug info in NodeJs via console.log                                                                                                                                                                                        |
-| compilerOptions       | typescript.CompilerOptions | ...                 | see the latest example above                                                                                                                                                                                                     |
+| port                  | Number                     | 8079                | App searches for free port (starts searching from pointed)                                                                                                                                                                       |
+| verbose               | Boolean                    | false               | Show debug info in NodeJs via console.log                                                                                                                                                                                        |
+| logResponses          | Boolean                    | false               | Show responses-info in NodeJs via console.log                                                                                                                                                                                    |
+| logRequests           | Boolean                    | false               | Show request-info in NodeJs via console.log                                                                                                                                                                                      |
+| before                | (req, res, next) => void   | undefined           | Execute custom middleware prior to all other middleware internally within the server Can be used for custom-logging. Example [here](#usage-with-multiplecustom-entries-instead-of-default-webpackmockts)                                  |
+| compilerOptions       | typescript.CompilerOptions | ...                 | See the latest example above                                                                                                                                                                                                     |
 | strictCompilerOptions | typescript.CompilerOptions | ...                 | **readOnly**. See the latest example above. These options impossible to override                                                                                                                                                 |
-| tsConfigFileName      | String                     | "tsconfig.json"     | pointer to typescript config file. Example [here](#usage-with-multiple-entries-by-pattern-wildcard):                                                                                                                             |
+| tsConfigFileName      | String                     | "tsconfig.json"     | Pointer to typescript config file. Example [here](#usage-with-multiple-entries-by-pattern-wildcard):                                                                                                                             |
 
 ## Troubleshooting
 
-- Don't use NodeJs **require** operator **as dynamic** to relative path. Use __dirname in this case instead or absolute path (__dirname is changed during the compilation)
+- Don't use NodeJs **require** operator **as dynamic** to relative path. Use __dirname in this case or absolute path (__dirname is changed during the compilation)
 
 ```js
 // Wrong

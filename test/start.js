@@ -12,6 +12,11 @@ webpackMockServer.use(
     tsConfigFileName: "test/tsconfig.json",
     compilerOptions: {
       skipLibCheck: true
+    },
+    before: (req, res, next) => {
+      console.log(`Got request: ${req.method} ${req.url}`);
+      next();
+      console.log(`Sent response: ${req.method} ${req.url}`);
     }
   }
 );

@@ -1,6 +1,8 @@
+/* eslint-disable class-methods-use-this */
 import ts, { ModuleResolutionKind } from "typescript";
 import nodePath from "path";
 import os from "os";
+import express from "express";
 import { nodeJsVer } from "./versionContainer";
 
 function defineTarget(): ts.ScriptTarget {
@@ -20,19 +22,22 @@ const outDir: string = nodePath.join(
 );
 
 class MockServerOptions {
-  /**
-    Disable/enable console.log
-   */
+  /** Enable/disable console.log */
   verbose = false;
 
-  /**
-    Port for webpack-mock-server
-   */
+  /** Port for webpack-mock-server */
   port = 8079;
 
-  /**
-    Typescript compiler options that override options from 'tsconfig.json'
-   */
+  /** Enable/disable console.log for requests */
+  logRequests: boolean | ((req: express.Request) => void) = false;
+
+  /** Enable/disable console.log for reponses */
+  logResponses: boolean | ((res: express.Response) => void) = false;
+
+  /** Execute custom middleware prior to all other middleware internally within the server */
+  before: express.RequestHandler | undefined;
+
+  /** Typescript compiler options that override options from 'tsconfig.json' */
   compilerOptions: ts.CompilerOptions = {
     strictNullChecks: false,
     noImplicitAny: false,
@@ -43,10 +48,7 @@ class MockServerOptions {
     // todo wait for transpileOnly option: https://github.com/microsoft/TypeScript/issues/29651
   };
 
-  /**
-   * Must-have Typescript compiler options (impossible to override)
-   */
-  // eslint-disable-next-line class-methods-use-this
+  /** Must-have Typescript compiler options (impossible to override) */
   get strictCompilerOptions(): ts.CompilerOptions {
     return {
       outDir, // {os.tmpdir()}/webpack-mock-server/{new Date().getTime()};
@@ -61,15 +63,13 @@ class MockServerOptions {
     } as ts.CompilerOptions;
   }
 
-  /**
-   * Typescript config file (used for compilation [entry] files)
-   */
+  /** Typescript config file (used for compilation [entry] files) */
   tsConfigFileName = "tsconfig.json";
 
   /**
    * Entry points for typescript-compiler
    * If pointed an 'empty array' or 'undefined' entry will be defined
-   * from [tsConfigFileName]: 'files' and 'includes' sections
+   * from [tsConfigFileName]: 'files','include' and 'exclude' sections
    */
   entry: string | string[] | undefined = ["webpack.mock.ts"];
 }
