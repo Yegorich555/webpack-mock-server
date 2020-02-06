@@ -41,6 +41,7 @@ module.exports = {
 
 // webpack.mock.ts - feel free to mock responses yourself
 import webpackMockServer from "webpack-mock-server";
+import nodePath from "path";
 
 // app is expressjs application
 export default webpackMockServer.add((app, helper) => {
@@ -54,7 +55,7 @@ export default webpackMockServer.add((app, helper) => {
 
   // you can return any file easy. Example for json response from file:
    app.get("/testResponseFromJsonFile", (_req, res) => {
-    res.sendFile(require.resolve("./response.json"));
+    res.sendFile(nodePath.join(__dirname, "./response.json"));
   });
 })
 
@@ -176,7 +177,8 @@ module.exports = {
                     noImplicitAny: false,
                     noUnusedLocals: false,
                     noUnusedParameters: false,
-                    skipLibCheck: true
+                    skipLibCheck: true,
+                    resolveJsonModule: true
                 },
                 strictCompilerOptions: { // these options impossible to override
                     outDir: "" // used the following: {os.tmpdir()}/webpack-mock-server/{new Date().getTime()}
@@ -209,3 +211,33 @@ module.exports = {
 | compilerOptions       | typescript.CompilerOptions | ...                 | see the latest example above                                                                                                                                                                                                     |
 | strictCompilerOptions | typescript.CompilerOptions | ...                 | **readOnly**. See the latest example above. These options impossible to override                                                                                                                                                 |
 | tsConfigFileName      | String                     | "tsconfig.json"     | pointer to typescript config file. Example [here](#usage-with-multiple-entries-by-pattern-wildcard):                                                                                                                             |
+
+## Troubleshooting
+
+- Don't use NodeJs **require** operator **as dynamic** to relative path. Use __dirname in this case instead or absolute path (__dirname is changed during the compilation)
+
+```js
+// Wrong
+app.get("/testResponseFromJsonFile", (_req, res) => {
+  res.sendFile(require.resolve("./response.json"));
+});
+
+app.get("/testResponseFromJsonFile2", (_req, res) => {
+    res.json(require("./response.json"));
+});
+  
+// Good
+import nodePath from "path";
+
+app.get("/testResponseFromJsonFile", (_req, res) => {
+  res.sendFile(nodePath.join(__dirname, "./response.json"));
+});
+
+app.get("/testResponseFromJsonFile2", (_req, res) => {
+   res.json(require("./response.json", {paths: {__dirname}));
+});
+
+app.get("/testResponseFromJsonFile3", (_req, res) => {
+   res.json(require(nodePath.join(__dirname, "./response.json")));
+});
+```

@@ -38,7 +38,8 @@ class MockServerOptions {
     noImplicitAny: false,
     noUnusedLocals: false,
     noUnusedParameters: false,
-    skipLibCheck: true
+    skipLibCheck: true,
+    resolveJsonModule: true
     // todo wait for transpileOnly option: https://github.com/microsoft/TypeScript/issues/29651
   };
 

@@ -1,5 +1,6 @@
 import ts from "typescript";
 import fs from "fs";
+import nodePath from "path";
 import log from "./log";
 import VersionContainer, { nodeJsVer } from "./versionContainer";
 import CompilerOutRootFiles, { OutputMockFile } from "./compilerOutRootFiles";
@@ -102,7 +103,6 @@ export default function compiler(
     log.debug("write", path);
     isOutputChanged = true;
 
-    // fix 'import from node_modules' when file is moved into tmp-dir
     if (data) {
       arguments[1] = data.replace(
         /require\(["']([^./\\][^\n\r]+)["']\)/g,
@@ -117,14 +117,19 @@ export default function compiler(
   sysConfig.readFile = function readFile(path: string): string | undefined {
     log.debug("read", path);
     // @ts-ignore
-    const result = ts.sys.readFile(...arguments);
-    if (!result && path === tsConfigFileName) {
+    const data = ts.sys.readFile(...arguments);
+    if (!data && path === tsConfigFileName) {
       log.debug(
         `file ${tsConfigFileName} is not found. Compilation with default settings...`
       );
       return JSON.stringify({});
     }
-    return result;
+    if (!data || path.includes("node_modules")) {
+      return data;
+    }
+    return data
+      .replace(/(?<![/).])__dirname/g, `"${nodePath.dirname(path)}"`)
+      .replace(/(?<![/).])__filename/g, `"${path}"`);
   };
 
   const host = ts.createWatchCompilerHost(

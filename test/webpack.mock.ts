@@ -1,3 +1,4 @@
+import nodePath from "path";
 import webpackMockServer from "../src/index";
 import testAddon from "../webpack.test.mockOut";
 
@@ -16,7 +17,7 @@ export default webpackMockServer.add(app => {
     res.json(response);
   });
   app.get("/testResponseFromJsonFile", (_req, res) => {
-    res.sendFile(require.resolve("./response.json"));
+    res.sendFile(nodePath.join(__dirname, "./response.json"));
   });
   app.get("/testResponseFromJsonFile2", (_req, res) => {
     // eslint-disable-next-line @typescript-eslint/no-var-requires, global-require
