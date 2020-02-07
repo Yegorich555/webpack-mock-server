@@ -1,8 +1,9 @@
 <!-- markdownlint-disable MD024 -->
 <!-- markdownlint-disable MD041 -->
 
-## [1.0.1](https://github.com/Yegorich555/webpack-mock-server/compare/v0.0.1...v1.0.1) (coming soon)
+## [1.0.1](https://github.com/Yegorich555/webpack-mock-server/compare/v1.0.0...v1.0.1) (February 7, 2020)
 
+* fix 'server does not provide favicon via directToServer response'
 * fix 'default logger catches exception and does not provide actual response'
 * fix '__dirname under wepback is not absolute`
 
