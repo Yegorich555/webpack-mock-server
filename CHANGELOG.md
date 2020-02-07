@@ -1,15 +1,15 @@
 <!-- markdownlint-disable MD024 -->
 <!-- markdownlint-disable MD041 -->
 
-## [0.1.0](https://github.com/Yegorich555/webpack-mock-server/compare/v0.0.4...v0.0.5) (coming soon)
+## [1.0.0](https://github.com/Yegorich555/webpack-mock-server/compare/v0.0.4...v1.0.0) (February 7, 2020)
 
-* BREAKING CHANGE: improve export for NodeJs-require (use **require('...')** instead of **require('...').default**)
-* add logResponse, logRequest, before to mockServerOptions
-* add 'single string' support for mockServerOptions.entry. Add type and wildcard checking
-* add mockServerHelper. Add methods getRandomInt, getUniqueIdInt
-* add 'webpackMockServer.add' and 'webpackMockServer.defaultOptions'
+* **BREAKING CHANGE**: improve export for NodeJs-require (use **require('...')** instead of **require('...').default**)
+* **options**: add **.logResponse**, **.logRequest**, **.before**
+* **options.entry**: add 'single string' support. Add type and wildcard checking
+* **mockServerHelper**: implement with methods **getRandomInt**, **getUniqueIdInt**
+* **webpackMockServer**: add '**.add**' and '**.defaultOptions**' to export
 * fix 'sometimes mock-server overrides webpack port'
-* fix '__dirname' provides tmpName instead of sourceName
+* fix '__dirname provides tmpName instead of sourceName'
 * fix mockServerOptions: put noEmitHelpers and esModuleInterop to strictCompilerOptions
 * fix memory liquid on infinite handling 'process.on' events (each reloading from tsCompiler)
 * fix piping for routes with optional parameters
