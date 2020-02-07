@@ -84,7 +84,7 @@ export default function mockServer(
       const oldWrite = res.write;
       const oldEnd = res.end;
       // @ts-ignore
-      const chunks = [];
+      const chunks: (Buffer | Uint8Array | string)[] = [];
 
       // @ts-ignore
       res.write = function hookWrite(chunk): boolean {
@@ -93,34 +93,58 @@ export default function mockServer(
         return oldWrite.apply(res, arguments);
       };
 
-      let resBody: string | undefined;
-
       // @ts-ignore
       res.end = function hookEnd(chunk): void {
-        if (chunk) chunks.push(chunk);
-        try {
-          // @ts-ignore
-          resBody = Buffer.concat(chunks).toString("utf8");
-        } catch (ex) {
-          log.error("", ex);
+        if (chunk) {
+          chunks.push(chunk);
         }
-
         // @ts-ignore
         oldEnd.apply(res, arguments);
       };
 
       next();
 
-      const headers = res.getHeaders();
-      const contentType = headers["content-type"];
-      const isJson =
-        typeof contentType === "string" &&
-        contentType.startsWith("application/json");
-      log.info(`Sent response for ${req.method}`, req.url, {
-        headers,
-        statusCode: res.statusCode,
-        statusMessage: res.statusMessage,
-        body: (isJson && resBody && JSON.parse(resBody)) || "[byteArray]"
+      res.once("finish", () => {
+        const headers = res.getHeaders();
+        const contentType = (headers["content-type"] as string) || "";
+        const isJson = contentType.startsWith("application/json");
+        const isText = contentType.startsWith("text/");
+        // eslint-disable-next-line @typescript-eslint/ban-types
+        let body: Object | string | undefined;
+
+        try {
+          if (chunks.length) {
+            const isBufferArray = !chunks.some(
+              v => !v || !(v instanceof Buffer || v instanceof Uint8Array)
+            );
+
+            // @ts-ignore
+            if (isJson) {
+              let str = "";
+              if (isBufferArray) {
+                str = Buffer.concat(chunks as Buffer[]).toString("utf8");
+              } else {
+                str = chunks.join("\n");
+              }
+              body = str && JSON.parse(str);
+            } else if (isText) {
+              body = chunks.join("\n");
+            } else if (isBufferArray) {
+              body = "[byteArray]";
+            } else {
+              body = chunks;
+            }
+          }
+        } catch (ex) {
+          log.error("", ex);
+        }
+
+        log.info(`Sent response for ${req.method}`, req.url, {
+          headers: { ...headers }, // it fixes [Object: null prototype] in console
+          statusCode: res.statusCode,
+          statusMessage: res.statusMessage,
+          body
+        });
       });
     });
   }

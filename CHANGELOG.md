@@ -3,6 +3,7 @@
 
 ## [1.0.1](https://github.com/Yegorich555/webpack-mock-server/compare/v0.0.1...v1.0.1) (coming soon)
 
+* fix 'default logger catches exception and does not provide actual response'
 * fix '__dirname under wepback is not absolute`
 
 ## [1.0.0](https://github.com/Yegorich555/webpack-mock-server/compare/v0.0.4...v1.0.0) (February 7, 2020)
