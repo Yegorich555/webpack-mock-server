@@ -83,7 +83,6 @@ export default function mockServer(
 
       const oldWrite = res.write;
       const oldEnd = res.end;
-      // @ts-ignore
       const chunks: (Buffer | Uint8Array | string)[] = [];
 
       // @ts-ignore
@@ -163,6 +162,17 @@ export default function mockServer(
     } catch (ex) {
       res.send("Mock server is ready");
       log.error("Exception in provideRoutes()", ex as Error);
+    }
+  });
+
+  // provides favicon only in case if request to this server directly but not to via ParentProxyServer
+  app.get("/favicon.ico", (req, res, next) => {
+    const hostHeader = req.header("host");
+    // in this case previousPort == currentPort
+    if (hostHeader && hostHeader.includes(`:${previousPort}`)) {
+      res.sendFile(require.resolve("../public/favicon.ico"));
+    } else {
+      next();
     }
   });
 
