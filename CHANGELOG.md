@@ -6,7 +6,8 @@
 * BREAKING CHANGE: improve export for NodeJs-require (use **require('...')** instead of **require('...').default**)
 * add logResponse, logRequest, before to mockServerOptions
 * add 'single string' support for mockServerOptions.entry. Add type and wildcard checking
-* add mockServerHelper, add 'webpackMockServer.add' and 'webpackMockServer.defaultOptions'
+* add mockServerHelper. Add methods getRandomInt, getUniqueIdInt
+* add 'webpackMockServer.add' and 'webpackMockServer.defaultOptions'
 * fix 'sometimes mock-server overrides webpack port'
 * fix '__dirname' provides tmpName instead of sourceName
 * fix mockServerOptions: put noEmitHelpers and esModuleInterop to strictCompilerOptions

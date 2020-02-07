@@ -1,3 +1,4 @@
+let id = 0;
 /* eslint-disable class-methods-use-this */
 export class MockServerHelper {
   /**
@@ -7,6 +8,11 @@ export class MockServerHelper {
    */
   getRandomInt(min = 0, max = 2147483648): number {
     return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
+
+  /** Returns unique integer */
+  getUniqueIdInt(): number {
+    return ++id;
   }
 }
 

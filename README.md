@@ -14,7 +14,7 @@ Uses for mocking api responses
 - ES6 export/import support
 - Hot replacement support
 - Does not require proxy-path-pattern (because this is middleware that pipes routes to splitted server without proxy-path-pattern)
-- Can be used without webpack (because this is expressjs [middleware](http://expressjs.com/en/guide/using-middleware.html) )
+- Can be used without webpack (because this is expressjs [middleware](http://expressjs.com/en/guide/using-middleware.html))
 - Shows every configured response in user-friendly *index.html* (just click on mock-server-url in console after as mockServer is started)
 
 ## Installing
@@ -80,8 +80,8 @@ const webpackMockServer = require("webpack-mock-server");
 module.exports = {
   devServer: {
     before: app =>
-        webpackMockServer.use(app, { //MockServerOptions here
-          entry: [ //exact fileNames are expected (no wildcard or folder - use custom tsConfig instead)
+        webpackMockServer.use(app, { // MockServerOptions here
+          entry: [ // exact fileNames are expected (no wildcard or folder - use custom tsConfig instead)
               "api/users.mock.ts",
               "api/goods.mock.js"
           ],
@@ -218,10 +218,15 @@ module.exports = {
 | verbose               | Boolean                    | false               | Show debug info in NodeJs via console.log                                                                                                                                                                                        |
 | logResponses          | Boolean                    | false               | Show responses-info in NodeJs via console.log                                                                                                                                                                                    |
 | logRequests           | Boolean                    | false               | Show request-info in NodeJs via console.log                                                                                                                                                                                      |
-| before                | (req, res, next) => void   | undefined           | Execute custom middleware prior to all other middleware internally within the server Can be used for custom-logging. Example [here](#usage-with-multiplecustom-entries-instead-of-default-webpackmockts)                                  |
+| before                | (req, res, next) => void   | undefined           | Execute custom middleware prior to all other middleware internally within the server Can be used for custom-logging. Example [here](#usage-with-multiplecustom-entries-instead-of-default-webpackmockts)                         |
 | compilerOptions       | typescript.CompilerOptions | ...                 | See the latest example above                                                                                                                                                                                                     |
 | strictCompilerOptions | typescript.CompilerOptions | ...                 | **readOnly**. See the latest example above. These options impossible to override                                                                                                                                                 |
 | tsConfigFileName      | String                     | "tsconfig.json"     | Pointer to typescript config file. Example [here](#usage-with-multiple-entries-by-pattern-wildcard):                                                                                                                             |
+
+## MockServerHelper. Methods
+
+- [**.getRandomInt**(min = 0, max = 2147483648)](#MockServerHelper._Methods) ⇒ `Number - returns random integer between min and max`
+- [**.getUniqueIdInt**()](#MockServerHelper._Methods) ⇒ `Number - returns unique integer`
 
 ## Troubleshooting
 
