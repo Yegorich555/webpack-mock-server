@@ -127,9 +127,12 @@ export default function compiler(
     if (!data || path.includes("node_modules")) {
       return data;
     }
+
+    // this is required because under webpack 'path' is not absolute
+    const absolutePath = nodePath.resolve(path);
     return data
-      .replace(/(?<![/).])__dirname/g, `"${nodePath.dirname(path)}"`)
-      .replace(/(?<![/).])__filename/g, `"${path}"`);
+      .replace(/(?<![/).])__dirname/g, `String.raw\`${nodePath.dirname(absolutePath)}\``)
+      .replace(/(?<![/).])__filename/g, `String.raw\`${absolutePath}\``);
   };
 
   const host = ts.createWatchCompilerHost(

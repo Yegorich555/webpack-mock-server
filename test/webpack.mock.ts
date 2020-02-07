@@ -1,3 +1,4 @@
+/* eslint-disable import/no-dynamic-require */
 import nodePath from "path";
 import webpackMockServer from "../src/index";
 import testAddon from "../webpack.test.mockOut";
@@ -21,7 +22,7 @@ export default webpackMockServer.add(app => {
   });
   app.get("/testResponseFromJsonFile2", (_req, res) => {
     // eslint-disable-next-line @typescript-eslint/no-var-requires, global-require
-    res.json(require("./response.json"));
+    res.json(require(nodePath.join(__dirname, "./response.json")));
   });
 });
 
