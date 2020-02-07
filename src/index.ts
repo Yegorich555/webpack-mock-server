@@ -1,4 +1,6 @@
 import { Application as ExpressApp } from "express";
+import http, { Server } from "http";
+import { AddressInfo } from "net";
 import log from "./log";
 import MockServerOptions, { defOptions } from "./mockServerOptions";
 import mockServer from "./mockServer";
@@ -16,30 +18,49 @@ const webpackMockServer = {
     app: ExpressApp,
     extendOptions: MockServerOptions | undefined = undefined
   ): void {
-    try {
-      const opt = { ...defOptions, ...extendOptions } as MockServerOptions;
-      opt.compilerOptions = {
-        ...defOptions.compilerOptions,
-        ...extendOptions?.compilerOptions,
-        ...defOptions.strictCompilerOptions
-      };
-      log.verbose = opt.verbose;
+    const opt = {
+      ...defOptions,
+      ...extendOptions
+    } as MockServerOptions;
+    opt.compilerOptions = {
+      ...defOptions.compilerOptions,
+      ...extendOptions?.compilerOptions,
+      ...defOptions.strictCompilerOptions
+    };
+    log.verbose = opt.verbose;
 
-      mockServerMiddleware(app, 0);
-
-      compiler(
-        opt.entry,
-        opt.tsConfigFileName,
-        opt.compilerOptions,
-        outFileNames => {
-          mockServer(outFileNames, opt, port => {
-            mockServerMiddleware(app, port);
-          });
+    const prev = http.createServer;
+    http.createServer = function hook(): Server {
+      // @ts-ignore
+      const server = prev.apply(this, arguments);
+      server.once("listening", () => {
+        http.createServer = prev; // remove hook because another child-server will be started
+        const address = server.address() as AddressInfo;
+        const parentPort = (address && address.port) || 8080;
+        log.debug("Parent server is started. Starting mock-server...");
+        // set another port because of httpServer in the same process overrides previous listenere
+        if (opt.port === parentPort) {
+          ++opt.port;
         }
-      );
-    } catch (ex) {
-      log.error("Unable to start server", ex);
-    }
+        try {
+          mockServerMiddleware(app, opt.port);
+
+          compiler(
+            opt.entry,
+            opt.tsConfigFileName,
+            opt.compilerOptions,
+            outFileNames => {
+              mockServer(outFileNames, opt, port => {
+                mockServerMiddleware(app, port);
+              });
+            }
+          );
+        } catch (ex) {
+          log.error("Unable to start server\n", ex);
+        }
+      });
+      return server;
+    };
   },
   /**
    * Add mock functions into webackMockServer

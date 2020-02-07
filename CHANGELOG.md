@@ -7,6 +7,7 @@
 * add logResponse, logRequest, before to mockServerOptions
 * add 'single string' support for mockServerOptions.entry. Add type and wildcard checking
 * add mockServerHelper, add 'webpackMockServer.add' and 'webpackMockServer.defaultOptions'
+* fix 'sometimes mock-server overrides webpack port'
 * fix '__dirname' provides tmpName instead of sourceName
 * fix mockServerOptions: put noEmitHelpers and esModuleInterop to strictCompilerOptions
 * fix memory liquid on infinite handling 'process.on' events (each reloading from tsCompiler)
