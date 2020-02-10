@@ -101,8 +101,6 @@ export default function mockServer(
         oldEnd.apply(res, arguments);
       };
 
-      next();
-
       res.once("finish", () => {
         const headers = res.getHeaders();
         const contentType = (headers["content-type"] as string) || "";
@@ -145,6 +143,8 @@ export default function mockServer(
           body
         });
       });
+
+      next();
     });
   }
 

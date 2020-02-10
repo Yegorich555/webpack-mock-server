@@ -1,6 +1,10 @@
 <!-- markdownlint-disable MD024 -->
 <!-- markdownlint-disable MD041 -->
 
+## [1.0.2](https://github.com/Yegorich555/webpack-mock-server/compare/v1.0.1...v1.0.2) (February 10, 2020)
+
+* fix 'res.once should be before next() for avoiding missing res.once event for logging purpose'
+
 ## [1.0.1](https://github.com/Yegorich555/webpack-mock-server/compare/v1.0.0...v1.0.1) (February 7, 2020)
 
 * fix 'server does not provide favicon via directToServer response'
