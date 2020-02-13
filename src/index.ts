@@ -29,6 +29,9 @@ const webpackMockServer = {
     };
     log.verbose = opt.verbose;
 
+    // important to apply middleware before we made hook otherwise post/put request will be rejected
+    mockServerMiddleware(app, opt.port);
+
     const prev = http.createServer;
     http.createServer = function hook(): Server {
       // @ts-ignore
@@ -43,8 +46,6 @@ const webpackMockServer = {
           ++opt.port;
         }
         try {
-          mockServerMiddleware(app, opt.port);
-
           compiler(
             opt.entry,
             opt.tsConfigFileName,

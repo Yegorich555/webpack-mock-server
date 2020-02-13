@@ -1,6 +1,10 @@
 <!-- markdownlint-disable MD024 -->
 <!-- markdownlint-disable MD041 -->
 
+## [1.0.3](https://github.com/Yegorich555/webpack-mock-server/compare/v1.0.2...v1.0.3) (February 13, 2020)
+
+* fix 'post/put does not work and returns httpCode: 405'
+
 ## [1.0.2](https://github.com/Yegorich555/webpack-mock-server/compare/v1.0.1...v1.0.2) (February 10, 2020)
 
 * fix 'res.once should be before next() for avoiding missing res.once event for logging purpose'
