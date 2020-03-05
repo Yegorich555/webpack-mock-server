@@ -233,6 +233,8 @@ module.exports = {
 ## Troubleshooting
 
 - Don't use NodeJs **require** operator **as dynamic** to relative path. Use __dirname in this case or absolute path (__dirname is changed during the compilation)
+- NodeJs caches every **require**d module (file), so you maybe interested in clearing cache for *require(*.json)*.
+  Use ```delete require.cache[require.resolve({yourPathName})]``` before you call ```require({yourPathName})```;
 
 ```js
 // Wrong
@@ -252,10 +254,12 @@ app.get("/testResponseFromJsonFile", (_req, res) => {
 });
 
 app.get("/testResponseFromJsonFile2", (_req, res) => {
-   res.json(require("./response.json", {paths: {__dirname}));
-});
-
-app.get("/testResponseFromJsonFile3", (_req, res) => {
-   res.json(require(nodePath.join(__dirname, "./response.json")));
+  /* From NodeJs v8.9.0 you can use options: path
+   * const resolvedPath = require.resolve("./response.json", { paths: [__dirname] });
+   */
+  const resolvedPath = require.resolve(nodePath.join(__dirname, "./response.json"));  
+  // removing NodeJS cache for getting the latest file
+  delete require.cache[resolvedPath];
+  res.json(require(resolvedPath));
 });
 ```

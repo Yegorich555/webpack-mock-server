@@ -21,8 +21,23 @@ export default webpackMockServer.add(app => {
     res.sendFile(nodePath.join(__dirname, "./response.json"));
   });
   app.get("/testResponseFromJsonFile2", (_req, res) => {
+    const resolvedPath = require.resolve(
+      nodePath.join(__dirname, "./response.json")
+    );
+    // removing NodeJS cache for getting the latest file
+    delete require.cache[resolvedPath];
     // eslint-disable-next-line @typescript-eslint/no-var-requires, global-require
-    res.json(require(nodePath.join(__dirname, "./response.json")));
+    res.json(require(resolvedPath));
+  });
+  app.get("/testResponseFromJsonFile2_alt", (_req, res) => {
+    const resolvedPath = require.resolve("./response.json", {
+      // option 'paths' available from NodeJS v8.9.0
+      paths: [__dirname]
+    });
+    // removing NodeJS cache for getting the latest file
+    delete require.cache[resolvedPath];
+    // eslint-disable-next-line @typescript-eslint/no-var-requires, global-require
+    res.json(require(resolvedPath));
   });
 });
 
