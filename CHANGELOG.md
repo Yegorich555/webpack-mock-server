@@ -1,5 +1,9 @@
 <!-- markdownlint-disable MD024 -->
 <!-- markdownlint-disable MD041 -->
+## [1.0.5](https://github.com/Yegorich555/webpack-mock-server/compare/v1.0.4...v1.0.5) (March 16, 2020)
+
+* Fix vulnerabilities in packages
+  
 ## [1.0.4](https://github.com/Yegorich555/webpack-mock-server/compare/v1.0.3...v1.0.4) (March 5, 2020)
 
 * update README: point on NodeJs ```require.cache``` and how we can delete it
