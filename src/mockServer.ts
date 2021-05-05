@@ -7,6 +7,7 @@ import provideRoutes from "./provideRoutes";
 import NetError from "./netError";
 import { OutputMockFile } from "./compilerOutRootFiles";
 import MockServerOptions from "./mockServerOptions";
+import multer from "multer";
 
 let app: Application;
 let server: Server | undefined;
@@ -61,6 +62,10 @@ export default function mockServer(
   close();
   app = express();
   app.set("json spaces", 2); // prettify json-response
+  app.use(express.json());
+  app.use(express.urlencoded({ extended: true })); // support form-urlencoded
+  app.use(express.text()); // support ordinary text
+  app.use(multer().none()); // support multipart/form-data
 
   options.before && app.use(options.before);
 

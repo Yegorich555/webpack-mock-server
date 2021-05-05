@@ -31,7 +31,7 @@ function reportDiagnostic(diagnostic: ts.Diagnostic): void {
 /** Clear Node cache for files in tmpFolder */
 function clearNodeCache(rootPath: string): void {
   Object.keys(require.cache).forEach(key => {
-    if (require.cache[key].filename.startsWith(rootPath)) {
+    if (require.cache[key]?.filename.startsWith(rootPath)) {
       log.debug("delete node-cache for", key);
       delete require.cache[key];
     }
@@ -131,7 +131,10 @@ export default function compiler(
     // this is required because under webpack 'path' is not absolute
     const absolutePath = nodePath.resolve(path);
     return data
-      .replace(/(?<![/).])__dirname/g, `String.raw\`${nodePath.dirname(absolutePath)}\``)
+      .replace(
+        /(?<![/).])__dirname/g,
+        `String.raw\`${nodePath.dirname(absolutePath)}\``
+      )
       .replace(/(?<![/).])__filename/g, `String.raw\`${absolutePath}\``);
   };
 

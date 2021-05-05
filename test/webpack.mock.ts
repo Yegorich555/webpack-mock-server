@@ -47,17 +47,8 @@ export const result2 = webpackMockServer.add(app => {
     res.download("public/favicon.ico", "favicon.ico");
   });
 
-  app.post(["/testPost"], (_req, res) => {
-    const response = [];
-    for (let i = 0; i < 20; ++i) {
-      response.push({
-        bestAddress1: "101 Main St",
-        bestAddress2: "",
-        bestCountry: "US",
-        lastDate: new Date()
-      });
-    }
-    res.json(response);
+  app.post(["/testPost"], (req, res) => {
+    res.json({ success: !!req.body, gotBody: req.body || null });
   });
 
   ["get", "post", "put", "delete"].forEach(method => {

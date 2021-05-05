@@ -1,8 +1,14 @@
 <!-- markdownlint-disable MD024 -->
 <!-- markdownlint-disable MD041 -->
+## [1.0.6](https://github.com/Yegorich555/webpack-mock-server/compare/v1.0.5...v1.0.6) (May 5, 2021)
+
+* add inbox supporting of popular body types as json/form-urlencoded/text/multipart-form-data (mostly for post/put requests)
+* move package @types/express to dependencies (for ts/js-intellisense)
+* update packages
+  
 ## [1.0.5](https://github.com/Yegorich555/webpack-mock-server/compare/v1.0.4...v1.0.5) (March 16, 2020)
 
-* Fix vulnerabilities in packages
+* fix vulnerabilities in packages
   
 ## [1.0.4](https://github.com/Yegorich555/webpack-mock-server/compare/v1.0.3...v1.0.4) (March 5, 2020)
 
