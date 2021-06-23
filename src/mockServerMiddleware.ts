@@ -41,7 +41,7 @@ export default function mockServerMiddleware(
         if (res.statusCode === 404) {
           next();
         } else if (res) {
-          clientRes.writeHead(201 || res.statusCode || 200, res.headers);
+          clientRes.writeHead(res.statusCode || 200, res.headers);
           res.pipe(clientRes, {
             end: true
           });
