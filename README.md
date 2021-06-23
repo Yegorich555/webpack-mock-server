@@ -19,10 +19,10 @@ Uses for mocking api responses
 
 ## Installing
 
-Using npm:
+Using npm (installing Typescript is required even if you don't use ts files):
 
 ```npm
-npm install webpack-mock-server
+npm install --save-dev webpack-mock-server typescript
 ```
 
 ## Examples
@@ -232,6 +232,7 @@ module.exports = {
 
 ## Troubleshooting
 
+- It's important to install Typescript even if use only JS-files (webpack-mock-server uses ts-compiler for gathering ts,js,json files)
 - Don't use NodeJs **require** operator **as dynamic** to relative path. Use __dirname in this case or absolute path (__dirname is changed during the compilation)
 - NodeJs caches every **require**d module (file), so you maybe interested in clearing cache for *require(*.json)*.
   Use ```delete require.cache[require.resolve({yourPathName})]``` before you call ```require({yourPathName})```;

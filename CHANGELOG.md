@@ -1,5 +1,9 @@
 <!-- markdownlint-disable MD024 -->
 <!-- markdownlint-disable MD041 -->
+## [1.0.7](https://github.com/Yegorich555/webpack-mock-server/compare/v1.0.6...v1.0.7) (June 23, 2021)
+
+* fixed case when https is selected in devServer
+  
 ## [1.0.6](https://github.com/Yegorich555/webpack-mock-server/compare/v1.0.5...v1.0.6) (May 5, 2021)
 
 * add inbox supporting of popular body types as json/form-urlencoded/text/multipart-form-data (mostly for post/put requests)
