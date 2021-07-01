@@ -1,5 +1,9 @@
 <!-- markdownlint-disable MD024 -->
 <!-- markdownlint-disable MD041 -->
+## [1.0.9](https://github.com/Yegorich555/webpack-mock-server/compare/v1.0.8...v1.0.9) (July 1, 2021)
+
+* removed console.warn added previously for debugging
+  
 ## [1.0.8](https://github.com/Yegorich555/webpack-mock-server/compare/v1.0.7...v1.0.8) (June 23, 2021)
 
 * fixed wrong http-code (was 201 instead of inherited)
