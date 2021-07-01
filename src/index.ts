@@ -30,7 +30,6 @@ const webpackMockServer = {
     };
     log.verbose = opt.verbose;
 
-    console.warn(app);
     // important to apply middleware before we made hook otherwise post/put request will be rejected
     mockServerMiddleware(app, opt.port);
 
