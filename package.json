@@ -45,26 +45,26 @@
   },
   "homepage": "https://github.com/Yegorich555/webpack-mock-server#readme",
   "devDependencies": {
-    "@types/multer": "^1.4.5",
-    "@types/node": "^13.13.51",
+    "@types/multer": "^1.4.7",
+    "@types/node": "^13.13.52",
     "@typescript-eslint/eslint-plugin": "^2.34.0",
     "@typescript-eslint/parser": "^2.34.0",
     "eslint": "^6.8.0",
     "eslint-config-airbnb-base": "^14.2.1",
     "eslint-config-prettier": "^6.15.0",
     "eslint-import-resolver-alias": "^1.1.2",
-    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-import": "^2.23.4",
     "eslint-plugin-json": "^2.1.2",
     "eslint-plugin-prettier": "^3.4.0",
     "express": "^4.17.1",
     "prettier": "^1.19.1",
-    "typescript": "^3.9.9",
+    "typescript": "^3.9.10",
     "webpack": "^4.46.0",
     "webpack-cli": "^3.3.12",
     "webpack-dev-server": "^3.11.2"
   },
   "dependencies": {
-    "@types/express": "^4.17.11",
+    "@types/express": "^4.17.13",
     "multer": "^1.4.2"
   },
   "peerDependencies": {
