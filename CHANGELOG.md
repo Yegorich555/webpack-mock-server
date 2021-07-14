@@ -1,6 +1,10 @@
 <!-- markdownlint-disable MD024 -->
 <!-- markdownlint-disable MD041 -->
-## [1.0.10](https://github.com/Yegorich555/webpack-mock-server/compare/v1.0.8...v1.0.11) (July 12, 2021)
+## [1.0.12](https://github.com/Yegorich555/webpack-mock-server/compare/v1.0.11...v1.0.12) (July 14, 2021)
+
+* fixed 'sometimes old response after recompilation'
+  
+## [1.0.11](https://github.com/Yegorich555/webpack-mock-server/compare/v1.0.8...v1.0.11) (July 12, 2021)
 
 * removed console.warn added previously for debugging
   
