@@ -1,13 +1,13 @@
 import express, { Application } from "express";
-import { Server } from "http";
-import nodePath from "path";
 import fs from "fs";
-import log from "./log";
-import provideRoutes from "./provideRoutes";
-import NetError from "./netError";
-import { OutputMockFile } from "./compilerOutRootFiles";
-import MockServerOptions from "./mockServerOptions";
+import { Server } from "http";
 import multer from "multer";
+import nodePath from "path";
+import { OutputMockFile } from "./compilerOutRootFiles";
+import log from "./log";
+import MockServerOptions from "./mockServerOptions";
+import NetError from "./netError";
+import provideRoutes from "./provideRoutes";
 
 let app: Application;
 let server: Server | undefined;
