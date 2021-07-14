@@ -2,6 +2,7 @@ import express, { Application } from "express";
 import fs from "fs";
 import { Server } from "http";
 import multer from "multer";
+import { Socket } from "net";
 import nodePath from "path";
 import { OutputMockFile } from "./compilerOutRootFiles";
 import log from "./log";
@@ -11,11 +12,22 @@ import provideRoutes from "./provideRoutes";
 
 let app: Application;
 let server: Server | undefined;
+const sockets = new Set<Socket>();
 let previousPort = 0;
 
-function close(callback?: (err?: Error) => void): void {
-  server && server.close(callback);
-  server = undefined;
+function close(): Promise<void> {
+  return new Promise(resolve => {
+    if (server) {
+      sockets.forEach(v => v.destroy());
+      sockets.clear();
+      server.close(() => {
+        resolve();
+        server = undefined;
+      });
+    } else {
+      resolve();
+    }
+  });
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -43,12 +55,12 @@ function requireDefault(file: OutputMockFile): (usedApp: Application) => void {
 }
 
 let isFirstStart = true;
-export default function mockServer(
+export default async function mockServer(
   attachedFileNames: OutputMockFile[],
   options: MockServerOptions,
   listenCallback: (port: number, server: Server) => void
-): Application {
-  log.debug(!server ? "starting" : "re-starting");
+): Promise<Application> {
+  log.debug(!server ? "starting" : "re-starting...");
 
   /*
    *  self-destroying
@@ -59,7 +71,8 @@ export default function mockServer(
     isFirstStart = false;
   }
 
-  close();
+  await close();
+
   app = express();
   app.set("json spaces", 2); // prettify json-response
   app.use(express.json());
@@ -198,6 +211,12 @@ export default function mockServer(
         } else {
           log.error("", err);
         }
+      })
+      .on("connection", socket => {
+        sockets.add(socket);
+        socket.once("close", () => {
+          sockets.delete(socket);
+        });
       });
   }
 
