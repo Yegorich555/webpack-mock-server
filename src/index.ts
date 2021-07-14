@@ -8,6 +8,7 @@ import mockServer from "./mockServer";
 import mockServerHelper, { MockServerHelper } from "./mockServerHelper";
 import mockServerMiddleware from "./mockServerMiddleware";
 import MockServerOptions, { defOptions } from "./mockServerOptions";
+import NetError from "./netError";
 
 const webpackMockServer = {
   /**
@@ -30,6 +31,8 @@ const webpackMockServer = {
     };
     log.verbose = opt.verbose;
 
+    let isDefined = false;
+
     // important to apply middleware before we made hook otherwise post/put request will be rejected
     mockServerMiddleware(app, opt.port);
 
@@ -48,16 +51,24 @@ const webpackMockServer = {
       httpOrHttps.createServer = function hook(): T {
         // @ts-ignore
         const server = prev.apply(this, arguments);
-        server.once("listening", () => {
+
+        function parentServerCallback(err?: NetError): void {
+          if (isDefined) {
+            return;
+          }
+          isDefined = true;
+
+          console.log("\n\ngot listening\n\n");
           disposeAll.forEach(d => d());
           disposeAll = [];
           const address = server.address() as AddressInfo;
-          const parentPort = (address && address.port) || 8080;
+          const parentPort = address?.port || err?.port || 8080;
           log.debug("Parent server is started. Starting mock-server...");
           // set another port because of httpServer in the same process overrides previous listenere
           if (opt.port === parentPort) {
             ++opt.port;
           }
+
           try {
             compiler(
               opt.entry,
@@ -72,7 +83,10 @@ const webpackMockServer = {
           } catch (ex) {
             log.error("Unable to start server\n", ex);
           }
-        });
+        }
+
+        server.once("listening", parentServerCallback);
+        server.once("error", parentServerCallback);
         return server as T;
       };
     }
