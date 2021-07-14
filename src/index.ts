@@ -58,7 +58,6 @@ const webpackMockServer = {
           }
           isDefined = true;
 
-          console.log("\n\ngot listening\n\n");
           disposeAll.forEach(d => d());
           disposeAll = [];
           const address = server.address() as AddressInfo;

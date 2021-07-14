@@ -55,6 +55,7 @@ function requireDefault(file: OutputMockFile): (usedApp: Application) => void {
 }
 
 let isFirstStart = true;
+
 export default async function mockServer(
   attachedFileNames: OutputMockFile[],
   options: MockServerOptions,
@@ -62,12 +63,16 @@ export default async function mockServer(
 ): Promise<Application> {
   log.debug(!server ? "starting" : "re-starting...");
 
-  /*
-   *  self-destroying
-   */
+  // self-destroying
   if (isFirstStart) {
-    process.on("SIGINT", () => close()); // handle termination by Ctrl+C
-    process.on("beforeExit", () => close());
+    const signals: Array<NodeJS.Signals> = ["SIGINT", "SIGTERM"];
+    signals.forEach(s => {
+      process.on(s, async () => {
+        await close();
+        process.exit();
+      });
+    });
+
     isFirstStart = false;
   }
 

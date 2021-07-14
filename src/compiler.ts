@@ -1,9 +1,9 @@
-import ts from "typescript";
 import fs from "fs";
 import nodePath from "path";
+import ts from "typescript";
+import CompilerOutRootFiles, { OutputMockFile } from "./compilerOutRootFiles";
 import log from "./log";
 import VersionContainer, { nodeJsVer } from "./versionContainer";
-import CompilerOutRootFiles, { OutputMockFile } from "./compilerOutRootFiles";
 
 const formatHost: ts.FormatDiagnosticsHost = {
   getCanonicalFileName: path => path,
@@ -208,6 +208,11 @@ export default function compiler(
     closed = true;
   }
 
-  process.on("SIGINT", close); // handle termination by Ctrl+C
-  process.on("beforeExit", close);
+  const signals: Array<NodeJS.Signals> = ["SIGINT", "SIGTERM"];
+  signals.forEach(s => {
+    process.on(s, () => {
+      close();
+      process.exit();
+    });
+  });
 }
