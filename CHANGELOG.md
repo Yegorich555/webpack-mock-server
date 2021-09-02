@@ -1,6 +1,10 @@
 <!-- markdownlint-disable MD024 -->
 <!-- markdownlint-disable MD041 -->
 
+## [1.0.14](https://github.com/Yegorich555/webpack-mock-server/compare/v1.0.13...v1.0.14) (September 2, 2021)
+
+- added support ts-path-alias. Related to <https://github.com/microsoft/TypeScript/issues/26722>
+
 ## [1.0.13](https://github.com/Yegorich555/webpack-mock-server/compare/v1.0.12...v1.0.13) (July 14, 2021)
 
 - fixed 'webpack throws EADDRINUSE after restarting with webpack-mock-server'
