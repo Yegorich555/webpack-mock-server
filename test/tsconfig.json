@@ -4,6 +4,19 @@
   "exclude": ["../test/*mockExclude.ts"],
   "files": [],
   "compilerOptions": {
-    "resolveJsonModule": true
+    "baseUrl": "../",
+    "paths": {
+      //none-js-ts files is not supported by intellisense. Use 'path-intellisense.mappings' in .vscode/settings.json instead
+      //this is should be sync with aliases in webpack
+      "@/*": ["./*"]
+    },
+    "outDir": "./testBuild",
+    "target": "es6",
+    "declaration": true,
+    "esModuleInterop": true,
+    "strict": true,
+    "module": "commonJs",
+    "allowJs": true,
+    "checkJs": true
   }
 }

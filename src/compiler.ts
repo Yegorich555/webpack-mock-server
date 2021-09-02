@@ -99,6 +99,23 @@ export default function compiler(
     return ts.sys.watchDirectory(...arguments);
   };
 
+  // todo import alias doesn't work https://github.com/microsoft/TypeScript/issues/26722
+  function resolvePathAlias(filePath: string, path: string): string {
+    /* eslint-disable @typescript-eslint/no-use-before-define */
+    const isMatchAlias = definedTSOptions.pathsArr.some(
+      v => v[0] === filePath[0]
+    );
+
+    if (isMatchAlias) {
+      const m = ts.resolveModuleName(filePath, path, definedTSOptions, host)
+        .resolvedModule?.resolvedFileName;
+      /* eslint-enable @typescript-eslint/no-use-before-define */
+      return m || filePath;
+    }
+
+    return filePath;
+  }
+
   sysConfig.writeFile = function writeFile(path: string, data: string): void {
     log.debug("write", path);
     isOutputChanged = true;
@@ -106,8 +123,10 @@ export default function compiler(
     if (data) {
       arguments[1] = data.replace(
         /require\(["']([^./\\][^\n\r]+)["']\)/g,
-        (_str, matchGroup1: string) =>
-          `require(require.resolve("${matchGroup1}", {paths:[process.cwd(), "${process.env.NODE_PATH}"]} ))`
+        (_str, mPath: string) => {
+          // prettier-ignore
+          return `require(require.resolve("${resolvePathAlias(mPath, path)}", {paths:[process.cwd(), "${process.env.NODE_PATH || ''}"]} ))`;
+        }
       );
     }
     // @ts-ignore
@@ -138,6 +157,9 @@ export default function compiler(
       .replace(/(?<![/).])__filename/g, `String.raw\`${absolutePath}\``);
   };
 
+  // eslint-disable-next-line no-param-reassign
+  // extendCompilerOptions.traceResolution = true;
+
   const host = ts.createWatchCompilerHost(
     tsConfigFileName,
     extendCompilerOptions,
@@ -155,6 +177,7 @@ export default function compiler(
     }
   );
 
+  let definedTSOptions: ts.CompilerOptions & { pathsArr: string[] };
   const origCreateProgram = host.createProgram;
   host.createProgram = function hookCreateProgram(
     tsRootNames,
@@ -164,14 +187,20 @@ export default function compiler(
     arguments[0] = definedRootNames;
     const tsOptions = allOptions as ts.CompilerOptions;
 
+    // rewrite to resolve alias-paths relative to outDir
+    definedTSOptions = JSON.parse(JSON.stringify(tsOptions));
+    definedTSOptions.baseUrl = definedTSOptions.outDir;
+    definedTSOptions.pathsArr =
+      (definedTSOptions.paths && Object.keys(definedTSOptions.paths)) || [];
+
     isOutputChanged = outMockFiles.update(
       definedRootNames,
       tsOptions.rootDir as string,
       tsOptions.outDir as string
     );
-
     log.debug("defined root names", "", definedRootNames);
     log.debug("TS options", "", tsOptions);
+
     // @ts-ignore
     return origCreateProgram(...arguments);
   };

@@ -1,5 +1,9 @@
 {
   "compilerOptions": {
+    "baseUrl": "./",
+    "paths": {
+      "@/*": ["/*"],
+    },
     "outDir": "./lib",
     "target": "es6",
     "declaration": true,
