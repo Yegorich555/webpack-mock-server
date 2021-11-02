@@ -1,6 +1,10 @@
 <!-- markdownlint-disable MD024 -->
 <!-- markdownlint-disable MD041 -->
 
+## [1.0.15](https://github.com/Yegorich555/webpack-mock-server/compare/v1.0.14...v1.0.15) (November 2, 2021)
+
+- added support uploading files with auto-storing to memory and mapping to routes (for retrieving back)
+
 ## [1.0.14](https://github.com/Yegorich555/webpack-mock-server/compare/v1.0.13...v1.0.14) (September 2, 2021)
 
 - added support ts-path-alias. Related to <https://github.com/microsoft/TypeScript/issues/26722>
