@@ -39,6 +39,10 @@ export default webpackMockServer.add(app => {
     // eslint-disable-next-line @typescript-eslint/no-var-requires, global-require
     res.json(require(resolvedPath));
   });
+  app.post("/testUploadFile", (req, res) => {
+    console.warn(req.file, req.files);
+    res.json(req.fileDownloadUrls && req.fileDownloadUrls[0]);
+  });
 });
 
 export const result2 = webpackMockServer.add(app => {

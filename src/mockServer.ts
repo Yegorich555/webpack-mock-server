@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-namespace */
 import express, { Application } from "express";
 import fs from "fs";
 import { Server } from "http";
@@ -32,6 +33,7 @@ function close(): Promise<void> {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function requireDefault(file: OutputMockFile): (usedApp: Application) => void {
+  // todo it doesn't work with ES6 imports in packages
   // eslint-disable-next-line import/no-dynamic-require, global-require, @typescript-eslint/no-var-requires
   const m = require(file.path);
 
@@ -83,7 +85,48 @@ export default async function mockServer(
   app.use(express.json());
   app.use(express.urlencoded({ extended: true })); // support form-urlencoded
   app.use(express.text()); // support ordinary text
-  app.use(multer().none()); // support multipart/form-data
+  app.use(multer().any()); // support multipart/form-data
+
+  // uploadImage middleware - storing in memory
+  app.use((req, _res, next) => {
+    if (req.file || req.files?.length) {
+      const fileDownloadUrls: string[] = [];
+
+      // eslint-disable-next-line no-inner-declarations
+      function assignFile(file: Express.Multer.File | undefined): void {
+        if (!file) {
+          return;
+        }
+
+        const lastModified = Date.now();
+        // eslint-disable-next-line no-param-reassign
+        file.downloadUrl = `/_file/${lastModified}_${file.originalname}`;
+        fileDownloadUrls.push(file.downloadUrl);
+
+        app.get(file.downloadUrl, (_req, res) => {
+          res.writeHead(200, {
+            "Content-Type": file.mimetype,
+            "Last-Modified": new Date(lastModified).toUTCString()
+          });
+          res.end(file.buffer);
+        });
+      }
+
+      assignFile(req.file);
+      // eslint-disable-next-line no-unused-expressions
+      const { files } = req;
+      if (files) {
+        if (Array.isArray(files)) {
+          files.forEach(v => assignFile(v));
+        } else {
+          Object.keys(files).forEach(k => files[k].forEach(v => assignFile(v)));
+        }
+      }
+
+      req.fileDownloadUrls = fileDownloadUrls;
+    }
+    next();
+  });
 
   options.before && app.use(options.before);
 
@@ -156,7 +199,7 @@ export default async function mockServer(
             }
           }
         } catch (ex) {
-          log.error("", ex);
+          log.error("", ex as Error);
         }
 
         log.info(`Sent response for ${req.method}`, req.url, {
@@ -238,7 +281,7 @@ export default async function mockServer(
     }
     listen(options.port);
   } catch (ex) {
-    log.error("Exception during attaching node-modules", ex);
+    log.error("Exception during attaching node-modules", ex as Error);
   }
 
   return app;

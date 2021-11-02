@@ -69,7 +69,8 @@
   },
   "peerDependencies": {
     "typescript": ">=2.7",
-    "express": "*"
+    "express": "*",
+    "@types/multer": "*"
   },
   "files": [
     "lib/*",

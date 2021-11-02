@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-namespace */
 import { Application as ExpressApp } from "express";
 import http, { Server } from "http";
 import https from "https";
@@ -12,7 +13,7 @@ import NetError from "./netError";
 
 const webpackMockServer = {
   /**
-   * Applies wepackMiddleware on existed express-application
+   * Applies webpackMiddleware on existed express-application
    * @param app expressjs application that is used for mapping-routes
    * @param extendOptions MockServerOptions that overrides default options
    */
@@ -80,7 +81,7 @@ const webpackMockServer = {
               }
             );
           } catch (ex) {
-            log.error("Unable to start server\n", ex);
+            log.error("Unable to start server\n", ex as Error);
           }
         }
 
@@ -111,3 +112,21 @@ const webpackMockServer = {
 };
 
 export = webpackMockServer;
+
+declare global {
+  namespace Express {
+    interface Request {
+      /**
+       * Urls that can be used for downloading uploaded files
+       * Uploading files automatically stores it's in memory
+       * As alternative you can check req.file and req.files for getting file-names
+       * */
+      fileDownloadUrls?: string[];
+    }
+    namespace Multer {
+      interface File {
+        downloadUrl: string;
+      }
+    }
+  }
+}
