@@ -15,7 +15,7 @@ Uses for mocking api responses
 - Hot replacement support
 - Does not require proxy-path-pattern (because this is middleware that pipes routes to splitted server without proxy-path-pattern)
 - Can be used without webpack (because this is expressjs [middleware](http://expressjs.com/en/guide/using-middleware.html))
-- Shows every configured response in user-friendly *index.html* (just click on mock-server-url in console after as mockServer is started)
+- Shows every configured response in user-friendly _index.html_ (just click on mock-server-url in console after as mockServer is started)
 
 ## Installing
 
@@ -37,7 +37,7 @@ module.exports = {
   devServer: {
     before: webpackMockServer.use
   }
-}
+};
 
 // webpack.mock.ts - feel free to mock responses yourself
 import webpackMockServer from "webpack-mock-server";
@@ -54,21 +54,22 @@ export default webpackMockServer.add((app, helper) => {
   });
 
   // you can return any file easy. Example for json response from file:
-   app.get("/testResponseFromJsonFile", (_req, res) => {
+  app.get("/testResponseFromJsonFile", (_req, res) => {
     res.sendFile(nodePath.join(__dirname, "./response.json"));
   });
-})
+});
 
 // multiple exports are supported
 export const result = webpackMockServer.add((app, helper) => {
   app.delete("/testDelete", (_req, res) => {
-    res.json("JS delete-object can be here. Random int:" + helper.getRandomInt());
+    res.json(
+      "JS delete-object can be here. Random int:" + helper.getRandomInt()
+    );
   });
   app.pust("/testPut", (_req, res) => {
     res.json("JS put-object can be here");
   });
-})
-  
+});
 ```
 
 ### Usage with multiple/custom entries (instead of default **webpack.mock.ts**)
@@ -166,6 +167,8 @@ app.listen(1782);
 
 ### Usage with the whole default config
 
+#### for webpack [v5+](https://webpack.js.org/configuration/dev-server/#devserveronbeforesetupmiddleware)
+
 ```js
 // webpack.config.js
 ...
@@ -173,7 +176,52 @@ const webpackMockServer = require("webpack-mock-server");
 
 module.exports = {
   devServer: {
-    before: app =>
+    onBeforeSetupMiddleware: devServer => // it's different for wepback v4
+      webpackMockServer.use(devServer.app, {
+          port: 8079, // app searches for free port (starts searching from pointed)
+          verbose: false, // send info via console.log
+          logRequests: false,
+          logResponses: false,
+          before: undefined, //can be used for logging
+          entry: ["webpack.mock.ts"],
+          tsConfigFileName: "tsconfig.json",
+          compilerOptions: { // typescript.CompilerOptions that override tsconfig.json:[compilerOptions]
+              strictNullChecks: false,
+              noImplicitAny: false,
+              noUnusedLocals: false,
+              noUnusedParameters: false,
+              skipLibCheck: true,
+              resolveJsonModule: true
+          },
+          strictCompilerOptions: { // these options impossible to override
+              outDir: "" // used the following: {os.tmpdir()}/webpack-mock-server/{new Date().getTime()}
+              rootDir: process.cwd(),
+              noEmit: false,
+              noEmitHelpers: false,
+              esModuleInterop: true,
+              module: ts.ModuleKind.CommonJS,
+              declaration: false,
+              moduelResolution: ModuleResolutionKind.NodeJs,
+              target: defineTarget() // it defines target-ES based on NODE version
+          }
+      })
+  }
+}
+
+// webpack.mock.ts - example you can find above
+...
+```
+
+#### for webpack v4
+
+```js
+// webpack.config.js
+...
+const webpackMockServer = require("webpack-mock-server");
+
+module.exports = {
+  devServer: {
+    before: app => // it's different for wepback v5
       webpackMockServer.use(app, {
           port: 8079, // app searches for free port (starts searching from pointed)
           verbose: false, // send info via console.log
@@ -211,11 +259,11 @@ module.exports = {
 
 ## Options
 
-**Note:** Every path-file-name in options has to be pointed relative to the *currentWorkingDirectory* (*process.cwd()* in NodeJs) **or** point an absolute path
+**Note:** Every path-file-name in options has to be pointed relative to the _currentWorkingDirectory_ (_process.cwd()_ in NodeJs) **or** point an absolute path
 
 | Param                 | Type                       | Default             | Description                                                                                                                                                                                                                      |
 | --------------------- | -------------------------- | ------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| entry                 | String, String[], null     | ["webpack.mock.ts"] | Entry points for typescript-compiler (exact fileNames are expected). Set an **empty array** or **null** for using **files**, **include** and **exlcude** sections from *tsConfigFileName*. Otherwise these sections are ignored! |
+| entry                 | String, String[], null     | ["webpack.mock.ts"] | Entry points for typescript-compiler (exact fileNames are expected). Set an **empty array** or **null** for using **files**, **include** and **exlcude** sections from _tsConfigFileName_. Otherwise these sections are ignored! |
 | port                  | Number                     | 8079                | App searches for free port (starts searching from pointed)                                                                                                                                                                       |
 | verbose               | Boolean                    | false               | Show debug info in NodeJs via console.log                                                                                                                                                                                        |
 | logResponses          | Boolean                    | false               | Show responses-info in NodeJs via console.log                                                                                                                                                                                    |
@@ -233,9 +281,9 @@ module.exports = {
 ## Troubleshooting
 
 - It's important to install Typescript even if use only JS-files (webpack-mock-server uses ts-compiler for gathering ts,js,json files)
-- Don't use NodeJs **require** operator **as dynamic** to relative path. Use __dirname in this case or absolute path (__dirname is changed during the compilation)
-- NodeJs caches every **require**d module (file), so you maybe interested in clearing cache for *require(*.json)*.
-  Use ```delete require.cache[require.resolve({yourPathName})]``` before you call ```require({yourPathName})```;
+- Don't use NodeJs **require** operator **as dynamic** to relative path. Use **dirname in this case or absolute path (**dirname is changed during the compilation)
+- NodeJs caches every **require**d module (file), so you maybe interested in clearing cache for _require(_.json)\*.
+  Use `delete require.cache[require.resolve({yourPathName})]` before you call `require({yourPathName})`;
 
 ```js
 // Wrong
@@ -244,9 +292,9 @@ app.get("/testResponseFromJsonFile", (_req, res) => {
 });
 
 app.get("/testResponseFromJsonFile2", (_req, res) => {
-    res.json(require("./response.json"));
+  res.json(require("./response.json"));
 });
-  
+
 // Good
 import nodePath from "path";
 
@@ -258,7 +306,9 @@ app.get("/testResponseFromJsonFile2", (_req, res) => {
   /* From NodeJs v8.9.0 you can use options: path
    * const resolvedPath = require.resolve("./response.json", { paths: [__dirname] });
    */
-  const resolvedPath = require.resolve(nodePath.join(__dirname, "./response.json"));  
+  const resolvedPath = require.resolve(
+    nodePath.join(__dirname, "./response.json")
+  );
   // removing NodeJS cache for getting the latest file
   delete require.cache[resolvedPath];
   res.json(require(resolvedPath));
