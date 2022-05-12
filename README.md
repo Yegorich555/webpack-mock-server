@@ -117,10 +117,25 @@ export default webpackMockServer.add((app, helper) => {
 // webpack.config.js
 const webpackMockServer = require("webpack-mock-server");
 
+// for webpack v4
 module.exports = {
-  devServer: {
+  devServer: { 
     before: app =>
       webpackMockServer.use(app, {
+          /* set an empty-array or null to [entry], so entry will be defined
+              from 'files' and 'includes' sections in [tsConfigFileName]
+          */
+          entry: [],
+          tsConfigFileName: "mock/tsconfig.json" // use a different tsconfig-file that is contained entries
+      })
+  }
+}
+
+// for webpack v5
+module.exports = {
+  devServer: {
+    onBeforeSetupMiddleware: devServer => // it's different for wepback v4
+      webpackMockServer.use(devServer.app, {
           /* set an empty-array or null to [entry], so entry will be defined
               from 'files' and 'includes' sections in [tsConfigFileName]
           */
