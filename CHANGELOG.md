@@ -1,6 +1,11 @@
 <!-- markdownlint-disable MD024 -->
 <!-- markdownlint-disable MD041 -->
 
+## [1.0.16](https://github.com/Yegorich555/webpack-mock-server/compare/v1.0.15...v1.0.16) (May 12, 2022)
+
+- bump version of vulnerable packages
+- added [details about usage with webpack v5](README.md#for-webpack-v5)
+
 ## [1.0.15](https://github.com/Yegorich555/webpack-mock-server/compare/v1.0.14...v1.0.15) (November 2, 2021)
 
 - added support uploading files with auto-storing to memory and mapping to routes (for retrieving back)
