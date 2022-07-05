@@ -1,3 +1,4 @@
+/* eslint-disable no-use-before-define */
 import fs from "fs";
 import nodePath from "path";
 import ts from "typescript";
@@ -6,9 +7,9 @@ import log from "./log";
 import VersionContainer, { nodeJsVer } from "./versionContainer";
 
 const formatHost: ts.FormatDiagnosticsHost = {
-  getCanonicalFileName: path => path,
+  getCanonicalFileName: (path) => path,
   getCurrentDirectory: ts.sys.getCurrentDirectory,
-  getNewLine: () => ts.sys.newLine
+  getNewLine: () => ts.sys.newLine,
 };
 
 function reportDiagnostic(diagnostic: ts.Diagnostic): void {
@@ -17,8 +18,9 @@ function reportDiagnostic(diagnostic: ts.Diagnostic): void {
     const { line, character } = diagnostic.file.getLineAndCharacterOfPosition(
       diagnostic.start || 0
     );
-    linePointer = `in ${diagnostic.file?.fileName} (${line + 1},${character +
-      1})`;
+    linePointer = `in ${diagnostic.file?.fileName} (${line + 1},${
+      character + 1
+    })`;
   }
   log.error(
     `TS${diagnostic.code}: ${linePointer}\n${ts.flattenDiagnosticMessageText(
@@ -30,7 +32,7 @@ function reportDiagnostic(diagnostic: ts.Diagnostic): void {
 
 /** Clear Node cache for files in tmpFolder */
 function clearNodeCache(rootPath: string): void {
-  Object.keys(require.cache).forEach(key => {
+  Object.keys(require.cache).forEach((key) => {
     if (require.cache[key]?.filename.startsWith(rootPath)) {
       log.debug("delete node-cache for", key);
       delete require.cache[key];
@@ -55,7 +57,7 @@ export default function compiler(
 
   const entries = entry && (Array.isArray(entry) ? entry : [entry]);
   entries &&
-    entries.forEach(v => {
+    entries.forEach((v) => {
       if (typeof v !== "string") {
         throw new Error(
           `WebpackMockServer. Option [entry]. Only 'string' is expected: ${v}`
@@ -76,11 +78,11 @@ export default function compiler(
 
   const emptyWatcher: ts.FileWatcher = {
     // eslint-disable-next-line @typescript-eslint/no-empty-function
-    close: (): void => {}
+    close: (): void => {},
   };
 
   const sysConfig: ts.System = {
-    ...ts.sys
+    ...ts.sys,
   };
 
   sysConfig.watchFile = function watchFile(path: string): ts.FileWatcher {
@@ -103,7 +105,7 @@ export default function compiler(
   function resolvePathAlias(filePath: string, path: string): string {
     /* eslint-disable @typescript-eslint/no-use-before-define */
     const isMatchAlias = definedTSOptions.pathsArr.some(
-      v => v[0] === filePath[0]
+      (v) => v[0] === filePath[0]
     );
 
     if (isMatchAlias) {
@@ -123,10 +125,9 @@ export default function compiler(
     if (data) {
       arguments[1] = data.replace(
         /require\(["']([^./\\][^\n\r]+)["']\)/g,
-        (_str, mPath: string) => {
+        (_str, mPath: string) =>
           // prettier-ignore
-          return `require(require.resolve("${resolvePathAlias(mPath, path)}", {paths:[process.cwd(), "${process.env.NODE_PATH || ''}"]} ))`;
-        }
+          `require(require.resolve("${resolvePathAlias(mPath, path)}", {paths:[process.cwd(), "${process.env.NODE_PATH || ''}"]} ))`
       );
     }
     // @ts-ignore
@@ -166,7 +167,7 @@ export default function compiler(
     sysConfig,
     ts.createEmitAndSemanticDiagnosticsBuilderProgram,
     reportDiagnostic,
-    diagnostic => {
+    (diagnostic) => {
       if (isOutputChanged && onChanged && diagnostic.code === 6194) {
         clearNodeCache(extendCompilerOptions.outDir as string);
         onChanged(outMockFiles.files);
@@ -216,13 +217,13 @@ export default function compiler(
     // recursive option is expiremental and supported in node >= v12.10.0: https://nodejs.org/api/fs.html#fs_fs_rmdir_path_options_callback
     try {
       fs.rmdirSync(extendCompilerOptions.outDir as string, {
-        recursive: true
+        recursive: true,
       });
       // eslint-disable-next-line no-empty
     } catch (ex) {
       const nodeJsRequired = new VersionContainer("12.10.0");
       if (nodeJsVer > nodeJsRequired)
-        log.error("error in clearing tmp folder", ex);
+        log.error("error in clearing tmp folder", ex as Error);
     }
   }
 
@@ -238,7 +239,7 @@ export default function compiler(
   }
 
   const signals: Array<NodeJS.Signals> = ["SIGINT", "SIGTERM"];
-  signals.forEach(s => {
+  signals.forEach((s) => {
     process.on(s, () => {
       close();
       process.exit();

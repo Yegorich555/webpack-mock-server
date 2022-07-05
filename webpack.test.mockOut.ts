@@ -1,4 +1,4 @@
-import { Application, json } from "express";
+import { Application } from "express";
 
 export default (app: Application): void => {
   app.get("/testExportOut", (_req, res) => {

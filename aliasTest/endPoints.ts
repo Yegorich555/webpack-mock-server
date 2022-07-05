@@ -1,5 +1,5 @@
 const endPoints = {
-  get: "/api/testEndpoint"
+  get: "/api/testEndpoint",
 };
 
 export default endPoints;

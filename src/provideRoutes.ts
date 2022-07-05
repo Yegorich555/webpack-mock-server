@@ -5,13 +5,13 @@ type Route = {
   path: string;
 };
 
-type Stack = {
-  route: StackRoute | undefined;
-};
-
 type StackRoute = {
   methods: Record<string, string>;
   path: string;
+};
+
+type Stack = {
+  route: StackRoute | undefined;
 };
 
 export default function provideRoutes(
@@ -24,9 +24,9 @@ export default function provideRoutes(
     if (path !== exlcudePath) {
       routes.push({
         method: Object.keys(methods)
-          .filter(key => methods[key])
+          .filter((key) => methods[key])
           .join(","),
-        path
+        path,
       });
     }
   }
@@ -37,7 +37,7 @@ export default function provideRoutes(
       const { path } = r.route;
       const { methods } = r.route;
       if (Array.isArray(path)) {
-        path.forEach(v => normalizeInfo(v, methods));
+        path.forEach((v) => normalizeInfo(v, methods));
       } else {
         normalizeInfo(path, methods);
       }
@@ -48,7 +48,7 @@ export default function provideRoutes(
     return v1.localeCompare(v2, undefined, {
       sensitivity: "base",
       ignorePunctuation: true,
-      numeric: true
+      numeric: true,
     });
   }
 

@@ -5,14 +5,14 @@ import testAddon from "../webpack.test.mockOut";
 
 export { testAddon };
 
-export default webpackMockServer.add(app => {
+export default webpackMockServer.add((app) => {
   app.get("/testDefaultExport", (_req, res) => {
     const response = [];
     for (let i = 0; i < 101; ++i) {
       response.push({
         firstName: "Jane",
         lastName: "Doe",
-        lastDate: new Date()
+        lastDate: new Date(),
       });
     }
     res.json(response);
@@ -32,7 +32,7 @@ export default webpackMockServer.add(app => {
   app.get("/testResponseFromJsonFile2_alt", (_req, res) => {
     const resolvedPath = require.resolve("./response.json", {
       // option 'paths' available from NodeJS v8.9.0
-      paths: [__dirname]
+      paths: [__dirname],
     });
     // removing NodeJS cache for getting the latest file
     delete require.cache[resolvedPath];
@@ -45,7 +45,7 @@ export default webpackMockServer.add(app => {
   });
 });
 
-export const result2 = webpackMockServer.add(app => {
+export const result2 = webpackMockServer.add((app) => {
   app.get(["/getFavIcon"], (_req, res) => {
     // res.type("application/...");
     res.download("public/favicon.ico", "favicon.ico");
@@ -55,7 +55,7 @@ export const result2 = webpackMockServer.add(app => {
     res.json({ success: !!req.body, gotBody: req.body || null });
   });
 
-  ["get", "post", "put", "delete"].forEach(method => {
+  ["get", "post", "put", "delete"].forEach((method) => {
     for (let i = 0; i < 2; ++i) {
       const route = `/test${method}${i + 1}`;
       // @ts-ignore
@@ -64,7 +64,7 @@ export const result2 = webpackMockServer.add(app => {
           route,
           method,
           date: new Date(),
-          num: i
+          num: i,
         });
       });
     }

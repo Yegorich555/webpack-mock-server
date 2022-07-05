@@ -4,8 +4,9 @@ const log = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   info(message: string, uri: string, ...optionalParams: any[]): void {
     console.info(
-      `\nWebpackMockServer. ${message} \u001b[1m\u001b[34m${uri ||
-        ""}\n\u001b[39m\u001b[22m`,
+      `\nWebpackMockServer. ${message} \u001b[1m\u001b[34m${
+        uri || ""
+      }\n\u001b[39m\u001b[22m`,
       ...optionalParams
     );
   },
@@ -39,7 +40,7 @@ const log = {
       ...optionalParams
     );
   },
-  verbose: true
+  verbose: true,
 };
 
 export default log;

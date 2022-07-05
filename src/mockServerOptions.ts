@@ -44,7 +44,7 @@ class MockServerOptions {
     noUnusedLocals: false,
     noUnusedParameters: false,
     skipLibCheck: true,
-    resolveJsonModule: true
+    resolveJsonModule: true,
     // todo wait for transpileOnly option: https://github.com/microsoft/TypeScript/issues/29651
   };
 
@@ -59,7 +59,7 @@ class MockServerOptions {
       module: ts.ModuleKind.CommonJS,
       declaration: false,
       moduelResolution: ModuleResolutionKind.NodeJs,
-      target: defineTarget()
+      target: defineTarget(),
     } as ts.CompilerOptions;
   }
 

@@ -23,12 +23,12 @@ const webpackMockServer = {
   ): void {
     const opt = {
       ...defOptions,
-      ...extendOptions
+      ...extendOptions,
     } as MockServerOptions;
     opt.compilerOptions = {
       ...defOptions.compilerOptions,
       ...extendOptions?.compilerOptions,
-      ...defOptions.strictCompilerOptions
+      ...defOptions.strictCompilerOptions,
     };
     log.verbose = opt.verbose;
 
@@ -59,7 +59,7 @@ const webpackMockServer = {
           }
           isDefined = true;
 
-          disposeAll.forEach(d => d());
+          disposeAll.forEach((d) => d());
           disposeAll = [];
           const address = server.address() as AddressInfo;
           const parentPort = address?.port || err?.port || 8080;
@@ -74,8 +74,8 @@ const webpackMockServer = {
               opt.entry,
               opt.tsConfigFileName,
               opt.compilerOptions,
-              outFileNames => {
-                mockServer(outFileNames, opt, port => {
+              (outFileNames) => {
+                mockServer(outFileNames, opt, (port) => {
                   mockServerMiddleware(app, port);
                 });
               }
@@ -108,7 +108,7 @@ const webpackMockServer = {
   /** Default MockServer options (readonly) */
   get defaultOptions(): MockServerOptions {
     return JSON.parse(JSON.stringify(defOptions));
-  }
+  },
 };
 
 export = webpackMockServer;

@@ -1,6 +1,10 @@
 <!-- markdownlint-disable MD024 -->
 <!-- markdownlint-disable MD041 -->
 
+## [1.0.17](https://github.com/Yegorich555/webpack-mock-server/compare/v1.0.16...v1.0.17) (xxx)
+
+- updated packages
+
 ## [1.0.16](https://github.com/Yegorich555/webpack-mock-server/compare/v1.0.15...v1.0.16) (May 12, 2022)
 
 - bump version of vulnerable packages

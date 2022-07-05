@@ -1,20 +1,20 @@
 module.exports = {
   parser: "@typescript-eslint/parser",
   parserOptions: {
-    sourceType: "module"
+    sourceType: "module",
   },
   extends: ["airbnb-base", "prettier", "plugin:@typescript-eslint/recommended"],
   env: {
     es6: true,
     node: true,
-    browser: true
+    browser: true,
   },
   globals: {
-    DEBUG: true
+    DEBUG: true,
   },
   plugins: ["@typescript-eslint", "json", "prettier"],
   rules: {
-    "@typescript-eslint/ban-ts-ignore": "off",
+    "@typescript-eslint/ban-ts-comment": "off",
     "no-plusplus": "off",
     "no-bitwise": "off",
     "prefer-rest-params": "off",
@@ -27,8 +27,8 @@ module.exports = {
       "ignorePackages",
       {
         js: "never",
-        ts: "never"
-      }
+        ts: "never",
+      },
     ],
     "max-len": [
       "warn",
@@ -41,25 +41,25 @@ module.exports = {
         ignoreUrls: true,
         ignoreStrings: true,
         ignoreTemplateLiterals: true,
-        ignoreRegExpLiterals: true
-      }
-    ]
+        ignoreRegExpLiterals: true,
+      },
+    ],
   },
   overrides: [
     {
       // enable the rule specifically for TypeScript files
       files: ["*.js", "*.jsx"],
       rules: {
-        "@typescript-eslint/explicit-function-return-type": "off"
-      }
-    }
+        "@typescript-eslint/explicit-function-return-type": "off",
+      },
+    },
   ],
   settings: {
     "import/resolver": {
-      alias: {
-        map: [["@/", "./src"]],
-        extensions: [".ts", ".js", ".json"]
-      }
-    }
-  }
+      typescript: {
+        alwaysTryTypes: true, // always try to resolve types under `<root>@types` directory even it doesn't contain any source code, like `@types/unist`
+        project: ["./tsconfig.json"],
+      },
+    },
+  },
 };

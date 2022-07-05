@@ -1,3 +1,4 @@
+/* eslint-disable no-shadow */
 /* eslint-disable @typescript-eslint/no-namespace */
 import express, { Application } from "express";
 import fs from "fs";
@@ -17,9 +18,9 @@ const sockets = new Set<Socket>();
 let previousPort = 0;
 
 function close(): Promise<void> {
-  return new Promise(resolve => {
+  return new Promise((resolve) => {
     if (server) {
-      sockets.forEach(v => v.destroy());
+      sockets.forEach((v) => v.destroy());
       sockets.clear();
       server.close(() => {
         resolve();
@@ -39,10 +40,10 @@ function requireDefault(file: OutputMockFile): (usedApp: Application) => void {
 
   const arr: Array<(usedApp: Application) => void> = [];
   function moduleEachWrapper(usedApp: Application): void {
-    arr.forEach(f => f(usedApp));
+    arr.forEach((f) => f(usedApp));
   }
 
-  Object.keys(m).forEach(key => {
+  Object.keys(m).forEach((key) => {
     const f = m[key];
     if (typeof f !== "function") {
       log.error(
@@ -68,7 +69,7 @@ export default async function mockServer(
   // self-destroying
   if (isFirstStart) {
     const signals: Array<NodeJS.Signals> = ["SIGINT", "SIGTERM"];
-    signals.forEach(s => {
+    signals.forEach((s) => {
       process.on(s, async () => {
         await close();
         process.exit();
@@ -106,7 +107,7 @@ export default async function mockServer(
         app.get(file.downloadUrl, (_req, res) => {
           res.writeHead(200, {
             "Content-Type": file.mimetype,
-            "Last-Modified": new Date(lastModified).toUTCString()
+            "Last-Modified": new Date(lastModified).toUTCString(),
           });
           res.end(file.buffer);
         });
@@ -117,9 +118,11 @@ export default async function mockServer(
       const { files } = req;
       if (files) {
         if (Array.isArray(files)) {
-          files.forEach(v => assignFile(v));
+          files.forEach((v) => assignFile(v));
         } else {
-          Object.keys(files).forEach(k => files[k].forEach(v => assignFile(v)));
+          Object.keys(files).forEach((k) =>
+            files[k].forEach((v) => assignFile(v))
+          );
         }
       }
 
@@ -138,7 +141,7 @@ export default async function mockServer(
           httpVersion: req.httpVersion,
           headers: req.headers,
           params: req.params,
-          cookies: req.cookies
+          cookies: req.cookies,
         });
       }
 
@@ -178,7 +181,7 @@ export default async function mockServer(
         try {
           if (chunks.length) {
             const isBufferArray = !chunks.some(
-              v => !v || !(v instanceof Buffer || v instanceof Uint8Array)
+              (v) => !v || !(v instanceof Buffer || v instanceof Uint8Array)
             );
 
             // @ts-ignore
@@ -206,7 +209,7 @@ export default async function mockServer(
           headers: { ...headers }, // it fixes [Object: null prototype] in console
           statusCode: res.statusCode,
           statusMessage: res.statusMessage,
-          body
+          body,
         });
       });
 
@@ -244,7 +247,7 @@ export default async function mockServer(
 
   function listen(port: number): void {
     server = app
-      .listen(port, function gotPort() {
+      .listen(port, () => {
         if (port !== previousPort) {
           log.info("Started at", `http://localhost:${port}/`);
           previousPort = port;
@@ -253,14 +256,14 @@ export default async function mockServer(
         }
         listenCallback && listenCallback(port, server as Server);
       })
-      .on("error", function listenErrorCallback(err: NetError) {
+      .on("error", (err: NetError) => {
         if (err.code === "EADDRINUSE" || err.code === "EACCES") {
           listen(port + 1);
         } else {
           log.error("", err);
         }
       })
-      .on("connection", socket => {
+      .on("connection", (socket) => {
         sockets.add(socket);
         socket.once("close", () => {
           sockets.delete(socket);
@@ -275,9 +278,9 @@ export default async function mockServer(
       log.debug(
         "import rootFiles:",
         "",
-        attachedFileNames.map(v => v.path)
+        attachedFileNames.map((v) => v.path)
       );
-      attachedFileNames.forEach(v => requireDefault(v)(app));
+      attachedFileNames.forEach((v) => requireDefault(v)(app));
     }
     listen(options.port);
   } catch (ex) {

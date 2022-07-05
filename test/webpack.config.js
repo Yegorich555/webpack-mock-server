@@ -10,18 +10,23 @@ module.exports = {
   devServer: {
     https: false,
     historyApiFallback: true, // it enables HTML5 mode: https://developer.mozilla.org/en-US/docs/Web/API/History
-    stats: {
-      children: false // disable console.info for node_modules/*
+    devMiddleware: {
+      stats: {
+        children: false, // disable console.info for node_modules/*
+        modules: false,
+      },
     },
-    contentBase: __dirname,
-    publicPath: __dirname,
-    before: app =>
-      webpackMockServer.use(app, {
+    static: {
+      directory: __dirname, // folder with static content
+      publicPath: __dirname,
+    },
+    onBeforeSetupMiddleware: (devServer) =>
+      webpackMockServer.use(devServer.app, {
         entry: "test/webpack.mock.ts",
         tsConfigFileName: "test/tsconfig.json",
         verbose: true,
         logResponses: true,
-        port: 8080
-      })
-  }
+        port: 8080,
+      }),
+  },
 };

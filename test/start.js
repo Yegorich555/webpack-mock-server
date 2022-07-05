@@ -10,13 +10,13 @@ webpackMockServer.use(app, {
   entry: [], // ["test/webpack.mock2.ts"],
   tsConfigFileName: "test/tsconfig.json",
   compilerOptions: {
-    skipLibCheck: true
+    skipLibCheck: true,
   },
   before: (req, res, next) => {
     console.log(`Got request: ${req.method} ${req.url}`);
     next();
     console.log(`Sent response: ${req.method} ${req.url}`);
-  }
+  },
 });
 
 let server = app.listen(1782);

@@ -1,4 +1,3 @@
-// eslint-disable-next-line import/no-unresolved
 import endPoints from "@/aliasTest/endPoints";
 import webpackMockServer from "../src/index";
 
@@ -14,7 +13,7 @@ export default webpackMockServer.add((app, helper) => {
       response.push({
         id: helper.getUniqueIdInt(),
         randomInt: helper.getRandomInt(),
-        lastDate: new Date()
+        lastDate: new Date(),
       });
     }
 

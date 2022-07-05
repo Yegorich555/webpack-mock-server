@@ -16,14 +16,14 @@ export default function mockServerMiddleware(
   }
   let wasError = false;
   isDone = true;
-  app.use(function handle(clientReq, clientRes, next) {
+  app.use((clientReq, clientRes, next) => {
     try {
       const options = {
         hostname: "localhost",
         port: storedPort,
         path: clientReq.url,
         method: clientReq.method,
-        headers: clientReq.headers
+        headers: clientReq.headers,
       };
 
       if (
@@ -36,23 +36,23 @@ export default function mockServerMiddleware(
         return;
       }
 
-      const proxy = http.request(options, function callback(res) {
+      const proxy = http.request(options, (res) => {
         wasError = false;
         if (res.statusCode === 404) {
           next();
         } else if (res) {
           clientRes.writeHead(res.statusCode || 200, res.headers);
           res.pipe(clientRes, {
-            end: true
+            end: true,
           });
         }
       });
 
       clientReq
         .pipe(proxy, {
-          end: true
+          end: true,
         })
-        .on("error", function onError(ex: NetError) {
+        .on("error", (ex: NetError) => {
           if (!wasError) {
             wasError = true;
             if (ex.code === "ECONNREFUSED") {
@@ -68,7 +68,7 @@ export default function mockServerMiddleware(
           next();
         });
     } catch (ex) {
-      log.error(ex);
+      log.error((ex as Error).toString());
       next();
     }
   });
