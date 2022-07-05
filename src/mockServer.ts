@@ -98,10 +98,13 @@ export default async function mockServer(
         if (!file) {
           return;
         }
-
+        let name = file.originalname;
+        if (encodeURI(name) !== name) {
+          name = nodePath.extname(name); // extract only extension file if fileName isn't normalized
+        }
         const lastModified = Date.now();
         // eslint-disable-next-line no-param-reassign
-        file.downloadUrl = `/_file/${lastModified}_${file.originalname}`;
+        file.downloadUrl = `/_file/${lastModified}_${name}`;
         fileDownloadUrls.push(file.downloadUrl);
 
         app.get(file.downloadUrl, (_req, res) => {
