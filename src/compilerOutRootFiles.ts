@@ -31,7 +31,7 @@ export default class CompilerOutRootFiles {
 
       // add new rootNames
       rootNames.forEach((rootName) => {
-        const ePath = rootName.replace(/(.ts)$/, ".js");
+        const ePath = rootName.replace(/([^.][^d])(\.ts)$/, "$1.js"); // replace only .ts to .js by skip d.ts
         const outPath = nodePath.join(outDir, nodePath.relative(inDir, ePath));
         if (!this.files.find((f) => f.path === outPath)) {
           isChanged = true;
