@@ -299,7 +299,7 @@ module.exports = {
 - Don't use NodeJs **require** operator **as dynamic** to relative path. Use **dirname in this case or absolute path (**dirname is changed during the compilation)
 - NodeJs caches every **require**d module (file), so you maybe interested in clearing cache for _require(_.json)\*.
   Use `delete require.cache[require.resolve({yourPathName})]` before you call `require({yourPathName})`;
-
+- Mockserver can't compile the TS-code. Solution: building with files like `global.d.ts` isn't supported or you have some extra import. All mock-files must be clear enough and independent on the main-project files. To check what's wrong check compilation trace `npx tsc --project tsconfig.mock.json --generateTrace traceDir`
 ```js
 // Wrong
 app.get("/testResponseFromJsonFile", (_req, res) => {
