@@ -2,6 +2,7 @@
 <!-- markdownlint-disable MD041 -->
 ## [1.0.18](https://github.com/Yegorich555/webpack-mock-server/compare/v1.0.17...v1.0.18) (April 26, 2023)
 
+- updated packages
 - fixed `ordinary string isn't supported in JSON`
 
 ## [1.0.17](https://github.com/Yegorich555/webpack-mock-server/compare/v1.0.16...v1.0.17) (July 05, 2022)
