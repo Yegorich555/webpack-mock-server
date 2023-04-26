@@ -7,11 +7,11 @@
   "scripts": {
     "test": "npm run lint",
     "lint": "npm run lint-code && npm run lint-md",
-    "lint-code": "./node_modules/.bin/eslint ./**/*.{js,jsx,ts,tsx,json} --fix",
-    "lint-md": "./node_modules/.bin/markdownlint **/*.md --ignore node_modules --fix",
-    "serve-node": "npm run build && node ./test/start",
+    "lint-code": ".\\node_modules\\.bin\\eslint ./**/*.{js,jsx,ts,tsx,json} --fix",
+    "lint-md": ".\\node_modules\\.bin\\markdownlint **/*.md --ignore node_modules --fix",
+    "serve-node": "npm run build && node .\\test\\start",
     "serve": "npm run build && npm run run-webpack",
-    "run-webpack": "./node_modules/.bin/webpack serve --hot --config test/webpack.config.js",
+    "run-webpack": ".\\node_modules\\.bin\\webpack serve --hot --config test/webpack.config.js",
     "build": "tsc"
   },
   "repository": {

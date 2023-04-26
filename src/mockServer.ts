@@ -83,7 +83,7 @@ export default async function mockServer(
 
   app = express();
   app.set("json spaces", 2); // prettify json-response
-  app.use(express.json());
+  app.use(express.json({ strict: false }));
   app.use(express.urlencoded({ extended: true })); // support form-urlencoded
   app.use(express.text()); // support ordinary text
   app.use(multer().any()); // support multipart/form-data
