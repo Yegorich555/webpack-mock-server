@@ -45,27 +45,27 @@
   "homepage": "https://github.com/Yegorich555/webpack-mock-server#readme",
   "devDependencies": {
     "@types/multer": "^1.4.7",
-    "@types/node": "^18.0.1",
-    "@typescript-eslint/eslint-plugin": "^5.30.5",
-    "@typescript-eslint/parser": "^5.30.5",
-    "eslint": "^8.19.0",
+    "@types/node": "^18.16.1",
+    "@typescript-eslint/eslint-plugin": "^5.59.1",
+    "@typescript-eslint/parser": "^5.59.1",
+    "eslint": "^8.39.0",
     "eslint-config-airbnb-base": "^15.0.0",
-    "eslint-config-prettier": "^8.5.0",
+    "eslint-config-prettier": "^8.8.0",
     "eslint-import-resolver-alias": "^1.1.2",
-    "eslint-import-resolver-typescript": "^3.2.1",
-    "eslint-plugin-import": "^2.26.0",
+    "eslint-import-resolver-typescript": "^3.5.5",
+    "eslint-plugin-import": "^2.27.5",
     "eslint-plugin-json": "^3.1.0",
     "eslint-plugin-prettier": "^4.2.1",
-    "express": "^4.18.1",
-    "markdownlint-cli": "^0.31.1",
-    "prettier": "^2.7.1",
-    "typescript": "^4.7.4",
-    "webpack": "^5.73.0",
-    "webpack-cli": "^4.10.0",
-    "webpack-dev-server": "^4.9.3"
+    "express": "^4.18.2",
+    "markdownlint-cli": "^0.33.0",
+    "prettier": "^2.8.8",
+    "typescript": "^5.0.4",
+    "webpack": "^5.81.0",
+    "webpack-cli": "^5.0.2",
+    "webpack-dev-server": "^4.13.3"
   },
   "dependencies": {
-    "@types/express": "^4.17.13",
+    "@types/express": "^4.17.17",
     "multer": "^1.4.5-lts.1"
   },
   "peerDependencies": {
@@ -76,9 +76,5 @@
   "files": [
     "lib/*",
     "public/*"
-  ],
-  "publishConfig": {
-    "save-prefix": "^",
-    "save-dev": true
-  }
+  ]
 }
