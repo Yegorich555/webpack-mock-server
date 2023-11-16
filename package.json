@@ -1,6 +1,6 @@
 {
   "name": "webpack-mock-server",
-  "version": "1.0.18",
+  "version": "1.0.19",
   "description": "Mocks api requests for webpack-dev-server with hot-replacement",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -34,10 +34,10 @@
     "hot",
     "replacement",
     "hmr",
-    "expressjs",
+    "express",
     "middleware"
   ],
-  "author": "yegorich555",
+  "author": "Yegorich555",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/Yegorich555/webpack-mock-server/issues"

@@ -1,5 +1,10 @@
 <!-- markdownlint-disable MD024 -->
 <!-- markdownlint-disable MD041 -->
+
+## [1.0.19](https://github.com/Yegorich555/webpack-mock-server/compare/v1.0.1/...v1.0.19) (November 16, 2023)
+
+- updated examples for webpack 5 according to recent webpack changes (Readme.md)
+
 ## [1.0.18](https://github.com/Yegorich555/webpack-mock-server/compare/v1.0.17...v1.0.18) (April 26, 2023)
 
 - updated packages
@@ -26,7 +31,7 @@
 ## [1.0.13](https://github.com/Yegorich555/webpack-mock-server/compare/v1.0.12...v1.0.13) (July 14, 2021)
 
 - fixed `webpack throws EADDRINUSE after restarting with webpack-mock-server`
-- fixed `wepback-mock-server does not run if wepack gets EADDRINUSE`
+- fixed `webpack-mock-server does not run if webpack gets EADDRINUSE`
 
 ## [1.0.12](https://github.com/Yegorich555/webpack-mock-server/compare/v1.0.11...v1.0.12) (July 14, 2021)
 

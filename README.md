@@ -22,7 +22,7 @@ Uses for mocking api responses
 Using npm (installing Typescript is required even if you don't use ts files):
 
 ```npm
-npm install --save-dev webpack-mock-server typescript
+npm i --save-dev webpack-mock-server typescript @types/express
 ```
 
 ## Examples
@@ -30,12 +30,15 @@ npm install --save-dev webpack-mock-server typescript
 ### Usage with defaults
 
 ```js
-// webpack.config.js
+// webpack.config.js - ver 5+
 const webpackMockServer = require("webpack-mock-server");
 
 module.exports = {
   devServer: {
-    before: webpackMockServer.use
+    setupMiddlewares: (middlewares, devServer) => {
+       webpackMockServer.use(devServer.app);
+       return middlewares;
+    }
   }
 };
 
@@ -43,9 +46,9 @@ module.exports = {
 import webpackMockServer from "webpack-mock-server";
 import nodePath from "path";
 
-// app is expressjs application
+// app is express application
 export default webpackMockServer.add((app, helper) => {
-  // you can find more about expressjs here: https://expressjs.com/
+  // you can find more about express here: https://expressjs.com/
   app.get("/testGet", (_req, res) => {
     res.json("JS get-object can be here. Random int:" + helper.getRandomInt());
   });
@@ -66,7 +69,7 @@ export const result = webpackMockServer.add((app, helper) => {
       "JS delete-object can be here. Random int:" + helper.getRandomInt()
     );
   });
-  app.pust("/testPut", (_req, res) => {
+  app.put("/testPut", (_req, res) => {
     res.json("JS put-object can be here");
   });
 });
@@ -80,8 +83,8 @@ const webpackMockServer = require("webpack-mock-server");
 
 module.exports = {
   devServer: {
-    before: app =>
-        webpackMockServer.use(app, { // MockServerOptions here
+   setupMiddlewares: (middlewares, devServer) => {
+        webpackMockServer.use(devServer.app, { // MockServerOptions here
           entry: [ // exact fileNames are expected (no wildcard or folder - use custom tsConfig instead)
               "api/users.mock.ts",
               "api/goods.mock.js"
@@ -93,7 +96,9 @@ module.exports = {
                })
               next();
           }
-      })
+      });
+      return middlewares;
+    }
   }
 }
 
@@ -134,14 +139,15 @@ module.exports = {
 // for webpack v5
 module.exports = {
   devServer: {
-    onBeforeSetupMiddleware: devServer => // it's different for wepback v4
+    setupMiddlewares: (middlewares, devServer) => {
       webpackMockServer.use(devServer.app, {
           /* set an empty-array or null to [entry], so entry will be defined
-              from 'files' and 'includes' sections in [tsConfigFileName]
-          */
+              from 'files' and 'includes' sections in [tsConfigFileName] */
           entry: [],
           tsConfigFileName: "mock/tsconfig.json" // use a different tsconfig-file that is contained entries
-      })
+      });
+      return middlewares;
+    }
   }
 }
 
@@ -163,7 +169,7 @@ module.exports = {
 
 ### Usage without webpack
 
-As expressjs middleware: <http://expressjs.com/en/guide/using-middleware.html>
+As Express middleware: <http://expressjs.com/en/guide/using-middleware.html>
 
 ```js
 // webpack.config.js
@@ -191,7 +197,7 @@ const webpackMockServer = require("webpack-mock-server");
 
 module.exports = {
   devServer: {
-    onBeforeSetupMiddleware: devServer => // it's different for wepback v4
+    setupMiddlewares: (middlewares, devServer) => { // it's different for webpack v4
       webpackMockServer.use(devServer.app, {
           port: 8079, // app searches for free port (starts searching from pointed)
           verbose: false, // send info via console.log
@@ -216,10 +222,12 @@ module.exports = {
               esModuleInterop: true,
               module: ts.ModuleKind.CommonJS,
               declaration: false,
-              moduelResolution: ModuleResolutionKind.NodeJs,
+              moduleResolution: ModuleResolutionKind.NodeJs,
               target: defineTarget() // it defines target-ES based on NODE version
           }
-      })
+      });
+      return middlewares;
+    }
   }
 }
 
@@ -236,7 +244,7 @@ const webpackMockServer = require("webpack-mock-server");
 
 module.exports = {
   devServer: {
-    before: app => // it's different for wepback v5
+    before: app => // it's different for webpack v5
       webpackMockServer.use(app, {
           port: 8079, // app searches for free port (starts searching from pointed)
           verbose: false, // send info via console.log
@@ -261,7 +269,7 @@ module.exports = {
               esModuleInterop: true,
               module: ts.ModuleKind.CommonJS,
               declaration: false,
-              moduelResolution: ModuleResolutionKind.NodeJs,
+              moduleResolution: ModuleResolutionKind.NodeJs,
               target: defineTarget() // it defines target-ES based on NODE version
           }
       })
@@ -300,6 +308,7 @@ module.exports = {
 - NodeJs caches every **require**d module (file), so you maybe interested in clearing cache for _require(_.json)\*.
   Use `delete require.cache[require.resolve({yourPathName})]` before you call `require({yourPathName})`;
 - Mockserver can't compile the TS-code. Solution: building with files like `global.d.ts` isn't supported or you have some extra import. All mock-files must be clear enough and independent on the main-project files. To check what's wrong check compilation trace `npx tsc --project tsconfig.mock.json --generateTrace traceDir`
+
 ```js
 // Wrong
 app.get("/testResponseFromJsonFile", (_req, res) => {
