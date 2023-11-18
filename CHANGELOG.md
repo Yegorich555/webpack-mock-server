@@ -1,7 +1,7 @@
 <!-- markdownlint-disable MD024 -->
 <!-- markdownlint-disable MD041 -->
 
-## [1.0.19](https://github.com/Yegorich555/webpack-mock-server/compare/v1.0.1/...v1.0.19) (November 16, 2023)
+## [1.0.19](https://github.com/Yegorich555/webpack-mock-server/compare/v1.0.18...v1.0.19) (November 16, 2023)
 
 - updated examples for webpack 5 according to recent webpack changes (Readme.md)
 
