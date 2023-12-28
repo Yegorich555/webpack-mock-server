@@ -36,10 +36,10 @@ const webpackMockServer = require("webpack-mock-server");
 module.exports = {
   devServer: {
     setupMiddlewares: (middlewares, devServer) => {
-       webpackMockServer.use(devServer.app);
-       return middlewares;
-    }
-  }
+      webpackMockServer.use(devServer.app);
+      return middlewares;
+    },
+  },
 };
 
 // webpack.mock.ts - feel free to mock responses yourself
@@ -124,7 +124,7 @@ const webpackMockServer = require("webpack-mock-server");
 
 // for webpack v4
 module.exports = {
-  devServer: { 
+  devServer: {
     before: app =>
       webpackMockServer.use(app, {
           /* set an empty-array or null to [entry], so entry will be defined
@@ -159,7 +159,8 @@ module.exports = {
   "extends": "../tsconfig.json", // you can point the main tsconfig file or remove that property if it's not required
   "include": [  // wildcard-pattern is supported
       "../mock/*",
-      "*.mock.ts"
+      "*.mock.ts",
+      "**/global.d.ts",
   ],
   "files": [], // beside 'include' option you can point exact files here
   "exclude": ["*test.mock.ts"] // note: exclude option can override 'include' and 'files' options
@@ -222,7 +223,7 @@ module.exports = {
               esModuleInterop: true,
               module: ts.ModuleKind.CommonJS,
               declaration: false,
-              moduleResolution: ModuleResolutionKind.NodeJs,
+              moduleResolution: ModuleResolutionKind.Node10,
               target: defineTarget() // it defines target-ES based on NODE version
           }
       });
@@ -269,7 +270,7 @@ module.exports = {
               esModuleInterop: true,
               module: ts.ModuleKind.CommonJS,
               declaration: false,
-              moduleResolution: ModuleResolutionKind.NodeJs,
+              moduleResolution: ModuleResolutionKind.Node10,
               target: defineTarget() // it defines target-ES based on NODE version
           }
       })
@@ -307,7 +308,11 @@ module.exports = {
 - Don't use NodeJs **require** operator **as dynamic** to relative path. Use **dirname in this case or absolute path (**dirname is changed during the compilation)
 - NodeJs caches every **require**d module (file), so you maybe interested in clearing cache for _require(_.json)\*.
   Use `delete require.cache[require.resolve({yourPathName})]` before you call `require({yourPathName})`;
-- Mockserver can't compile the TS-code. Solution: building with files like `global.d.ts` isn't supported or you have some extra import. All mock-files must be clear enough and independent on the main-project files. To check what's wrong check compilation trace `npx tsc --project tsconfig.mock.json --generateTrace traceDir`
+- _Mockserver can't compile the TS-code_.
+  **Possible reason**: you have some extra import OR missed some global files (like `global.d.ts`).
+  **Solution**: all mock-files must be without dependencies (imports) of components defined in the main-project files
+  - If you have custom `tsconfig.mock.json` file check if all required `\*d.ts` files are included `.. include: ["**/global.d.ts", ..] ..`
+  - To check what's wrong check compilation trace `npx tsc --project tsconfig.mock.json --generateTrace traceDir` OR enable logging via option `verbose:true`
 
 ```js
 // Wrong

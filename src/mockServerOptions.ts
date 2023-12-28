@@ -58,7 +58,7 @@ class MockServerOptions {
       esModuleInterop: true,
       module: ts.ModuleKind.CommonJS,
       declaration: false,
-      moduelResolution: ModuleResolutionKind.NodeJs,
+      moduleResolution: ModuleResolutionKind.Node10,
       target: defineTarget(),
     } as ts.CompilerOptions;
   }

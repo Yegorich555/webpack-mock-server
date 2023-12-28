@@ -1,6 +1,10 @@
 <!-- markdownlint-disable MD024 -->
 <!-- markdownlint-disable MD041 -->
 
+## [1.0.20](https://github.com/Yegorich555/webpack-mock-server/compare/v1.0.19...v1.0.20) (December 16, 2023)
+
+- added support for global types defined in custom `*.d.ts` files
+
 ## [1.0.19](https://github.com/Yegorich555/webpack-mock-server/compare/v1.0.18...v1.0.19) (November 16, 2023)
 
 - updated examples for webpack 5 according to recent webpack changes (Readme.md)
@@ -52,7 +56,7 @@
 ## [1.0.6](https://github.com/Yegorich555/webpack-mock-server/compare/v1.0.5...v1.0.6) (May 5, 2021)
 
 - added inbox supporting of popular body types as json/form-urlencoded/text/multipart-form-data (mostly for post/put requests)
-- movev package @types/express to dependencies (for ts/js-intellisense)
+- moved package @types/express to dependencies (for ts/js-intellisense)
 - updated packages
 
 ## [1.0.5](https://github.com/Yegorich555/webpack-mock-server/compare/v1.0.4...v1.0.5) (March 16, 2020)

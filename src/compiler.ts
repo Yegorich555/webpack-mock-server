@@ -170,7 +170,9 @@ export default function compiler(
     (diagnostic) => {
       if (isOutputChanged && onChanged && diagnostic.code === 6194) {
         clearNodeCache(extendCompilerOptions.outDir as string);
-        onChanged(outMockFiles.files);
+        onChanged(
+          outMockFiles.files.filter((f) => !f.rootName.endsWith(".d.ts"))
+        );
         isOutputChanged = false;
       } else {
         log.debug(ts.formatDiagnostic(diagnostic, formatHost));
