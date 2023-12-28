@@ -1,8 +1,8 @@
 {
   "extends": "../tsconfig.json",
-  "include": ["../test/*mock*.ts"],
-  "exclude": ["../test/*mockExclude.ts"],
   "files": [],
+  "include": ["../test/*mock*.ts", "**/global.d.ts"],
+  "exclude": ["../test/*mockExclude.ts"],
   "compilerOptions": {
     "baseUrl": "../",
     "paths": {

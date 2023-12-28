@@ -13,6 +13,7 @@ export default webpackMockServer.add((app) => {
         firstName: "Jane",
         lastName: "Doe",
         lastDate: new Date(),
+        page: { number: 1 } as IPage,
       });
     }
     res.json(response);
