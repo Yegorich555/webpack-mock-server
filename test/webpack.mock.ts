@@ -14,6 +14,7 @@ export default webpackMockServer.add((app) => {
         lastName: "Doe",
         lastDate: new Date(),
         page: { number: 1 } as IPage,
+        sort: SortOrders.asc,
       });
     }
     res.json(response);
