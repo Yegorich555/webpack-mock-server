@@ -31,7 +31,7 @@ class MockServerOptions {
   /** Enable/disable console.log for requests */
   logRequests: boolean | ((req: express.Request) => void) = false;
 
-  /** Enable/disable console.log for reponses */
+  /** Enable/disable console.log for responses */
   logResponses: boolean | ((res: express.Response) => void) = false;
 
   /** Execute custom middleware prior to all other middleware internally within the server */

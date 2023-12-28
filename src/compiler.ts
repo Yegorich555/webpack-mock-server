@@ -214,7 +214,7 @@ export default function compiler(
   // clearing previous tmp-folder before exit
   function clearTmpOutput(): void {
     log.debug("clearing tmp folder ", extendCompilerOptions.outDir);
-    // recursive option is expiremental and supported in node >= v12.10.0: https://nodejs.org/api/fs.html#fs_fs_rmdir_path_options_callback
+    // recursive option is experimental and supported in node >= v12.10.0: https://nodejs.org/api/fs.html#fs_fs_rmdir_path_options_callback
     try {
       fs.rmdirSync(extendCompilerOptions.outDir as string, {
         recursive: true,
