@@ -12,7 +12,7 @@
     "serve-node": "npm run build && node .\\test\\start",
     "serve": "npm run build && npm run run-webpack",
     "run-webpack": ".\\node_modules\\.bin\\webpack serve --hot --config test/webpack.config.js",
-    "build": "tsc"
+    "build": "rm -rf ./lib/ && tsc --listEmittedFiles  --removeComments && tsc --emitDeclarationOnly"
   },
   "repository": {
     "type": "git",
