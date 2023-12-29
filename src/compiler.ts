@@ -188,21 +188,22 @@ export default function compiler(
   ): ts.EmitAndSemanticDiagnosticsBuilderProgram {
     const definedRootNames = entries && entries.length ? entries : tsRootNames;
     arguments[0] = definedRootNames;
-    const tsOptions = allOptions as ts.CompilerOptions;
 
     // rewrite to resolve alias-paths relative to outDir
-    definedTSOptions = JSON.parse(JSON.stringify(tsOptions));
-    definedTSOptions.baseUrl = definedTSOptions.outDir;
-    definedTSOptions.pathsArr =
-      (definedTSOptions.paths && Object.keys(definedTSOptions.paths)) || [];
+    if (allOptions) {
+      definedTSOptions = JSON.parse(JSON.stringify(allOptions));
+      definedTSOptions.baseUrl = definedTSOptions.outDir;
+      definedTSOptions.pathsArr =
+        (definedTSOptions.paths && Object.keys(definedTSOptions.paths)) || [];
 
-    isOutputChanged = outMockFiles.update(
-      definedRootNames,
-      tsOptions.rootDir as string,
-      tsOptions.outDir as string
-    );
-    log.debug("defined root names", "", definedRootNames);
-    log.debug("TS options", "", tsOptions);
+      isOutputChanged = outMockFiles.update(
+        definedRootNames,
+        allOptions.rootDir as string,
+        allOptions.outDir as string
+      );
+      log.debug("defined root names", "", definedRootNames);
+      log.debug("TS options", "", allOptions);
+    }
 
     // @ts-ignore
     return origCreateProgram(...arguments);

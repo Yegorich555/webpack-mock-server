@@ -14,7 +14,7 @@ import NetError from "./netError";
 const webpackMockServer = {
   /**
    * Applies webpackMiddleware on existed express-application
-   * @param app expressjs application that is used for mapping-routes
+   * @param app express application that is used for mapping-routes
    * @param extendOptions MockServerOptions that overrides default options
    */
   use(
@@ -64,7 +64,7 @@ const webpackMockServer = {
           const address = server.address() as AddressInfo;
           const parentPort = address?.port || err?.port || 8080;
           log.debug("Parent server is started. Starting mock-server...");
-          // set another port because of httpServer in the same process overrides previous listenere
+          // set another port because of httpServer in the same process overrides previous listener
           if (opt.port === parentPort) {
             ++opt.port;
           }
@@ -95,7 +95,7 @@ const webpackMockServer = {
     setupHook.call(this, https);
   },
   /**
-   * Add mock functions into webackMockServer
+   * Add mock functions into webpackMockServer
    * @param mockFunction
    */
   add(
@@ -116,11 +116,9 @@ export = webpackMockServer;
 declare global {
   namespace Express {
     interface Request {
-      /**
-       * Urls that can be used for downloading uploaded files
+      /** Urls that can be used for downloading uploaded files
        * Uploading files automatically stores it's in memory
-       * As alternative you can check req.file and req.files for getting file-names
-       * */
+       * As alternative you can check req.file and req.files for getting file-names */
       fileDownloadUrls?: string[];
     }
     namespace Multer {

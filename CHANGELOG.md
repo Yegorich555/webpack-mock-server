@@ -1,7 +1,11 @@
 <!-- markdownlint-disable MD024 -->
 <!-- markdownlint-disable MD041 -->
 
-## [1.0.20](https://github.com/Yegorich555/webpack-mock-server/compare/v1.0.19...v1.0.20) (December 16, 2023)
+## [1.0.21](https://github.com/Yegorich555/webpack-mock-server/compare/v1.0.20...v1.0.21) (December 29, 2023)
+
+- fixed crash on tsconfig.json changes
+
+## [1.0.20](https://github.com/Yegorich555/webpack-mock-server/compare/v1.0.19...v1.0.20) (December 28, 2023)
 
 - added support for global types defined in custom `*.d.ts` files
 
