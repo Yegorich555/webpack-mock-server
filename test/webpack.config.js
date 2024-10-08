@@ -20,13 +20,12 @@ module.exports = {
       publicPath: __dirname,
     },
     setupMiddlewares: (middlewares, devServer) => {
-      console.warn(devServer);
       webpackMockServer.use(devServer.app, {
         entry: "test/webpack.mock.ts",
         tsConfigFileName: "test/tsconfig.json",
         verbose: true,
         logResponses: true,
-        // port: 8079,
+        port: (devServer.options.port || 8080) + 1,
       });
       return middlewares;
     },

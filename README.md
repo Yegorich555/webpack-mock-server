@@ -36,7 +36,9 @@ const webpackMockServer = require("webpack-mock-server");
 module.exports = {
   devServer: {
     setupMiddlewares: (middlewares, devServer) => {
-      webpackMockServer.use(devServer.app);
+      webpackMockServer.use(devServer.app, {
+         port: (devServer.options.port || 8080) + 1,
+      });
       return middlewares;
     },
   },
@@ -122,20 +124,6 @@ export default webpackMockServer.add((app, helper) => {
 // webpack.config.js
 const webpackMockServer = require("webpack-mock-server");
 
-// for webpack v4
-module.exports = {
-  devServer: {
-    before: app =>
-      webpackMockServer.use(app, {
-          /* set an empty-array or null to [entry], so entry will be defined
-              from 'files' and 'includes' sections in [tsConfigFileName]
-          */
-          entry: [],
-          tsConfigFileName: "mock/tsconfig.json" // use a different tsconfig-file that is contained entries
-      })
-  }
-}
-
 // for webpack v5
 module.exports = {
   devServer: {
@@ -151,11 +139,26 @@ module.exports = {
   }
 }
 
+// for webpack v4
+module.exports = {
+  devServer: {
+    before: app =>
+      webpackMockServer.use(app, {
+          /* set an empty-array or null to [entry], so entry will be defined
+              from 'files' and 'includes' sections in [tsConfigFileName]
+          */
+          entry: [],
+          tsConfigFileName: "mock/tsconfig.json" // use a different tsconfig-file that is contained entries
+      })
+  }
+}
+
+
 // ./mock/tsconfig.json
 {
-/*
-    this is ordinary tsconfig file that overrides every option from [extends] - main tsconfig-file
-*/
+  /*
+   *  this is ordinary tsconfig file that overrides every option from [extends] - main tsconfig-file
+   */
   "extends": "../tsconfig.json", // you can point the main tsconfig file or remove that property if it's not required
   "include": [  // wildcard-pattern is supported
       "../mock/*",
@@ -200,7 +203,7 @@ module.exports = {
   devServer: {
     setupMiddlewares: (middlewares, devServer) => { // it's different for webpack v4
       webpackMockServer.use(devServer.app, {
-          port: 8079, // app searches for free port (starts searching from pointed)
+          port: (devServer.options.port || 8080) + 1, // app searches for free port (starts searching from pointed)
           verbose: false, // send info via console.log
           logRequests: false,
           logResponses: false,
@@ -213,7 +216,7 @@ module.exports = {
               noUnusedLocals: false,
               noUnusedParameters: false,
               skipLibCheck: true,
-              resolveJsonModule: true
+              resolveJsonModule: true,
           },
           strictCompilerOptions: { // these options impossible to override
               outDir: "" // used the following: {os.tmpdir()}/webpack-mock-server/{new Date().getTime()}
@@ -247,7 +250,7 @@ module.exports = {
   devServer: {
     before: app => // it's different for webpack v5
       webpackMockServer.use(app, {
-          port: 8079, // app searches for free port (starts searching from pointed)
+          port: 8081, // app searches for free port (starts searching from pointed)
           verbose: false, // send info via console.log
           logRequests: false,
           logResponses: false,

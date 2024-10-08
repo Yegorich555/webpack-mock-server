@@ -18,11 +18,11 @@ function defineTarget(): ts.ScriptTarget {
 const outDir: string = nodePath.join(os.tmpdir(), "webpack-mock-server", new Date().getTime().toString());
 
 class MockServerOptions {
-  /** Enable/disable console.log */
+  /** Enable/disable console.log; @defaultValue false */
   verbose = false;
 
-  /** Port for webpack-mock-server */
-  port = 8079;
+  /** Port for webpack-mock-server; @defaultValue 8081 */
+  port = 8081;
 
   /** Enable/disable console.log for requests */
   logRequests: boolean | ((req: express.Request) => void) = false;
