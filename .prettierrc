@@ -1,4 +1,5 @@
 {
-  "printWidth": 80,
-  "endOfLine": "crlf"
+  "printWidth": 140,
+  "endOfLine": "lf",
+  "tabWidth": 2
 }

@@ -15,11 +15,7 @@ function defineTarget(): ts.ScriptTarget {
   return ts.ScriptTarget.ES3;
 }
 
-const outDir: string = nodePath.join(
-  os.tmpdir(),
-  "webpack-mock-server",
-  new Date().getTime().toString()
-);
+const outDir: string = nodePath.join(os.tmpdir(), "webpack-mock-server", new Date().getTime().toString());
 
 class MockServerOptions {
   /** Enable/disable console.log */

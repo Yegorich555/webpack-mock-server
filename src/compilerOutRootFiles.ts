@@ -9,11 +9,7 @@ export default class CompilerOutRootFiles {
   files: OutputMockFile[] = [];
 
   /** Returns true if list of rootNames is changed */
-  update(
-    rootNames: readonly string[] | undefined,
-    inDir: string,
-    outDir: string
-  ): boolean {
+  update(rootNames: readonly string[] | undefined, inDir: string, outDir: string): boolean {
     let isChanged = false;
     if (!rootNames || !rootNames.length) {
       if (this.files.length) {

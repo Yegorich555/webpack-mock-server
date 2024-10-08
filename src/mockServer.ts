@@ -46,9 +46,7 @@ function requireDefault(file: OutputMockFile): (usedApp: Application) => void {
   Object.keys(m).forEach((key) => {
     const f = m[key];
     if (typeof f !== "function") {
-      log.error(
-        `Wrong 'export ${key} = ${f}' from ${file.rootName}: expected exporting only functions`
-      );
+      log.error(`Wrong 'export ${key} = ${f}' from ${file.rootName}: expected exporting only functions`);
     } else {
       arr.push(f);
     }
@@ -123,9 +121,7 @@ export default async function mockServer(
         if (Array.isArray(files)) {
           files.forEach((v) => assignFile(v));
         } else {
-          Object.keys(files).forEach((k) =>
-            files[k].forEach((v) => assignFile(v))
-          );
+          Object.keys(files).forEach((k) => files[k].forEach((v) => assignFile(v)));
         }
       }
 
@@ -183,9 +179,7 @@ export default async function mockServer(
 
         try {
           if (chunks.length) {
-            const isBufferArray = !chunks.some(
-              (v) => !v || !(v instanceof Buffer || v instanceof Uint8Array)
-            );
+            const isBufferArray = !chunks.some((v) => !v || !(v instanceof Buffer || v instanceof Uint8Array));
 
             // @ts-ignore
             if (isJson) {
@@ -224,12 +218,7 @@ export default async function mockServer(
   app.get(mockedInfoPath, (_req, res) => {
     try {
       const routes = provideRoutes(app, mockedInfoPath);
-      const html = fs
-        .readFileSync(
-          nodePath.resolve(__dirname, "../public/index.html"),
-          "utf8"
-        )
-        .replace("{routes}", JSON.stringify(routes));
+      const html = fs.readFileSync(nodePath.resolve(__dirname, "../public/index.html"), "utf8").replace("{routes}", JSON.stringify(routes));
       res.send(html);
     } catch (ex) {
       res.send("Mock server is ready");

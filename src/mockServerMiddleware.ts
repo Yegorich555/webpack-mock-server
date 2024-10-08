@@ -5,10 +5,7 @@ import log from "./log";
 
 let storedPort = 0;
 let isDone = false;
-export default function mockServerMiddleware(
-  app: ExpressApp,
-  port: number
-): void {
+export default function mockServerMiddleware(app: ExpressApp, port: number): void {
   storedPort = port;
 
   if (isDone) {
@@ -26,12 +23,7 @@ export default function mockServerMiddleware(
         headers: clientReq.headers,
       };
 
-      if (
-        clientReq.url === "/" ||
-        clientReq.url.startsWith("/?") ||
-        clientReq.url.startsWith("?") ||
-        !storedPort
-      ) {
+      if (clientReq.url === "/" || clientReq.url.startsWith("/?") || clientReq.url.startsWith("?") || !storedPort) {
         next();
         return;
       }
@@ -56,11 +48,7 @@ export default function mockServerMiddleware(
           if (!wasError) {
             wasError = true;
             if (ex.code === "ECONNREFUSED") {
-              log.error(
-                `Server is not available on ${ex.address}${
-                  ex.port ? `:${ex.port}` : ""
-                }`
-              );
+              log.error(`Server is not available on ${ex.address}${ex.port ? `:${ex.port}` : ""}`);
             } else {
               log.error("", ex);
             }

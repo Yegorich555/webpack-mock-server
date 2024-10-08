@@ -17,10 +17,7 @@ export default class VersionContainer {
   }
 
   valueOf(): number {
-    return Number.parseInt(
-      this.major.toString() + this.minor.toString() + this.patch.toString(),
-      10
-    );
+    return Number.parseInt(this.major.toString() + this.minor.toString() + this.patch.toString(), 10);
   }
 }
 

@@ -9,10 +9,9 @@
     "lint": "npm run lint-code && npm run lint-md",
     "lint-code": ".\\node_modules\\.bin\\eslint ./**/*.{js,jsx,ts,tsx,json} --fix",
     "lint-md": ".\\node_modules\\.bin\\markdownlint **/*.md --ignore node_modules --fix",
-    "serve-node": "npm run build && node .\\test\\start",
-    "serve": "npm run build && npm run run-webpack",
-    "run-webpack": ".\\node_modules\\.bin\\webpack serve --hot --config test/webpack.config.js",
-    "build": "rm -rf ./lib/ && tsc --listEmittedFiles  --removeComments && tsc --emitDeclarationOnly"
+    "start": "npm run build && node .\\test\\start",
+    "start-webpack": "npm run build && .\\node_modules\\.bin\\webpack serve --hot --config test/webpack.config.js",
+    "build": "shx rm -rf ./lib/ && tsc --listEmittedFiles  --removeComments && tsc --emitDeclarationOnly"
   },
   "repository": {
     "type": "git",
@@ -44,8 +43,8 @@
   },
   "homepage": "https://github.com/Yegorich555/webpack-mock-server#readme",
   "devDependencies": {
-    "@types/multer": "^1.4.11",
-    "@types/node": "^18.19.3",
+    "@types/multer": "^1.4.12",
+    "@types/node": "^18.19.55",
     "@typescript-eslint/eslint-plugin": "^5.62.0",
     "@typescript-eslint/parser": "^5.62.0",
     "eslint": "^8.56.0",
@@ -56,13 +55,14 @@
     "eslint-plugin-import": "^2.29.1",
     "eslint-plugin-json": "^3.1.0",
     "eslint-plugin-prettier": "^4.2.1",
-    "express": "^4.18.2",
+    "express": "^4.21.0",
     "markdownlint-cli": "^0.33.0",
     "prettier": "^2.8.8",
-    "typescript": "^5.3.3",
-    "webpack": "^5.89.0",
+    "shx": "^0.3.4",
+    "typescript": "^5.6.2",
+    "webpack": "^5.95.0",
     "webpack-cli": "^5.1.4",
-    "webpack-dev-server": "^4.15.1"
+    "webpack-dev-server": "^5.1.0"
   },
   "dependencies": {
     "@types/express": "^4.17.21",

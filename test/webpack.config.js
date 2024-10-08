@@ -8,7 +8,6 @@ module.exports = {
   stats: { children: false },
   mode: "development",
   devServer: {
-    https: false,
     historyApiFallback: true, // it enables HTML5 mode: https://developer.mozilla.org/en-US/docs/Web/API/History
     devMiddleware: {
       stats: {
@@ -20,13 +19,16 @@ module.exports = {
       directory: __dirname, // folder with static content
       publicPath: __dirname,
     },
-    onBeforeSetupMiddleware: (devServer) =>
+    setupMiddlewares: (middlewares, devServer) => {
+      console.warn(devServer);
       webpackMockServer.use(devServer.app, {
         entry: "test/webpack.mock.ts",
         tsConfigFileName: "test/tsconfig.json",
         verbose: true,
         logResponses: true,
-        port: 8080,
-      }),
+        // port: 8079,
+      });
+      return middlewares;
+    },
   },
 };

@@ -15,19 +15,10 @@ const formatHost: ts.FormatDiagnosticsHost = {
 function reportDiagnostic(diagnostic: ts.Diagnostic): void {
   let linePointer = "";
   if (diagnostic.file) {
-    const { line, character } = diagnostic.file.getLineAndCharacterOfPosition(
-      diagnostic.start || 0
-    );
-    linePointer = `in ${diagnostic.file?.fileName} (${line + 1},${
-      character + 1
-    })`;
+    const { line, character } = diagnostic.file.getLineAndCharacterOfPosition(diagnostic.start || 0);
+    linePointer = `in ${diagnostic.file?.fileName} (${line + 1},${character + 1})`;
   }
-  log.error(
-    `TS${diagnostic.code}: ${linePointer}\n${ts.flattenDiagnosticMessageText(
-      diagnostic.messageText,
-      formatHost.getNewLine()
-    )}`
-  );
+  log.error(`TS${diagnostic.code}: ${linePointer}\n${ts.flattenDiagnosticMessageText(diagnostic.messageText, formatHost.getNewLine())}`);
 }
 
 /** Clear Node cache for files in tmpFolder */
@@ -49,9 +40,7 @@ export default function compiler(
 ): void {
   const tsVer = Number.parseFloat(ts.versionMajorMinor);
   if (tsVer < 2.7) {
-    throw new Error(
-      `WebpackMockServer. Typescript version >=2.7 is expected. Current is ${ts.versionMajorMinor}`
-    );
+    throw new Error(`WebpackMockServer. Typescript version >=2.7 is expected. Current is ${ts.versionMajorMinor}`);
   }
   log.debug(`typescript version: ${ts.version}`);
 
@@ -59,9 +48,7 @@ export default function compiler(
   entries &&
     entries.forEach((v) => {
       if (typeof v !== "string") {
-        throw new Error(
-          `WebpackMockServer. Option [entry]. Only 'string' is expected: ${v}`
-        );
+        throw new Error(`WebpackMockServer. Option [entry]. Only 'string' is expected: ${v}`);
       }
       if (v.includes("*")) {
         throw new Error(
@@ -104,13 +91,10 @@ export default function compiler(
   // todo import alias doesn't work https://github.com/microsoft/TypeScript/issues/26722
   function resolvePathAlias(filePath: string, path: string): string {
     /* eslint-disable @typescript-eslint/no-use-before-define */
-    const isMatchAlias = definedTSOptions.pathsArr.some(
-      (v) => v[0] === filePath[0]
-    );
+    const isMatchAlias = definedTSOptions.pathsArr.some((v) => v[0] === filePath[0]);
 
     if (isMatchAlias) {
-      const m = ts.resolveModuleName(filePath, path, definedTSOptions, host)
-        .resolvedModule?.resolvedFileName;
+      const m = ts.resolveModuleName(filePath, path, definedTSOptions, host).resolvedModule?.resolvedFileName;
       /* eslint-enable @typescript-eslint/no-use-before-define */
       return m || filePath;
     }
@@ -139,9 +123,7 @@ export default function compiler(
     // @ts-ignore
     const data = ts.sys.readFile(...arguments);
     if (!data && path === tsConfigFileName) {
-      log.debug(
-        `file ${tsConfigFileName} is not found. Compilation with default settings...`
-      );
+      log.debug(`file ${tsConfigFileName} is not found. Compilation with default settings...`);
       return JSON.stringify({});
     }
     if (!data || path.includes("node_modules")) {
@@ -151,10 +133,7 @@ export default function compiler(
     // this is required because under webpack 'path' is not absolute
     const absolutePath = nodePath.resolve(path);
     return data
-      .replace(
-        /(?<![/).])__dirname/g,
-        `String.raw\`${nodePath.dirname(absolutePath)}\``
-      )
+      .replace(/(?<![/).])__dirname/g, `String.raw\`${nodePath.dirname(absolutePath)}\``)
       .replace(/(?<![/).])__filename/g, `String.raw\`${absolutePath}\``);
   };
 
@@ -170,9 +149,7 @@ export default function compiler(
     (diagnostic) => {
       if (isOutputChanged && onChanged && diagnostic.code === 6194) {
         clearNodeCache(extendCompilerOptions.outDir as string);
-        onChanged(
-          outMockFiles.files.filter((f) => !f.rootName.endsWith(".d.ts"))
-        );
+        onChanged(outMockFiles.files.filter((f) => !f.rootName.endsWith(".d.ts")));
         isOutputChanged = false;
       } else {
         log.debug(ts.formatDiagnostic(diagnostic, formatHost));
@@ -182,10 +159,7 @@ export default function compiler(
 
   let definedTSOptions: ts.CompilerOptions & { pathsArr: string[] };
   const origCreateProgram = host.createProgram;
-  host.createProgram = function hookCreateProgram(
-    tsRootNames,
-    allOptions
-  ): ts.EmitAndSemanticDiagnosticsBuilderProgram {
+  host.createProgram = function hookCreateProgram(tsRootNames, allOptions): ts.EmitAndSemanticDiagnosticsBuilderProgram {
     const definedRootNames = entries && entries.length ? entries : tsRootNames;
     arguments[0] = definedRootNames;
 
@@ -193,14 +167,9 @@ export default function compiler(
     if (allOptions) {
       definedTSOptions = JSON.parse(JSON.stringify(allOptions));
       definedTSOptions.baseUrl = definedTSOptions.outDir;
-      definedTSOptions.pathsArr =
-        (definedTSOptions.paths && Object.keys(definedTSOptions.paths)) || [];
+      definedTSOptions.pathsArr = (definedTSOptions.paths && Object.keys(definedTSOptions.paths)) || [];
 
-      isOutputChanged = outMockFiles.update(
-        definedRootNames,
-        allOptions.rootDir as string,
-        allOptions.outDir as string
-      );
+      isOutputChanged = outMockFiles.update(definedRootNames, allOptions.rootDir as string, allOptions.outDir as string);
       log.debug("defined root names", "", definedRootNames);
       log.debug("TS options", "", allOptions);
     }
@@ -225,8 +194,7 @@ export default function compiler(
       // eslint-disable-next-line no-empty
     } catch (ex) {
       const nodeJsRequired = new VersionContainer("12.10.0");
-      if (nodeJsVer > nodeJsRequired)
-        log.error("error in clearing tmp folder", ex as Error);
+      if (nodeJsVer > nodeJsRequired) log.error("error in clearing tmp folder", ex as Error);
     }
   }
 

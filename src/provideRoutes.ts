@@ -14,10 +14,7 @@ type Stack = {
   route: StackRoute | undefined;
 };
 
-export default function provideRoutes(
-  app: ExpressApp,
-  exlcudePath: string
-): Route[] {
+export default function provideRoutes(app: ExpressApp, exlcudePath: string): Route[] {
   const routes: Route[] = [];
 
   function normalizeInfo(path: string, methods: Record<string, string>): void {
@@ -52,8 +49,5 @@ export default function provideRoutes(
     });
   }
 
-  return routes.sort(
-    (v1: Route, v2: Route) =>
-      stringCompare(v1.method, v2.method) || stringCompare(v1.path, v2.path)
-  );
+  return routes.sort((v1: Route, v2: Route) => stringCompare(v1.method, v2.method) || stringCompare(v1.path, v2.path));
 }

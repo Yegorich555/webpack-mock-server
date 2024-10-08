@@ -17,10 +17,7 @@ const webpackMockServer = {
    * @param app express application that is used for mapping-routes
    * @param extendOptions MockServerOptions that overrides default options
    */
-  use(
-    app: ExpressApp,
-    extendOptions: MockServerOptions | undefined = undefined
-  ): void {
+  use(app: ExpressApp, extendOptions: MockServerOptions | undefined = undefined): void {
     const opt = {
       ...defOptions,
       ...extendOptions,
@@ -38,9 +35,7 @@ const webpackMockServer = {
     mockServerMiddleware(app, opt.port);
 
     let disposeAll: Array<() => void> = [];
-    function setupHook<T extends Server>(httpOrHttps: {
-      createServer: () => T;
-    }): void {
+    function setupHook<T extends Server>(httpOrHttps: { createServer: () => T }): void {
       const prev = httpOrHttps.createServer;
 
       disposeAll.push(() => {
@@ -70,16 +65,11 @@ const webpackMockServer = {
           }
 
           try {
-            compiler(
-              opt.entry,
-              opt.tsConfigFileName,
-              opt.compilerOptions,
-              (outFileNames) => {
-                mockServer(outFileNames, opt, (port) => {
-                  mockServerMiddleware(app, port);
-                });
-              }
-            );
+            compiler(opt.entry, opt.tsConfigFileName, opt.compilerOptions, (outFileNames) => {
+              mockServer(outFileNames, opt, (port) => {
+                mockServerMiddleware(app, port);
+              });
+            });
           } catch (ex) {
             log.error("Unable to start server\n", ex as Error);
           }
@@ -98,9 +88,7 @@ const webpackMockServer = {
    * Add mock functions into webpackMockServer
    * @param mockFunction
    */
-  add(
-    mockFunction: (app: ExpressApp, helper: MockServerHelper) => void
-  ): (app: ExpressApp) => void {
+  add(mockFunction: (app: ExpressApp, helper: MockServerHelper) => void): (app: ExpressApp) => void {
     return (app: ExpressApp): void => {
       mockFunction(app, mockServerHelper);
     };
