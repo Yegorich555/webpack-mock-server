@@ -17,7 +17,10 @@ module.exports = {
     },
     static: {
       directory: __dirname, // folder with static content
-      publicPath: __dirname,
+      publicPath: "/",
+      staticOptions: {
+        index: "index.html",
+      },
     },
     setupMiddlewares: (middlewares, devServer) => {
       webpackMockServer.use(devServer.app, {
