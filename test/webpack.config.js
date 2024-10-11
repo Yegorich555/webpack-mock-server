@@ -1,5 +1,7 @@
+/* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable @typescript-eslint/no-var-requires */
 const path = require("path");
+const HtmlWebpackPlugin = require("html-webpack-plugin");
 const webpackMockServer = require("../lib/index");
 
 /** @type {import('webpack').Configuration} */
@@ -7,8 +9,20 @@ module.exports = {
   entry: path.resolve(__dirname, "./webpackEntry"),
   stats: { children: false },
   mode: "development",
+  plugins: [
+    new HtmlWebpackPlugin({
+      template: path.resolve(__dirname, "./index.html"),
+    }),
+  ],
+  output: {
+    filename: "[name].bundle.js",
+    path: path.resolve(__dirname, "dist"),
+    clean: true,
+  },
   devServer: {
+    hot: true,
     historyApiFallback: true, // it enables HTML5 mode: https://developer.mozilla.org/en-US/docs/Web/API/History
+    watchFiles: ["src/**/*", "test/**/*"],
     devMiddleware: {
       stats: {
         children: false, // disable console.info for node_modules/*
@@ -16,11 +30,8 @@ module.exports = {
       },
     },
     static: {
+      watch: true,
       directory: __dirname, // folder with static content
-      publicPath: "/",
-      staticOptions: {
-        index: "index.html",
-      },
     },
     setupMiddlewares: (middlewares, devServer) => {
       webpackMockServer.use(devServer.app, {
