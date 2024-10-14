@@ -11,6 +11,7 @@ import log from "./log";
 import MockServerOptions from "./mockServerOptions";
 import NetError from "./netError";
 import provideRoutes from "./provideRoutes";
+import { parsePrimitives, tryParseJSONDate } from "./helpers";
 
 let app: Application;
 let server: Server | undefined;
@@ -86,8 +87,8 @@ export default async function mockServer(
   app.use(express.text()); // support ordinary text
   app.use(multer().any()); // support multipart/form-data
 
-  // uploadImage middleware - storing in memory
   app.use((req, _res, next) => {
+    // uploadImage middleware - storing in memory
     if (req.file || req.files?.length) {
       const fileDownloadUrls: string[] = [];
 
@@ -126,6 +127,13 @@ export default async function mockServer(
       }
 
       req.fileDownloadUrls = fileDownloadUrls;
+    }
+
+    if (req.rawHeaders?.some((h) => h.startsWith("multipart/form-data"))) {
+      // todo missed "file": in the body
+      req.body = parsePrimitives(req.body);
+    } else {
+      req.body = tryParseJSONDate(req.body);
     }
     next();
   });
