@@ -107,7 +107,6 @@ export default async function mockServer(
     }
 
     if (req.rawHeaders?.some((h) => h.startsWith("multipart/form-data"))) {
-      // todo missed "file": in the body
       req.body = parsePrimitives(req.body);
     } else {
       req.body = tryParseJSONDate(req.body);

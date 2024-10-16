@@ -57,8 +57,8 @@ declare global {
   namespace Express {
     interface Request {
       /** Urls that can be used for downloading uploaded files
-       * Uploading files automatically stores it's in memory
-       * As alternative you can check req.file and req.files for getting file-names */
+       * Uploading files automatically stores ones into memory
+       * As alternative you can check req.files for getting fileName `originalname` & form `fieldname` */
       fileDownloadUrls?: string[];
     }
     namespace Multer {

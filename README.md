@@ -308,8 +308,8 @@ module.exports = {
 ## Troubleshooting
 
 - It's important to install Typescript even if use only JS-files (webpack-mock-server uses ts-compiler for gathering ts,js,json files)
-- Don't use NodeJs **require** operator **as dynamic** to relative path. Use **dirname in this case or absolute path (**dirname is changed during the compilation)
-- NodeJs caches every **require**d module (file), so you maybe interested in clearing cache for _require(_.json)\*.
+- Don't use NodeJs **require** operator **as dynamic** to relative path. Use **dirname in this case or absolute path** (dirname is changed during the compilation)
+- NodeJs caches every **required** module (file), so you maybe interested in clearing cache for _require(_.json)\*.
   Use `delete require.cache[require.resolve({yourPathName})]` before you call `require({yourPathName})`;
 - _Mockserver can't compile the TS-code_.
   **Possible reason**: you have some extra import OR missed some global files (like `global.d.ts`).
@@ -327,7 +327,7 @@ app.get("/testResponseFromJsonFile2", (_req, res) => {
   res.json(require("./response.json"));
 });
 
-// Good
+// Correct
 import nodePath from "path";
 
 app.get("/testResponseFromJsonFile", (_req, res) => {

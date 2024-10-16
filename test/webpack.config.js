@@ -34,7 +34,6 @@ module.exports = {
       directory: __dirname, // folder with static content
     },
     setupMiddlewares: (middlewares, devServer) => {
-      // todo add 100ms timeouts otherwise prev-webpack versions could failed on port change
       webpackMockServer.use(devServer.app, {
         entry: "test/webpack.mock.ts",
         tsConfigFileName: "test/tsconfig.json",
