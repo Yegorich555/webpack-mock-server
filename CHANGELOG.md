@@ -1,7 +1,7 @@
 <!-- markdownlint-disable MD024 -->
 <!-- markdownlint-disable MD041 -->
 
-## [1.0.22](https://github.com/Yegorich555/webpack-mock-server/compare/v1.0.21...v1.0.22) (..., 2024)
+## [1.0.22](https://github.com/Yegorich555/webpack-mock-server/compare/v1.0.21...v1.0.22) (October 16, 2024)
 
 - fixed `not running on recent webpack-dev-server` versions
 - fixed `req.body contains unparsed Date json values`
