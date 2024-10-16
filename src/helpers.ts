@@ -8,7 +8,7 @@ import log from "./log";
 export function tryParseDate(value: any): any {
   if (typeof value !== "string" || value.length < 19 || value.length > 27) return value;
 
-  if (/^(\d{4})-(\d{2})-(\d{2})T(\d{2})\:(\d{2}):(\d{2})/.test(value)) {
+  if (/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})/.test(value)) {
     const v = Date.parse(value);
     if (!Number.isNaN(v)) return new Date(v);
   }

@@ -302,8 +302,8 @@ module.exports = {
 
 ## MockServerHelper. Methods
 
-- [**.getRandomInt**(min = 0, max = 2147483648)](#MockServerHelper._Methods) ⇒ `Number - returns random integer between min and max`
-- [**.getUniqueIdInt**()](#MockServerHelper._Methods) ⇒ `Number - returns unique integer`
+- [**.getRandomInt**(min = 0, max = 2147483648)](#mockserverhelper-methods) ⇒ `Number - returns random integer between min and max`
+- [**.getUniqueIdInt**()](#mockserverhelper-methods) ⇒ `Number - returns unique integer`
 
 ## Troubleshooting
 

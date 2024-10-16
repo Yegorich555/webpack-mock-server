@@ -1,3 +1,4 @@
+// eslint-disable-next-line import/extensions, import/no-unresolved
 import endPoints from "@/aliasTest/endPoints";
 import webpackMockServer from "../src/index";
 
