@@ -1,6 +1,8 @@
 /* eslint-disable no-inner-declarations */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable no-param-reassign */
+import { Application } from "express";
+import { OutputMockFile } from "./compilerOutRootFiles";
 import log from "./log";
 
 export function tryParseDate(value: any): any {
@@ -76,4 +78,27 @@ export function parsePrimitives(v: unknown) {
     log.error("Failed parsing form-data primitives", err as Error);
     return v;
   }
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function requireDefault(file: OutputMockFile): (usedApp: Application) => void {
+  // todo it doesn't work with ES6 imports in packages
+  // eslint-disable-next-line import/no-dynamic-require, global-require, @typescript-eslint/no-var-requires
+  const m = require(file.path);
+
+  const arr: Array<(usedApp: Application) => void> = [];
+  function moduleEachWrapper(usedApp: Application): void {
+    arr.forEach((f) => f(usedApp));
+  }
+
+  Object.keys(m).forEach((key) => {
+    const f = m[key];
+    if (typeof f !== "function") {
+      log.error(`Wrong 'export ${key} = ${f}' from ${file.rootName}: expected exporting only functions`);
+    } else {
+      arr.push(f);
+    }
+  });
+
+  return moduleEachWrapper;
 }
