@@ -1,6 +1,6 @@
 # Webpack Mock Server
 
-ExpressJs Middleware for webpack-dev-server with built-in hot-replacement (HMR) and typescript compiler.
+ExpressJs Middleware for webpack-dev-server with built-in hot-replacement (HMR) and Typescript compiler.
 Uses for mocking api responses
 
 [![npm version](https://img.shields.io/npm/v/webpack-mock-server.svg?style=flat-square)](https://www.npmjs.com/package/webpack-mock-server)
@@ -11,33 +11,46 @@ Uses for mocking api responses
 ## Features
 
 - Typescript support (>=v2.7): supports **.js**, **.ts**, **.json** files
-- ES6 export/import support
-- Hot replacement support
-- Does not require proxy-path-pattern (because this is middleware that pipes routes to splitted server without proxy-path-pattern)
+- ES6+ export/import support
+- Hot replacement support (auto rebuild on related file changes)
+- Does not require proxy-path-pattern (because this is middleware that pipes routes to splitted server without direct proxy settings)
 - Can be used without webpack (because this is expressjs [middleware](http://expressjs.com/en/guide/using-middleware.html))
-- Shows every configured response in user-friendly _index.html_ (just click on mock-server-url in console after as mockServer is started)
+- Shows every configured response in user-friendly _index.html_ (just click on mock-server-url in console after as mockServer is started: http://localhost:8081 by default)
+- Don't change API routes: use ordinary `fetch('/api/getUserInfo')` instead of `fetch('http://localhost:8081/api/getUserInfo')`. Despite on mock-server is hosted on another port, it adds proxy to webpack
 
 ## Installing
 
-Using npm (installing Typescript is required even if you don't use ts files):
+Using npm (**installing Typescript is required** even if you don't use ts files):
 
 ```npm
 npm i --save-dev webpack-mock-server typescript @types/express
 ```
 
+## Demo
+
+You can find example of real usage in repo [web-react](https://github.com/Yegorich555/web-react) (see [/components/account](https://github.com/Yegorich555/web-react/tree/master/src/components/account) folder)
+
 ## Examples
+
+- [Usage with defaults (for webpack 5+)](#usage-with-defaults)
+- [Usage with multiple/custom entries (instead of default webpack.mock.ts)](#usage-with-multiplecustom-entries-instead-of-default-webpackmockts)
+- [Usage with multiple entries by pattern (wildcard)](#usage-with-multiple-entries-by-pattern-wildcard)
+- [Usage **without** webpack](#usage-without-webpack)
+- [Usage with the whole default config](#usage-with-the-whole-default-config)
+  - [for webpack v5+](#for-webpack-v5)
+  - [for webpack v4](#for-webpack-v4)
 
 ### Usage with defaults
 
 ```js
-// webpack.config.js - ver 5+
+// webpack.config.js - webpack v5+
 const webpackMockServer = require("webpack-mock-server");
 
 module.exports = {
   devServer: {
     setupMiddlewares: (middlewares, devServer) => {
       webpackMockServer.use(devServer.app, {
-         port: (devServer.options.port || 8080) + 1,
+        port: (devServer.options.port || 8080) + 1,
       });
       return middlewares;
     },
@@ -67,9 +80,7 @@ export default webpackMockServer.add((app, helper) => {
 // multiple exports are supported
 export const result = webpackMockServer.add((app, helper) => {
   app.delete("/testDelete", (_req, res) => {
-    res.json(
-      "JS delete-object can be here. Random int:" + helper.getRandomInt()
-    );
+    res.json("JS delete-object can be here. Random int:" + helper.getRandomInt());
   });
   app.put("/testPut", (_req, res) => {
     res.json("JS put-object can be here");
@@ -192,7 +203,9 @@ app.listen(1782);
 
 ### Usage with the whole default config
 
-#### for webpack [v5+](https://webpack.js.org/configuration/dev-server/#devserveronbeforesetupmiddleware)
+#### for webpack v5
+
+Details about webpack-dev-server v5 vs v4 see [here](https://webpack.js.org/configuration/dev-server/#devserveronbeforesetupmiddleware)
 
 ```js
 // webpack.config.js
@@ -305,6 +318,10 @@ module.exports = {
 - [**.getRandomInt**(min = 0, max = 2147483648)](#mockserverhelper-methods) ⇒ `Number - returns random integer between min and max`
 - [**.getUniqueIdInt**()](#mockserverhelper-methods) ⇒ `Number - returns unique integer`
 
+---
+
+---
+
 ## Troubleshooting
 
 - It's important to install Typescript even if use only JS-files (webpack-mock-server uses ts-compiler for gathering ts,js,json files)
@@ -315,7 +332,7 @@ module.exports = {
   **Possible reason**: you have some extra import OR missed some global files (like `global.d.ts`).
   **Solution**: all mock-files must be without dependencies (imports) of components defined in the main-project files
   - If you have custom `tsconfig.mock.json` file check if all required `\*d.ts` files are included `.. include: ["**/global.d.ts", ..] ..`
-  - To check what's wrong check compilation trace `npx tsc --project tsconfig.mock.json --generateTrace traceDir` OR enable logging via option `verbose:true`
+  - To check what's wrong use compilation trace `npx tsc --project tsconfig.mock.json --generateTrace traceDir` OR enable logging via webpack-mock-server option `verbose:true`
 
 ```js
 // Wrong
@@ -338,11 +355,23 @@ app.get("/testResponseFromJsonFile2", (_req, res) => {
   /* From NodeJs v8.9.0 you can use options: path
    * const resolvedPath = require.resolve("./response.json", { paths: [__dirname] });
    */
-  const resolvedPath = require.resolve(
-    nodePath.join(__dirname, "./response.json")
-  );
+  const resolvedPath = require.resolve(nodePath.join(__dirname, "./response.json"));
   // removing NodeJS cache for getting the latest file
   delete require.cache[resolvedPath];
   res.json(require(resolvedPath));
 });
+```
+
+```js
+/* Your ordinary http responses from UI */
+
+// Wrong
+function apiGetUserInfo() {
+  return fetch("http://localhost:8081/api/getUserInfo"); // it works if webpack-mock-server hosted under 8081 port, but it's not correct usage
+}
+
+// Correct
+function apiGetUserInfo() {
+  return fetch("/api/getUserInfo"); // so if you run webpack-devServer with webpack-mock-server data returns webpack-mock-server if route exists; but if build your project then your API will be here
+}
 ```
