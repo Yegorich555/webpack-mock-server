@@ -11,7 +11,7 @@ import log from "./log";
 import MockServerOptions from "./mockServerOptions";
 import NetError from "./netError";
 import provideRoutes from "./provideRoutes";
-import { parsePrimitives, requireDefault, tryParseJSONDate } from "./helpers";
+import { parseFormDataObject, requireDefault, tryParseJSONDate } from "./helpers";
 
 let app: Application;
 let server: Server | undefined;
@@ -107,7 +107,7 @@ export default async function mockServer(
     }
 
     if (req.rawHeaders?.some((h) => h.startsWith("multipart/form-data"))) {
-      req.body = parsePrimitives(req.body);
+      req.body = parseFormDataObject(req.body);
     } else {
       req.body = tryParseJSONDate(req.body);
     }

@@ -49,22 +49,39 @@ export function tryParseJSONDate(obj: any): any {
   }
 }
 
-export function parsePrimitives(v: unknown) {
+export function parseFormDataObject(v: unknown) {
   try {
     if (v == null) {
       return null;
     }
     if (Array.isArray(v)) {
       v.forEach((_, i) => {
-        v[i] = parsePrimitives(v[i]);
+        v[i] = parseFormDataObject(v[i]);
       });
       return v;
     }
     if (typeof v === "object") {
-      Object.keys(v).forEach((k) => {
-        (v as any)[k] = parsePrimitives((v as any)[k]);
+      const result: Record<string, any> = {};
+
+      Object.entries(v).forEach(([key, value]) => {
+        const keys = key.replace(/\[(\d+)]/g, ".$1").split("."); // Convert array notation [index] to dot notation
+        let current = result;
+
+        for (let i = 0; i < keys.length; i++) {
+          const k = keys[i];
+
+          if (i === keys.length - 1) {
+            current[k] = parseFormDataObject(value);
+            return;
+          }
+
+          const nextKey = keys[i + 1];
+          current[k] = current[k] || (Number.isNaN(Number(nextKey)) ? {} : []);
+          current = current[k];
+        }
       });
-      return v;
+
+      return result;
     }
     if (v === "true") return true;
     if (v === "false") return false;

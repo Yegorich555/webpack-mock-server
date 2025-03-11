@@ -41,6 +41,7 @@ export default webpackMockServer.add((app) => {
   });
   app.post("/testUploadFile", (req, res) => {
     console.warn(req.file, req.files);
+    console.warn("GOT FORM DATA\n", JSON.stringify(req.body));
     res.json(req.fileDownloadUrls && req.fileDownloadUrls[0]);
   });
 });

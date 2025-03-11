@@ -32,6 +32,11 @@ async function apiUploadFile() {
   formData.append("valueArray[1][name]", "Adam");
   formData.append("valueArray[1][isOld]", true);
   formData.append("valueArray[1][DateOfBirth]", new Date(2012, 10, 15).toISOString());
+  formData.append("valueArray[1][options][field1]", 345);
+
+  formData.append("valueArray[2].id", 102);
+  formData.append("valueArray[2].name", "Adam");
+  formData.append("valueArray[2].options.field1", 99);
 
   const res = await postData("/testUploadFile", formData);
   console.log("upload file result: ", res);
