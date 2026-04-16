@@ -10,11 +10,11 @@ Uses for mocking api responses
 
 ## Features
 
-- Typescript support (>=v2.7): supports **.js**, **.ts**, **.json** files
+- Typescript support (6.0+): supports **.js**, **.ts**, **.json** files. For using with Typescript v5 and lower (see [1.0.23](https://www.npmjs.com/package/webpack-mock-server/v/1.0.23))
 - ES6+ export/import support
 - Hot replacement support (auto rebuild on related file changes)
-- Does not require proxy-path-pattern (because this is middleware that pipes routes to splitted server without direct proxy settings)
-- Can be used without webpack (because this is expressjs [middleware](http://expressjs.com/en/guide/using-middleware.html))
+- Does not require proxy-path-pattern (because this is middleware that pipes routes to split server without direct proxy settings)
+- Can be used without webpack (because this is express-js [middleware](http://expressjs.com/en/guide/using-middleware.html))
 - Shows every configured response in user-friendly _index.html_ (just click on mock-server-url in console after as mockServer is started: <http://localhost:8081> by default)
 - Don't change API routes: use ordinary `fetch('/api/getUserInfo')` instead of `fetch('http://localhost:8081/api/getUserInfo')`. Despite on mock-server is hosted on another port, it adds proxy to webpack
 

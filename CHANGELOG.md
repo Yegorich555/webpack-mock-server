@@ -1,7 +1,11 @@
 <!-- markdownlint-disable MD024 -->
 <!-- markdownlint-disable MD041 -->
 
-## [1.0.23](https://github.com/Yegorich555/webpack-mock-server/compare/v1.0.21...v1.0.22) (March 11, 2025)
+## [2.0.0](https://github.com/Yegorich555/webpack-mock-server/compare/v1.0.23...v1.1.0) (April 17, 2026)
+
+- BREAKING CHANGE: added support for TypeScript 6+
+
+## [1.0.23](https://github.com/Yegorich555/webpack-mock-server/compare/v1.0.22...v1.0.23) (March 11, 2025)
 
 - fixed `req.body contains unparsed formData nested properties with dot-notation`
 
