@@ -47,7 +47,7 @@ function handlePathAlias(definedTSOptions: MyCompilerOptions): MyCompilerOptions
 
   if (aliasPaths && outDir) {
     const allPathsMap = Object.keys(aliasPaths);
-    definedTSOptions._pathsArr = allPathsMap;
+    definedTSOptions._toResolveAliasPaths = allPathsMap;
 
     const rootDir = definedTSOptions.rootDir as string;
     const pathsBasePath = (definedTSOptions.pathsBasePath as string | undefined) || rootDir;
@@ -222,7 +222,7 @@ export default function compiler(
     log.debug("clearing tmp folder ", extendCompilerOptions.outDir);
     // recursive option is experimental and supported in node >= v12.10.0: https://nodejs.org/api/fs.html#fs_fs_rmdir_path_options_callback
     try {
-      fs.rmdirSync(extendCompilerOptions.outDir as string, {
+      fs.rmSync(extendCompilerOptions.outDir as string, {
         recursive: true,
       });
       // eslint-disable-next-line no-empty
