@@ -15,7 +15,7 @@ Uses for mocking api responses
 - Hot replacement support (auto rebuild on related file changes)
 - Does not require proxy-path-pattern (because this is middleware that pipes routes to splitted server without direct proxy settings)
 - Can be used without webpack (because this is expressjs [middleware](http://expressjs.com/en/guide/using-middleware.html))
-- Shows every configured response in user-friendly _index.html_ (just click on mock-server-url in console after as mockServer is started: http://localhost:8081 by default)
+- Shows every configured response in user-friendly _index.html_ (just click on mock-server-url in console after as mockServer is started: <http://localhost:8081> by default)
 - Don't change API routes: use ordinary `fetch('/api/getUserInfo')` instead of `fetch('http://localhost:8081/api/getUserInfo')`. Despite on mock-server is hosted on another port, it adds proxy to webpack
 
 ## Installing

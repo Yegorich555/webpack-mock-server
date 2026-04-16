@@ -52,9 +52,9 @@ class MockServerOptions {
       noEmit: false, // fix when 'jsconfig.json'
       noEmitHelpers: false,
       esModuleInterop: true,
-      module: ts.ModuleKind.CommonJS,
+      module: ts.ModuleKind.NodeNext,
       declaration: false,
-      moduleResolution: ModuleResolutionKind.Node10,
+      moduleResolution: ModuleResolutionKind.NodeNext,
       target: defineTarget(),
     } as ts.CompilerOptions;
   }

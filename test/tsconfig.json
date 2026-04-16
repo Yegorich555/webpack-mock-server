@@ -4,13 +4,13 @@
   "include": ["../test/*mock*.ts", "**/global.d.ts"],
   "exclude": ["../test/*mockExclude.ts"],
   "compilerOptions": {
-    "baseUrl": "../",
     "paths": {
       //none-js-ts files is not supported by intellisense. Use 'path-intellisense.mappings' in .vscode/settings.json instead
       //this is should be sync with aliases in webpack
       "@/*": ["./*"]
     },
     "outDir": "./testBuild",
+    "rootDir": "./",
     "target": "es6",
     "declaration": true,
     "esModuleInterop": true,

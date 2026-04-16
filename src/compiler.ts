@@ -1,3 +1,5 @@
+/* eslint-disable no-param-reassign */
+/* eslint-disable no-underscore-dangle */
 /* eslint-disable no-use-before-define */
 import fs from "fs";
 import nodePath from "path";
@@ -5,6 +7,10 @@ import ts from "typescript";
 import CompilerOutRootFiles, { OutputMockFile } from "./compilerOutRootFiles";
 import log from "./log";
 import VersionContainer, { nodeJsVer } from "./versionContainer";
+
+interface MyCompilerOptions extends ts.CompilerOptions {
+  _toResolveAliasPaths: string[];
+}
 
 const formatHost: ts.FormatDiagnosticsHost = {
   getCanonicalFileName: (path) => path,
@@ -29,6 +35,37 @@ function clearNodeCache(rootPath: string): void {
       delete require.cache[key];
     }
   });
+}
+
+/* Resolve alias-paths relative to outDir */
+function handlePathAlias(definedTSOptions: MyCompilerOptions): MyCompilerOptions {
+  definedTSOptions._toResolveAliasPaths = [];
+
+  // Instead of deprecated baseUrl, make each paths entry absolute by prepending outDir
+  const aliasPaths = definedTSOptions.paths;
+  const { outDir } = definedTSOptions;
+
+  if (aliasPaths && outDir) {
+    const allPathsMap = Object.keys(aliasPaths);
+    definedTSOptions._pathsArr = allPathsMap;
+
+    const rootDir = definedTSOptions.rootDir as string;
+    const pathsBasePath = (definedTSOptions.pathsBasePath as string | undefined) || rootDir;
+
+    const resolvedPaths: ts.MapLike<string[]> = {};
+    Object.keys(aliasPaths).forEach((key) => {
+      resolvedPaths[key] = aliasPaths[key].map((p) => {
+        // p is relative to pathsBasePath; resolve it to an absolute source path,
+        // then compute its position relative to rootDir, then join with outDir
+        const absoluteSourcePath = nodePath.resolve(pathsBasePath, p);
+        const relToRootDir = nodePath.relative(rootDir, absoluteSourcePath);
+        return nodePath.join(outDir, relToRootDir);
+      });
+    });
+    definedTSOptions.paths = resolvedPaths;
+  }
+
+  return definedTSOptions;
 }
 
 // https://github.com/microsoft/TypeScript/wiki/Using-the-Compiler-API#writing-an-incremental-program-watcher
@@ -90,8 +127,7 @@ export default function compiler(
 
   // todo import alias doesn't work https://github.com/microsoft/TypeScript/issues/26722
   function resolvePathAlias(filePath: string, path: string): string {
-    /* eslint-disable @typescript-eslint/no-use-before-define */
-    const isMatchAlias = definedTSOptions.pathsArr.some((v) => v[0] === filePath[0]);
+    const isMatchAlias = definedTSOptions._toResolveAliasPaths.some((v) => v[0] === filePath[0]);
 
     if (isMatchAlias) {
       const m = ts.resolveModuleName(filePath, path, definedTSOptions, host).resolvedModule?.resolvedFileName;
@@ -157,17 +193,15 @@ export default function compiler(
     }
   );
 
-  let definedTSOptions: ts.CompilerOptions & { pathsArr: string[] };
+  let definedTSOptions: ts.CompilerOptions & { _toResolveAliasPaths: string[] };
   const origCreateProgram = host.createProgram;
   host.createProgram = function hookCreateProgram(tsRootNames, allOptions): ts.EmitAndSemanticDiagnosticsBuilderProgram {
     const definedRootNames = entries && entries.length ? entries : tsRootNames;
     arguments[0] = definedRootNames;
 
-    // rewrite to resolve alias-paths relative to outDir
     if (allOptions) {
       definedTSOptions = JSON.parse(JSON.stringify(allOptions));
-      definedTSOptions.baseUrl = definedTSOptions.outDir;
-      definedTSOptions.pathsArr = (definedTSOptions.paths && Object.keys(definedTSOptions.paths)) || [];
+      definedTSOptions = handlePathAlias(definedTSOptions);
 
       isOutputChanged = outMockFiles.update(definedRootNames, allOptions.rootDir as string, allOptions.outDir as string);
       log.debug("defined root names", "", definedRootNames);

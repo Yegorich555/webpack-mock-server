@@ -11,7 +11,7 @@
     "lint-md": ".\\node_modules\\.bin\\markdownlint **/*.md --ignore node_modules --fix",
     "start": "npm run build && node .\\test\\start",
     "start-webpack": "npm run build && .\\node_modules\\.bin\\webpack serve --hot --config test/webpack.config.js",
-    "build": "shx rm -rf ./lib/ && tsc --listEmittedFiles  --removeComments && tsc --emitDeclarationOnly"
+    "build": "shx rm -rf ./lib/ && tsc --listEmittedFiles  --removeComments --rootDir ./src && tsc --emitDeclarationOnly --rootDir ./src"
   },
   "repository": {
     "type": "git",
@@ -61,7 +61,7 @@
     "markdownlint-cli": "^0.33.0",
     "prettier": "^2.8.8",
     "shx": "^0.3.4",
-    "typescript": "^5.9.3",
+    "typescript": "^6.0.2",
     "webpack": "^5.106.2",
     "webpack-cli": "^5.1.4",
     "webpack-dev-server": "^5.2.3"
