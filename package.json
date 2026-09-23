@@ -1,6 +1,6 @@
 {
   "name": "webpack-mock-server",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Mocks api requests for webpack-dev-server with hot-replacement",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
