@@ -1,18 +1,17 @@
 /* eslint-disable class-methods-use-this */
-import ts, { ModuleResolutionKind } from "typescript";
 import nodePath from "path";
 import os from "os";
 import express from "express";
 import { nodeJsVer } from "./versionContainer";
 
-function defineTarget(): ts.ScriptTarget {
+/** Typescript compiler options in the same format as 'compilerOptions' section in 'tsconfig.json' */
+export type CompilerOptions = Record<string, unknown>;
+
+function defineTarget(): string {
   if (nodeJsVer.major >= 10) {
-    return ts.ScriptTarget.ES2017;
+    return "es2017";
   }
-  if (nodeJsVer.major >= 6) {
-    return ts.ScriptTarget.ES5;
-  }
-  return ts.ScriptTarget.ES3;
+  return "es2015"; // ES5 & ES3 are not supported since TS 7
 }
 
 const outDir: string = nodePath.join(os.tmpdir(), "webpack-mock-server", new Date().getTime().toString());
@@ -34,7 +33,7 @@ class MockServerOptions {
   before: express.RequestHandler | undefined;
 
   /** Typescript compiler options that override options from 'tsconfig.json' */
-  compilerOptions: ts.CompilerOptions = {
+  compilerOptions: CompilerOptions = {
     strictNullChecks: false,
     noImplicitAny: false,
     noUnusedLocals: false,
@@ -45,18 +44,18 @@ class MockServerOptions {
   };
 
   /** Must-have Typescript compiler options (impossible to override) */
-  get strictCompilerOptions(): ts.CompilerOptions {
+  get strictCompilerOptions(): CompilerOptions {
     return {
       outDir, // {os.tmpdir()}/webpack-mock-server/{new Date().getTime()};
       rootDir: process.cwd(),
       noEmit: false, // fix when 'jsconfig.json'
       noEmitHelpers: false,
       esModuleInterop: true,
-      module: ts.ModuleKind.NodeNext,
+      module: "nodenext",
       declaration: false,
-      moduleResolution: ModuleResolutionKind.NodeNext,
+      moduleResolution: "nodenext",
       target: defineTarget(),
-    } as ts.CompilerOptions;
+    };
   }
 
   /** Typescript config file (used for compilation [entry] files) */

@@ -8,7 +8,7 @@ export default webpackMockServer.add((app, helper) => {
     return res.json(item);
   });
 
-  app.get("/mockFile_2", (_req, res) => {
+  app.get("/mockFile_3", (_req, res) => {
     const response = [];
     for (let i = 0; i < 101; ++i) {
       response.push({

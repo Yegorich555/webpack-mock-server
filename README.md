@@ -223,7 +223,7 @@ module.exports = {
           before: undefined, //can be used for logging
           entry: ["webpack.mock.ts"],
           tsConfigFileName: "tsconfig.json",
-          compilerOptions: { // typescript.CompilerOptions that override tsconfig.json:[compilerOptions]
+          compilerOptions: { // options in the same format as tsconfig.json:[compilerOptions] that override ones from tsConfigFileName
               strictNullChecks: false,
               noImplicitAny: false,
               noUnusedLocals: false,
@@ -237,9 +237,9 @@ module.exports = {
               noEmit: false,
               noEmitHelpers: false,
               esModuleInterop: true,
-              module: ts.ModuleKind.CommonJS,
+              module: "nodenext",
               declaration: false,
-              moduleResolution: ModuleResolutionKind.Node10,
+              moduleResolution: "nodenext",
               target: defineTarget() // it defines target-ES based on NODE version
           }
       });
@@ -270,7 +270,7 @@ module.exports = {
           before: undefined, //can be used for logging
           entry: ["webpack.mock.ts"],
           tsConfigFileName: "tsconfig.json",
-          compilerOptions: { // typescript.CompilerOptions that override tsconfig.json:[compilerOptions]
+          compilerOptions: { // options in the same format as tsconfig.json:[compilerOptions] that override ones from tsConfigFileName
               strictNullChecks: false,
               noImplicitAny: false,
               noUnusedLocals: false,
@@ -284,9 +284,9 @@ module.exports = {
               noEmit: false,
               noEmitHelpers: false,
               esModuleInterop: true,
-              module: ts.ModuleKind.CommonJS,
+              module: "nodenext",
               declaration: false,
-              moduleResolution: ModuleResolutionKind.Node10,
+              moduleResolution: "nodenext",
               target: defineTarget() // it defines target-ES based on NODE version
           }
       })
@@ -309,8 +309,8 @@ module.exports = {
 | logResponses          | Boolean                    | false               | Show responses-info in NodeJs via console.log                                                                                                                                                                                    |
 | logRequests           | Boolean                    | false               | Show request-info in NodeJs via console.log                                                                                                                                                                                      |
 | before                | (req, res, next) => void   | undefined           | Execute custom middleware prior to all other middleware internally within the server Can be used for custom-logging. Example [here](#usage-with-multiplecustom-entries-instead-of-default-webpackmockts)                         |
-| compilerOptions       | typescript.CompilerOptions | ...                 | See the latest example above                                                                                                                                                                                                     |
-| strictCompilerOptions | typescript.CompilerOptions | ...                 | **readOnly**. See the latest example above. These options impossible to override                                                                                                                                                 |
+| compilerOptions       | tsconfig [compilerOptions] | ...                 | See the latest example above                                                                                                                                                                                                     |
+| strictCompilerOptions | tsconfig [compilerOptions] | ...                 | **readOnly**. See the latest example above. These options impossible to override                                                                                                                                                 |
 | tsConfigFileName      | String                     | "tsconfig.json"     | Pointer to typescript config file. Example [here](#usage-with-multiple-entries-by-pattern-wildcard):                                                                                                                             |
 
 ## MockServerHelper. Methods
