@@ -4,6 +4,7 @@
 import fs from "fs";
 import nodePath from "path";
 import ts from "typescript";
+import clearNodeCache from "./clearNodeCache";
 import CompilerOutRootFiles, { OutputMockFile } from "./compilerOutRootFiles";
 import log from "./log";
 import VersionContainer, { nodeJsVer } from "./versionContainer";
@@ -25,16 +26,6 @@ function reportDiagnostic(diagnostic: ts.Diagnostic): void {
     linePointer = `in ${diagnostic.file?.fileName} (${line + 1},${character + 1})`;
   }
   log.error(`TS${diagnostic.code}: ${linePointer}\n${ts.flattenDiagnosticMessageText(diagnostic.messageText, formatHost.getNewLine())}`);
-}
-
-/** Clear Node cache for files in tmpFolder */
-function clearNodeCache(rootPath: string): void {
-  Object.keys(require.cache).forEach((key) => {
-    if (require.cache[key]?.filename.startsWith(rootPath)) {
-      log.debug("delete node-cache for", key);
-      delete require.cache[key];
-    }
-  });
 }
 
 /* Resolve alias-paths relative to outDir */

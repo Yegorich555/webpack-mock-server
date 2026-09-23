@@ -1,7 +1,11 @@
 <!-- markdownlint-disable MD024 -->
 <!-- markdownlint-disable MD041 -->
 
-## [2.0.0](https://github.com/Yegorich555/webpack-mock-server/compare/v1.0.23...v1.1.0) (April 20, 2026)
+## [2.0.1](https://github.com/Yegorich555/webpack-mock-server/compare/v2.0.0...v2.0.1) (__, 2026)
+
+- added support for webpack-dev-server 6
+
+## [2.0.0](https://github.com/Yegorich555/webpack-mock-server/compare/v1.0.23...v2.0.0) (April 20, 2026)
 
 - BREAKING CHANGE: added support for TypeScript 6+ (for TS 5 use versions below)
 
