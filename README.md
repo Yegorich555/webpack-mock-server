@@ -10,7 +10,7 @@ Uses for mocking api responses
 
 ## Features
 
-- Typescript support (6.0+): supports **.js**, **.ts**, **.json** files. For using with Typescript v5 and lower (see [1.0.23](https://www.npmjs.com/package/webpack-mock-server/v/1.0.23))
+- Typescript support (6.0+, including native Typescript 7): supports **.js**, **.ts**, **.json** files. For using with Typescript v5 and lower (see [1.0.23](https://www.npmjs.com/package/webpack-mock-server/v/1.0.23))
 - ES6+ export/import support
 - Hot replacement support (auto rebuild on related file changes)
 - Does not require proxy-path-pattern (because this is middleware that pipes routes to split server without direct proxy settings)
@@ -309,7 +309,7 @@ module.exports = {
 | logResponses          | Boolean                    | false               | Show responses-info in NodeJs via console.log                                                                                                                                                                                    |
 | logRequests           | Boolean                    | false               | Show request-info in NodeJs via console.log                                                                                                                                                                                      |
 | before                | (req, res, next) => void   | undefined           | Execute custom middleware prior to all other middleware internally within the server Can be used for custom-logging. Example [here](#usage-with-multiplecustom-entries-instead-of-default-webpackmockts)                         |
-| compilerOptions       | tsconfig [compilerOptions] | ...                 | See the latest example above                                                                                                                                                                                                     |
+| compilerOptions       | tsconfig [compilerOptions] | ...                 | See the latest example above. Format of _ts.CompilerOptions_ (enums like `ts.ModuleKind.CommonJS`) is supported only with Typescript 6                                                                                           |
 | strictCompilerOptions | tsconfig [compilerOptions] | ...                 | **readOnly**. See the latest example above. These options impossible to override                                                                                                                                                 |
 | tsConfigFileName      | String                     | "tsconfig.json"     | Pointer to typescript config file. Example [here](#usage-with-multiple-entries-by-pattern-wildcard):                                                                                                                             |
 

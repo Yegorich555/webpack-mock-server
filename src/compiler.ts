@@ -1,6 +1,7 @@
 import { spawn } from "child_process";
 import fs from "fs";
 import nodePath from "path";
+import readline from "readline";
 import ts from "typescript";
 import clearNodeCache from "./clearNodeCache";
 import CompilerOutRootFiles, { OutputMockFile } from "./compilerOutRootFiles";
@@ -18,6 +19,8 @@ interface ParsedConfig {
   };
 }
 
+const emptyConfig: ParsedConfig = { fileNames: [], options: {} };
+
 interface ConfigParser {
   parse: (configFileName: string) => ParsedConfig;
   close: () => void;
@@ -27,6 +30,40 @@ interface ConfigParser {
 interface LegacyTypeScript {
   sys: object;
   getParsedCommandLineOfConfigFile: (configFileName: string, optionsToExtend: undefined, host: object) => ParsedConfig | undefined;
+  /** Internal API. Enum-like options have 'type' as Map<tsconfigValue, apiValue> */
+  optionDeclarations?: { name: string; type: unknown; element?: { type: unknown } }[];
+}
+
+const legacyTs = ts as unknown as LegacyTypeScript;
+
+/** Converts ts.CompilerOptions (enums like ts.ModuleKind.CommonJS, lib like 'lib.es2020.d.ts') to tsconfig format. Possible for TS < 7 only */
+function toTsConfigOptions(options: CompilerOptions): CompilerOptions {
+  const declarations = legacyTs.optionDeclarations;
+  if (!declarations) {
+    return options;
+  }
+
+  const toTsConfigValue = (type: unknown, value: unknown): unknown => {
+    if (!(type instanceof Map) || type.has(value)) {
+      return value;
+    }
+    const found = Array.from(type.entries()).find(([, apiValue]) => apiValue === value);
+    return found ? found[0] : value;
+  };
+  const result: CompilerOptions = {};
+  Object.keys(options).forEach((name) => {
+    const value = options[name];
+    const declaration = declarations.find((d) => d.name === name);
+    if (!declaration) {
+      result[name] = value;
+    } else if (declaration.element && Array.isArray(value)) {
+      const elementType = declaration.element.type;
+      result[name] = value.map((v) => toTsConfigValue(elementType, v));
+    } else {
+      result[name] = toTsConfigValue(declaration.type, value);
+    }
+  });
+  return result;
 }
 
 /** TS 7+ doesn't provide JS API anymore: tsconfig can be parsed only via 'unstable' API */
@@ -41,14 +78,13 @@ function createConfigParser(tsVer: number): ConfigParser {
     };
   }
 
-  const legacyTs = ts as unknown as LegacyTypeScript;
   const host = {
     ...legacyTs.sys,
     // eslint-disable-next-line @typescript-eslint/no-empty-function
     onUnRecoverableConfigFileDiagnostic: (): void => {}, // errors are reported by tsc itself
   };
   return {
-    parse: (configFileName) => legacyTs.getParsedCommandLineOfConfigFile(configFileName, undefined, host) || { fileNames: [], options: {} },
+    parse: (configFileName) => legacyTs.getParsedCommandLineOfConfigFile(configFileName, undefined, host) || emptyConfig,
     // eslint-disable-next-line @typescript-eslint/no-empty-function
     close: (): void => {},
   };
@@ -63,15 +99,22 @@ function getTscCommand(tsVer: number): string[] {
 
   // the same as 'typescript/lib/getExePath.js' does. 'typescript/bin/tsc' isn't used because it runs tsc in one more process that isn't killed on Windows
   const platformPackage = `@typescript/typescript-${process.platform}-${process.arch}`;
-  let platformPackageDir: string;
   try {
-    platformPackageDir = nodePath.dirname(require.resolve(`${platformPackage}/package.json`, { paths: [tsDir] }));
+    const platformPackageDir = nodePath.dirname(require.resolve(`${platformPackage}/package.json`, { paths: [tsDir] }));
+    return [nodePath.join(platformPackageDir, "lib", process.platform === "win32" ? "tsc.exe" : "tsc")];
   } catch (ex) {
     throw new Error(
       `WebpackMockServer. Unable to resolve ${platformPackage}. Either your platform is unsupported, or you are missing the package on disk`
     );
   }
-  return [nodePath.join(platformPackageDir, "lib", process.platform === "win32" ? "tsc.exe" : "tsc")];
+}
+
+function isFile(path: string): boolean {
+  try {
+    return fs.statSync(path).isFile();
+  } catch (ex) {
+    return false;
+  }
 }
 
 /** Returns matched key of 'paths' and value replaced by '*'. The same as Typescript does: exact match or pattern with the longest prefix */
@@ -99,33 +142,34 @@ function matchPathAlias(moduleName: string, paths: Record<string, string[]>): { 
 /* Resolve alias-paths to compiled files in outDir */
 function resolvePathAlias(moduleName: string, config: ParsedConfig, rootDir: string, outDir: string): string | undefined {
   const { paths } = config.options;
-  const matched = paths && matchPathAlias(moduleName, paths);
-  if (!paths || !matched) {
+  if (!paths) {
+    return undefined;
+  }
+  const matched = matchPathAlias(moduleName, paths);
+  if (!matched) {
     return undefined;
   }
 
   const pathsBasePath = config.options.pathsBasePath || rootDir;
-  const isFile = (path: string): boolean => fs.existsSync(path) && fs.statSync(path).isFile();
-  let resolved: string | undefined;
-  paths[matched.key].some((p) => {
+  const candidates = paths[matched.key].map((p) => {
     // p is relative to pathsBasePath; resolve it to an absolute source path,
     // then compute its position relative to rootDir, then join with outDir
     const absoluteSourcePath = nodePath.resolve(pathsBasePath, p.replace("*", matched.star));
     const outPath = nodePath.join(outDir, nodePath.relative(rootDir, absoluteSourcePath)).replace(/\.([cm]?)tsx?$/, ".$1js");
-    resolved = [outPath, `${outPath}.js`, nodePath.join(outPath, "index.js")].find(isFile);
-    return !!resolved;
+    return [outPath, `${outPath}.js`, nodePath.join(outPath, "index.js")];
   });
-  return resolved;
+  return ([] as string[]).concat(...candidates).find(isFile);
 }
+
+const sourceExtensions: Record<string, string[]> = {
+  ".cjs": [".cts", ".cjs"],
+  ".mjs": [".mts", ".mjs"],
+};
 
 /** Returns source file of the emitted one */
 function getSourceFileName(outFileName: string, rootDir: string, outDir: string): string {
   const absolutePath = nodePath.join(rootDir, nodePath.relative(outDir, outFileName));
   const { dir, name, ext } = nodePath.parse(absolutePath);
-  const sourceExtensions: Record<string, string[]> = {
-    ".cjs": [".cts", ".cjs"],
-    ".mjs": [".mts", ".mjs"],
-  };
   const found = (sourceExtensions[ext] || [".ts", ".tsx", ".js", ".jsx"])
     .map((e) => nodePath.join(dir, name + e))
     .find((p) => fs.existsSync(p));
@@ -140,8 +184,8 @@ export default function compiler(
   onChanged: (OutputMockFiles: OutputMockFile[]) => void
 ): void {
   const tsVer = Number.parseFloat(ts.versionMajorMinor);
-  if (tsVer < 2.7) {
-    throw new Error(`WebpackMockServer. Typescript version >=2.7 is expected. Current is ${ts.versionMajorMinor}`);
+  if (tsVer < 6) {
+    throw new Error(`WebpackMockServer. Typescript version >=6.0 is expected. Current is ${ts.versionMajorMinor}`);
   }
   log.debug(`typescript version: ${ts.version}`);
 
@@ -179,9 +223,8 @@ export default function compiler(
     JSON.stringify(
       {
         extends: isTsConfigExists ? tsConfigPath : undefined,
-        compilerOptions: extendCompilerOptions,
-        files: definedRootNames && definedRootNames.map((v) => nodePath.resolve(v)),
-        include: definedRootNames && [],
+        compilerOptions: toTsConfigOptions(extendCompilerOptions),
+        ...(definedRootNames && { files: definedRootNames.map((v) => nodePath.resolve(v)), include: [] }),
         watchOptions: {
           excludeDirectories: [nodeModulesPattern],
           excludeFiles: [`${nodeModulesPattern}/**/*`],
@@ -199,15 +242,15 @@ export default function compiler(
       return configParser.parse(outTsConfigPath);
     } catch (ex) {
       log.error(`Unable to parse ${tsConfigFileName}. Path-alias and 'include' section are ignored`, ex as Error);
-      return { fileNames: [], options: {} };
+      return emptyConfig;
     }
   }
 
-  // creating hooks
-  let isOutputChanged = true;
+  let isFirstCompile = true;
   let emittedFiles: string[] = [];
 
   const outMockFiles = new CompilerOutRootFiles();
+  const nodePathJson = JSON.stringify(process.env.NODE_PATH || "");
 
   // output is placed into tmp-folder, so paths relative to the source file must be resolved
   function fixEmittedFile(path: string, config: ParsedConfig): void {
@@ -222,7 +265,7 @@ export default function compiler(
       .replace(/(?<![/).])__filename/g, `String.raw\`${sourceFileName}\``)
       .replace(/require\(["']([^./\\][^"'\n\r]*)["']\)/g, (_str, mPath: string) => {
         const resolvedPath = JSON.stringify(resolvePathAlias(mPath, config, rootDir, outDir) || mPath);
-        return `require(require.resolve(${resolvedPath}, {paths:[process.cwd(), ${JSON.stringify(process.env.NODE_PATH || "")}]} ))`;
+        return `require(require.resolve(${resolvedPath}, {paths:[process.cwd(), ${nodePathJson}]} ))`;
       });
     if (fixed !== data) {
       fs.writeFileSync(path, fixed);
@@ -232,15 +275,14 @@ export default function compiler(
   function onCompiled(): void {
     const config = parseConfig();
     const rootNames = definedRootNames || config.fileNames;
-    if (outMockFiles.update(rootNames, rootDir, outDir)) {
-      isOutputChanged = true;
-    }
+    const isRootNamesChanged = outMockFiles.update(rootNames, rootDir, outDir);
     log.debug("defined root names", "", rootNames);
     log.debug("TS options", "", config.options);
 
+    const isOutputChanged = isFirstCompile || isRootNamesChanged || emittedFiles.length > 0;
+    isFirstCompile = false;
     emittedFiles.forEach((path) => {
       log.debug("write", path);
-      isOutputChanged = true;
       try {
         fixEmittedFile(path, config);
       } catch (ex) {
@@ -249,10 +291,9 @@ export default function compiler(
     });
     emittedFiles = [];
 
-    if (isOutputChanged && onChanged) {
+    if (isOutputChanged) {
       clearNodeCache(outDir);
       onChanged(outMockFiles.files.filter((f) => !f.rootName.endsWith(".d.ts")));
-      isOutputChanged = false;
     }
   }
 
@@ -292,14 +333,12 @@ export default function compiler(
     }
   }
 
-  // eslint-disable-next-line no-param-reassign
-  // extendCompilerOptions.traceResolution = true;
-
   log.debug("starting typescript compiler", "", tscCommand);
+  const [tscExe, ...tscArgs] = tscCommand;
   const program = spawn(
-    tscCommand[0],
+    tscExe,
     [
-      ...tscCommand.slice(1),
+      ...tscArgs,
       "--project",
       outTsConfigPath,
       "--watch",
@@ -310,16 +349,10 @@ export default function compiler(
       "--locale",
       "en", // output is parsed so it must be in english
     ],
-    { cwd: process.cwd(), stdio: ["ignore", "pipe", "pipe"], windowsHide: true }
+    { stdio: ["ignore", "pipe", "pipe"], windowsHide: true }
   );
 
-  let restOutput = "";
-  program.stdout.setEncoding("utf8");
-  program.stdout.on("data", (chunk: string) => {
-    const lines = (restOutput + chunk).split(/\r?\n/);
-    restOutput = lines.pop() as string;
-    lines.forEach(onOutputLine);
-  });
+  readline.createInterface({ input: program.stdout, crlfDelay: Infinity }).on("line", onOutputLine);
   program.stderr.setEncoding("utf8");
   program.stderr.on("data", (chunk: string) => log.error(chunk));
   program.on("error", (err) => log.error("Unable to start typescript compiler", err));
