@@ -74,7 +74,7 @@
   "peerDependencies": {
     "@types/multer": "*",
     "express": "*",
-    "typescript": ">=2.7"
+    "typescript": ">=6.0"
   },
   "files": [
     "lib/*",
